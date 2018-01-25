@@ -1,0 +1,5 @@
+<!--The content below is only a placeholder and can be replaced.-->
+<app-header *ngIf="currentRoute !== 'home'"></app-header>
+<div [class.main-view]="currentRoute !== 'home'">
+  <router-outlet></router-outlet>
+</div>

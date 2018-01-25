@@ -1,0 +1,12 @@
+<form>
+  <div class="form-group">
+    <label for="homeAddress">Home Address</label>
+    <input id="homeAddress" class="form-control" [(ngModel)]="homeLocationText" appGpComplete name="home-location" />
+    <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+  </div>
+  <div class="form-group">
+    <label for="workAddress">Work Address</label>
+    <input id="workAddress" class="form-control" [(ngModel)]="workLocationText" appGpComplete name="work-location" />
+  </div>
+  <button type="submit" class="btn btn-primary">Submit</button>
+</form>
