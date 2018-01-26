@@ -8,5 +8,18 @@
     <label for="workAddress">Work Address</label>
     <input id="workAddress" class="form-control" [(ngModel)]="workLocationText" appGpComplete name="work-location" />
   </div>
+  <div>
+    <label>Lunch Interval</label>
+    <code>someRange2: {{ someRange2 | json }}</code>
+    <nouislider [config]="someRange2config" [limit]="10" [(ngModel)]="someRange2" [ngModelOptions]="{standalone: true}"></nouislider>
+
+  </div>
+  <br>
+  <div>
+    <label>Dinner Interval</label>
+    <code>someRange2: {{ someRange2 | json }}</code>
+    <nouislider [config]="someRange2config" [limit]="10" [(ngModel)]="someRange2" [ngModelOptions]="{standalone: true}"></nouislider>
+  </div>
+  <br>
   <button type="submit" class="btn btn-primary">Submit</button>
 </form>
