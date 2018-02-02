@@ -1,0 +1,84 @@
+
+import requests
+import json
+def getLocationInformation(event, context):
+    # print(event)
+    # print(event.start_placeid)
+    # print(event.end_placeid)
+    #
+    # if event.start_placeid is None or len(event.start_placeid) == 0:
+    #     return {'status': 'Error'}
+    #
+    # if event.end_placeid is None or len(event.end_placeid) == 0:
+    #     return {'status': 'Error'}
+    #
+    # if event.mode is None:
+    #     return {'status': 'Error'}
+    #
+    #
+    # start_placeid = ""
+    # for placeid in event.start_placeid:
+    #     start_placeid += placeid + "|"
+    #
+    #
+    # start_placeid = start_placeid[0:-1]
+    #
+    # end_placeid = ""
+    # for placeid in event.end_placeid:
+    #     end_placeid += placeid + '|'
+    #
+    # end_placeid = end_placeid[0:-1]
+    # '''
+
+
+
+    start_placeid = "place_id:ChIJSxh5JbJqkFQRxI1KoO7oZHs"
+    end_placeid = "place_id:ChIJ55fLWVtBkFQR0v31eadEoLM|place_id:ChIJ3S-JXmauEmsRUcIaWtf4MzE"
+
+    mode = "bicycling"
+    key = "AIzaSyAFcqYxQE7IZjZtZ7tgMt_wb_1ghRCKbXk"
+
+    url = "https://maps.googleapis.com/maps/api/distancematrix/json"
+    params = {"origins":start_placeid,
+              "destinations": end_placeid,
+              "mode":mode,
+              "key": key}
+
+    response = requests.get(url, params)
+
+    if not response.ok:
+        return {'status': 'Error'}
+
+    json_response = json.loads(response.content)
+    if json_response['status'] != 'OK':
+        return {'status': 'Error'}
+
+    print(json_response)
+
+    if json_response is None:
+        return {'status': 'Error'}
+
+
+    result = []
+
+    if 'rows' not in  json_response or len(json_response['rows']) == 0:
+        return  None
+
+    for row in json_response['rows']:
+        if 'elements' not in row or len(row['elements']) == 0:
+            continue
+        for element in row['elements']:
+            elem = {}
+            if element['status'] == 'OK':
+                elem['status'] = 'Ok'
+                elem['distance_text'] = element['distance']['text']
+                elem['distance_value'] = element['distance']['value']
+                elem['duration_text'] = element['duration']['text']
+                elem['duration_value'] = element['duration']['value']
+            else:
+                elem['status'] = 'Error'
+            result.append(elem)
+
+
+    print result
+    return {'status': 'Ok' , "result":result}
