@@ -24,6 +24,7 @@ import { UserParametersService } from './services/user-parameters.service';
 import { UserLoginService } from './services/user-login.service';
 import { CentralApiService } from './services/central-api.service';
 import { ProfileService } from './profile/shared/profile.service';
+import { EventsService } from './calendar-view/shared/events.service';
 
 import * as $ from 'jquery';
 import * as bootstrap from 'bootstrap';
@@ -77,6 +78,7 @@ import { AuthInterceptor } from './apiinterceptor';
     UserParametersService,
     ProfileService,
     CentralApiService,
+    EventsService
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
