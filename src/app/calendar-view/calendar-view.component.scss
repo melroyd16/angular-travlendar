@@ -13,3 +13,11 @@ pre {
   background-color: aliceblue;
   box-shadow: inset 0 0 15px 0 rgba(0, 0, 0, 0.5);
 }
+
+.add-event-row {
+    margin-top: 20px;
+    float: right;
+    .add-icon {
+        margin-right: 5px;
+    }
+}

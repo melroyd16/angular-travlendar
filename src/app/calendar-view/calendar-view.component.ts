@@ -28,6 +28,7 @@ import { LoggedInCallback } from '../services/cognito.service';
 import { Router } from '@angular/router';
 
 import { ProfileService } from '../profile/shared/profile.service';
+import { EventsService } from './shared/events.service';
 import { Location } from '../classes/location';
 
 const colors: any = {
@@ -120,7 +121,10 @@ export class CalendarViewComponent implements OnInit {
 
   activeDayIsOpen = true;
 
-  constructor(private modal: NgbModal, public router: Router, public userService: UserLoginService, public profileService: ProfileService) {
+  constructor(private modal: NgbModal, public router: Router,
+    public userService: UserLoginService,
+    public profileService: ProfileService,
+    public eventsService: EventsService) {
     this.userService.isAuthenticated(this);
   }
 
@@ -136,6 +140,22 @@ export class CalendarViewComponent implements OnInit {
       this.homeLocation = this.profileService.userProfile.homeLocation;
       this.workLocation = this.profileService.userProfile.workLocation;
     }
+
+    this.eventsService.fetchEvents().subscribe((eventList) => {
+      for (let i = 0; i < eventList.Items.length; i++) {
+        this.events.push({
+          title: eventList.Items[i].eventTitle,
+          start: new Date(eventList.Items[i].eventStart),
+          end: new Date(eventList.Items[i].eventEnd),
+          color: colors.red,
+          draggable: true,
+          resizable: {
+            beforeStart: true,
+            afterEnd: true
+          }
+        });
+      }
+    });
   }
 
   isLoggedIn(message: string, isLoggedIn: boolean) {
