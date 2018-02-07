@@ -36,7 +36,7 @@ import { LogoutComponent, RegistrationConfirmationComponent } from './public/aut
 import { ResendCodeComponent } from './public/auth/resend/resendCode.component';
 import { NewPasswordComponent } from './public/auth/newpassword/newpassword.component';
 import { AuthInterceptor } from './apiinterceptor';
-import {NouisliderModule} from 'ng2-nouislider';
+import {IonRangeSliderModule} from 'ng2-ion-range-slider';
 
 @NgModule({
   declarations: [
@@ -64,8 +64,8 @@ import {NouisliderModule} from 'ng2-nouislider';
     BrowserModule,
     BrowserAnimationsModule,
     CommonModule,
-    NouisliderModule,
     FormsModule,
+    IonRangeSliderModule,
     HttpModule,
     HttpClientModule,
     routing
