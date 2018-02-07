@@ -29,8 +29,6 @@ import { EventsService } from './calendar-view/shared/events.service';
 import * as $ from 'jquery';
 import * as bootstrap from 'bootstrap';
 
-
-
 import { AboutComponent, HomeComponent, HomeLandingComponent } from './public/home.component';
 import { LoginComponent } from './public/auth/login/login.component';
 import { RegisterComponent } from './public/auth/register/registration.component';
@@ -39,6 +37,7 @@ import { LogoutComponent, RegistrationConfirmationComponent } from './public/aut
 import { ResendCodeComponent } from './public/auth/resend/resendCode.component';
 import { NewPasswordComponent } from './public/auth/newpassword/newpassword.component';
 import { AuthInterceptor } from './apiinterceptor';
+import {IonRangeSliderModule} from 'ng2-ion-range-slider';
 
 @NgModule({
   declarations: [
@@ -67,6 +66,7 @@ import { AuthInterceptor } from './apiinterceptor';
     BrowserAnimationsModule,
     CommonModule,
     FormsModule,
+    IonRangeSliderModule,
     HttpModule,
     HttpClientModule,
     routing
