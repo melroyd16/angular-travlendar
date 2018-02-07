@@ -3,16 +3,16 @@ import { TravelMode } from './travel-mode';
 
 export class Event {
   eventTitle: String;
-  eventStart: int;
-  eventEnd: int;
+  eventStart: number;
+  eventEnd: number;
   destination: Location;
   origin: Location;
   travelMode: TravelMode;
 
   constructor(
     eventTitle: String,
-    eventStart: int,
-    eventEnd: int,
+    eventStart: number,
+    eventEnd: number,
     destination: Location,
     origin: Location,
     travelMode: TravelMode

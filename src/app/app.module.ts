@@ -78,12 +78,13 @@ import { AuthInterceptor } from './apiinterceptor';
     UserParametersService,
     ProfileService,
     CentralApiService,
-    EventsService
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
       multi: true,
-    }
+    },
+    EventsService
+
   ],
   bootstrap: [AppComponent]
 })

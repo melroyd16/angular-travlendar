@@ -3,7 +3,8 @@ import {
   ChangeDetectionStrategy,
   ViewChild,
   TemplateRef,
-  OnInit
+  OnInit,
+  ChangeDetectorRef
 } from '@angular/core';
 import {
   startOfDay,
@@ -49,14 +50,14 @@ const colors: any = {
 @Component({
   selector: 'app-calendar-view',
   templateUrl: './calendar-view.component.html',
-  styleUrls: ['./calendar-view.component.scss'],
-  changeDetection: ChangeDetectionStrategy.OnPush,
+  styleUrls: ['./calendar-view.component.scss']
 })
 export class CalendarViewComponent implements OnInit {
   @ViewChild('modalContent') modalContent: TemplateRef<any>;
 
   view = 'month';
   displayLocationModal: boolean;
+  eventsLoaded = false;
   homeLocation: Location;
   workLocation: Location;
 
@@ -129,6 +130,7 @@ export class CalendarViewComponent implements OnInit {
   }
 
   ngOnInit() {
+    console.log(this);
     const userProfile = this.profileService.getUserProfile();
     if (!this.profileService.userProfile || !this.profileService.userProfile.homeLocation) {
       this.profileService.fetchUserProfile().subscribe((locationDetails) => {
@@ -142,6 +144,8 @@ export class CalendarViewComponent implements OnInit {
     }
 
     this.eventsService.fetchEvents().subscribe((eventList) => {
+      this.eventsLoaded = true;
+      console.log(this);
       for (let i = 0; i < eventList.Items.length; i++) {
         this.events.push({
           title: eventList.Items[i].eventTitle,
