@@ -1,75 +1,12 @@
 <form>
   <div class="form-group">
     <label for="homeAddress">Home Address</label>
-    <input id="homeAddress" class="form-control" [(ngModel)]="homeLocationText" appGpComplete name="home-location"/>
+    <input id="homeAddress" class="form-control" [(ngModel)]="homeLocationText" appGpComplete name="home-location" />
     <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
   </div>
   <div class="form-group">
     <label for="workAddress">Work Address</label>
-    <input id="workAddress" class="form-control" [(ngModel)]="workLocationText" appGpComplete name="work-location"/>
-  </div>
-  <div class="form-group">
-    <label>Lunch Time</label>
-    ({{advancedSlider1.onUpdate?.from}} - {{advancedSlider1.onUpdate?.to}})
-    <ion-range-slider #lunchSliderElement
-                      type="double"
-                      from="1"
-                      from_shadow="true"
-                      to="5"
-                      [values]="['11:00am','11:15am', '11:30am', '11:45am', '12:00pm', '12:15pm', '12:30pm', '12:45pm', '01:00pm', '01:15pm', '01:30pm','01:45pm', '02:00pm', '02:15pm', '02:30pm', '02:45pm', '03:00pm']"
-                      to_shadow="true"
-                      grid_num="17"
-                      prefix="Time: "
-                      drag_interval="true"
-                      decorate_both="true"
-                      [prettify_enabled]="true"
-                      (onUpdate)="update(advancedSlider1,$event)"
-                      (onChange)="update(advancedSlider1, $event)"
-                      (onFinish)="finish(advancedSlider1, $event)"></ion-range-slider>
-  </div>
-  <div class="form-group">
-
-    <label>Dinner Time</label>
-    ({{advancedSlider.onUpdate?.from}} - {{advancedSlider.onUpdate?.to}})
-
-    <ion-range-slider #DinnerSliderElement
-                      type="double"
-                      from="1"
-                      from_shadow="true"
-                      to="5"
-                      [values]="['06:00pm','06:15pm', '06:30am', '06:45am', '07:00pm', '07:15pm', '07:30pm', '07:45pm', '08:00pm', '08:15pm', '08:30pm','08:45pm', '09:00pm', '09:15pm', '09:30pm', '09:45pm', '10:00pm']"
-                      to_shadow="true"
-                      grid_num="17"
-                      prefix="Time: "
-                      drag_interval="true"
-                      decorate_both="true"
-                      [prettify_enabled]="true"
-                      (onUpdate)="update(advancedSlider,$event)"
-                      (onChange)="update(advancedSlider, $event)"
-                      (onFinish)="finish(advancedSlider, $event)"></ion-range-slider>
-  </div>
-  <br>
-  <div class="form-group">
-    <p>
-      <label>Preferred Mode of Travel</label>
-      <br>
-      <label [class.selected]="cb1.checked">
-        <input #cb1 type="checkbox" value="Driving" (change)="logCheckbox(cb1)"> Driving
-      </label>
-      <br>
-      <label [class.selected]="cb2.checked">
-        <input #cb2 type="checkbox" value="Biking" (change)="logCheckbox(cb2)"> Biking
-      </label>
-      <br>
-      <label [class.selected]="cb3.checked">
-        <input #cb3 type="checkbox" value="Flight" (change)="logCheckbox(cb3)"> Flight
-      </label>
-      <br>
-    </p>
-    Log
-    <button (click)="log=''">Clear</button>
-    <pre>{{log}}</pre>
-    <!--styles: ['.selected {color: OrangeRed;}']-->
+    <input id="workAddress" class="form-control" [(ngModel)]="workLocationText" appGpComplete name="work-location" />
   </div>
   <button type="submit" class="btn btn-primary">Submit</button>
 </form>
