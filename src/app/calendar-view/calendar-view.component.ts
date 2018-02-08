@@ -4,7 +4,8 @@ import {
   ViewChild,
   TemplateRef,
   OnInit,
-  ChangeDetectorRef
+  ChangeDetectorRef,
+  ApplicationRef
 } from '@angular/core';
 import {
   startOfDay,
@@ -70,14 +71,15 @@ export class CalendarViewComponent implements OnInit {
   eventStartMinDate: Date = new Date();
   viewDate: Date = new Date();
   activeDayIsOpen = false;
-  displayEventModal = false;
+
+  displayDeleteModal: boolean;
 
   modalData: {
     action: string;
     event: CalendarEvent;
   };
 
-  actions: CalendarEventAction[] = [
+  eventActions: CalendarEventAction[] = [
     {
       label: '<i class="fa fa-fw fa-pencil"></i>',
       onClick: ({ event }: { event: CalendarEvent }): void => {
@@ -87,8 +89,12 @@ export class CalendarViewComponent implements OnInit {
     {
       label: '<i class="fa fa-fw fa-times"></i>',
       onClick: ({ event }: { event: CalendarEvent }): void => {
-        this.events = this.events.filter(iEvent => iEvent !== event);
-        this.handleEvent('Deleted', event);
+        $('#deleteModal').modal('toggle');
+        this.deleteEventId = event.id;
+        // console.log(this.deleteEventId);
+        // console.log(this.events[0].title);
+        // this.events = this.events.filter(iEvent => iEvent !== event);
+        // this.handleEvent('Deleted', event);
       }
     }
   ];
@@ -100,13 +106,17 @@ export class CalendarViewComponent implements OnInit {
   constructor(private modal: NgbModal, public router: Router,
     public userService: UserLoginService,
     public profileService: ProfileService,
-    public eventsService: EventsService) {
+    public eventsService: EventsService,
+    private ref: ApplicationRef) {
     this.userService.isAuthenticated(this);
     this.locationTypes = ['home', 'work', 'prior event location', 'other'];
     this.selectedPriorLocation = 'home';
   }
 
   ngOnInit() {
+
+    this.displayDeleteModal = false;
+
     const userProfile = this.profileService.getUserProfile();
     if (!this.profileService.userProfile || !this.profileService.userProfile.homeLocation) {
       this.profileService.fetchUserProfile().subscribe((locationDetails) => {
@@ -123,9 +133,12 @@ export class CalendarViewComponent implements OnInit {
     }
     console.log(userProfile);
     this.eventsService.fetchEvents().subscribe((eventList) => {
+
       this.eventsLoaded = true;
       for (let i = 0; i < eventList.Items.length; i++) {
         this.events.push({
+
+          id: eventList.Items[i].id;
           title: eventList.Items[i].eventTitle,
           start: new Date(eventList.Items[i].eventStart),
           end: new Date(eventList.Items[i].eventEnd),
@@ -134,7 +147,9 @@ export class CalendarViewComponent implements OnInit {
           resizable: {
             beforeStart: true,
             afterEnd: true
-          }
+          },
+          // actions: eventActions
+          actions: this.eventActions
         });
       }
     });
@@ -212,10 +227,6 @@ export class CalendarViewComponent implements OnInit {
     this.modal.open(this.modalContent, { size: 'lg' });
   }
 
-  openEventModal(): void {
-    this.displayEventModal = true;
-  }
-
   addEvent(): void {
     this.events.push({
       title: 'New event',
@@ -230,4 +241,29 @@ export class CalendarViewComponent implements OnInit {
     });
     this.refresh.next();
   }
+
+// REQUIRED??
+  closeDeleteModal(): void {
+    $("#deleteModal").modal('toggle');
+    // $timeout(function () {
+    //     vm.displayDeleteModal = false;
+    // }, 1000);
+  }
+
+// DELETE EVENT
+deleteEvent(): void {
+  console.log(this.deleteEventId);
+  this.closeDeleteModal();
+  this.eventsService.deleteEvent(this.deleteEventId).subscribe(() => {
+    for (let i = 0; i < this.events.length; i++) {
+      if (this.events[i].id === this.deleteEventId) {
+        this.events.splice(i, 1);
+        this.ref.tick();
+        console.log("SUCCESSFULLY DELETED!!");
+      }
+    }
+  });
+}
+
+
 }
