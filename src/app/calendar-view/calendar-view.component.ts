@@ -31,6 +31,9 @@ import { Router } from '@angular/router';
 import { ProfileService } from '../profile/shared/profile.service';
 import { EventsService } from './shared/events.service';
 import { Location } from '../classes/location';
+import { Event } from '../classes/event';
+
+import * as moment from 'moment';
 
 const colors: any = {
   red: {
@@ -60,6 +63,7 @@ export class CalendarViewComponent implements OnInit {
   eventsLoaded = false;
   homeLocation: Location;
   workLocation: Location;
+  eventStartMinDate: Date = new Date();
 
   viewDate: Date = new Date();
 
@@ -130,7 +134,6 @@ export class CalendarViewComponent implements OnInit {
   }
 
   ngOnInit() {
-    console.log(this);
     const userProfile = this.profileService.getUserProfile();
     if (!this.profileService.userProfile || !this.profileService.userProfile.homeLocation) {
       this.profileService.fetchUserProfile().subscribe((locationDetails) => {
@@ -145,7 +148,6 @@ export class CalendarViewComponent implements OnInit {
 
     this.eventsService.fetchEvents().subscribe((eventList) => {
       this.eventsLoaded = true;
-      console.log(this);
       for (let i = 0; i < eventList.Items.length; i++) {
         this.events.push({
           title: eventList.Items[i].eventTitle,
@@ -160,6 +162,13 @@ export class CalendarViewComponent implements OnInit {
         });
       }
     });
+    this.initEvent();
+  }
+
+  initEvent(): void {
+    this.event = new Event();
+    this.event.eventStart = new Date();
+    this.event.eventEnd = moment().add('hours', 1);
   }
 
   isLoggedIn(message: string, isLoggedIn: boolean) {
@@ -171,8 +180,10 @@ export class CalendarViewComponent implements OnInit {
   selectAddress(place: any, location: string) {
     if (location === 'home') {
       this.homeLocation = new Location(place.place_id, place.formatted_address);
-    } else {
+    } else if (location === 'work') {
       this.workLocation = new Location(place.place_id, place.formatted_address);
+    } else {
+      this.event.destination = new Location(place.place_id, place.formatted_address);
     }
   }
 
@@ -195,6 +206,10 @@ export class CalendarViewComponent implements OnInit {
         this.viewDate = date;
       }
     }
+  }
+
+  saveEvent(): void {
+    console.log(this.event);
   }
 
   eventTimesChanged({
