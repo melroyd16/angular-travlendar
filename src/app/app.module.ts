@@ -26,6 +26,7 @@ import { UserLoginService } from './services/user-login.service';
 import { CentralApiService } from './services/central-api.service';
 import { ProfileService } from './profile/shared/profile.service';
 import { EventsService } from './calendar-view/shared/events.service';
+import { CalendarService } from './calendar-view/shared/calendar.service';
 
 import * as $ from 'jquery';
 import * as bootstrap from 'bootstrap';
@@ -88,7 +89,8 @@ import { AuthInterceptor } from './apiinterceptor';
       useClass: AuthInterceptor,
       multi: true,
     },
-    EventsService
+    EventsService,
+    CalendarService
 
   ],
   bootstrap: [AppComponent]

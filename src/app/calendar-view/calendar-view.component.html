@@ -110,6 +110,18 @@
               <input id="otherLocation" class="form-control" (onSelect)="selectAddress($event, 'other')" appGpComplete/>
             </div>
           </div>
+          <div class="form-group" *ngIf="displayTravelModes">
+            <label>Travel Mode:</label>
+            <table class="travel-mode-table">
+              <tr *ngFor="let travelMode of travelModeArray">
+                <td><input type="radio" [(ngModel)]="event.travelMode" [value]="travelMode.mode" name="travelMode"></td>
+                <td><i class="fa fa-{{travelMode.icon}} travel-mode-icon"></i></td>
+                <td>{{travelMode.mode}}</td>
+                <td>{{travelMode.value.distance.text}}</td>
+                <td>{{travelMode.value.duration.text}}</td>
+              </tr>
+            </table>
+          </div>
         </form>
       </div>
       <div class="modal-footer">

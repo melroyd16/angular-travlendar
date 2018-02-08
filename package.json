@@ -29,6 +29,7 @@
     "angular-calendar": "^0.21.3",
     "aws-sdk": "^2.149.0",
     "core-js": "^2.4.1",
+    "google-distance-matrix": "^1.1.1",
     "jquery": "^3.2.1",
     "moment": "^2.20.1",
     "moment-timezone": "^0.5.14",
