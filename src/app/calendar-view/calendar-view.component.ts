@@ -31,6 +31,7 @@ import { Router } from '@angular/router';
 
 import { ProfileService } from '../profile/shared/profile.service';
 import { EventsService } from './shared/events.service';
+import { CalendarService } from './shared/calendar.service';
 import { Location } from '../classes/location';
 import { Event } from '../classes/event';
 
@@ -64,15 +65,21 @@ export class CalendarViewComponent implements OnInit {
   eventsLoaded = false;
   homeLocation: Location;
   workLocation: Location;
-  locationTypes: String[];
-  selectedPriorLocation: String;
+  eventPayload: any;
   event: Event;
   otherLocationDetails: Location;
   eventStartMinDate: Date = new Date();
   viewDate: Date = new Date();
   activeDayIsOpen = false;
-
   displayDeleteModal: boolean;
+  displayEventModal = false;
+  displayTravelModes = false;
+  displayModalError = false;
+  forceSaveEvent = false;
+  scheduleModalError = '';
+  locationTypes = ['home', 'work', 'prior event location', 'other'];
+  selectedPriorLocation = 'home';
+  travelModeArray = [];
 
   modalData: {
     action: string;
@@ -107,10 +114,9 @@ export class CalendarViewComponent implements OnInit {
     public userService: UserLoginService,
     public profileService: ProfileService,
     public eventsService: EventsService,
+    public calendarService: CalendarService,
     private ref: ApplicationRef) {
     this.userService.isAuthenticated(this);
-    this.locationTypes = ['home', 'work', 'prior event location', 'other'];
-    this.selectedPriorLocation = 'home';
   }
 
   ngOnInit() {
@@ -131,26 +137,11 @@ export class CalendarViewComponent implements OnInit {
       this.homeLocation = this.profileService.userProfile.homeLocation;
       this.workLocation = this.profileService.userProfile.workLocation;
     }
-    console.log(userProfile);
     this.eventsService.fetchEvents().subscribe((eventList) => {
 
       this.eventsLoaded = true;
       for (let i = 0; i < eventList.Items.length; i++) {
-        this.events.push({
-
-          id: eventList.Items[i].id;
-          title: eventList.Items[i].eventTitle,
-          start: new Date(eventList.Items[i].eventStart),
-          end: new Date(eventList.Items[i].eventEnd),
-          color: colors.red,
-          draggable: true,
-          resizable: {
-            beforeStart: true,
-            afterEnd: true
-          },
-          // actions: eventActions
-          actions: this.eventActions
-        });
+        this.addEvent(eventList.Items[i].id, eventList.Items[i].eventTitle, eventList.Items[i].eventStart, eventList.Items[i].eventEnd);
       }
     });
     this.initEvent();
@@ -159,7 +150,15 @@ export class CalendarViewComponent implements OnInit {
   initEvent(): void {
     this.event = new Event();
     this.event.eventStart = new Date();
-    this.event.eventEnd = moment().add('hours', 1);
+    this.event.eventEnd = moment().add(1, 'hours');
+    this.displayEventModal = false;
+    this.displayTravelModes = false;
+    this.displayModalError = false;
+    this.forceSaveEvent = false;
+    this.scheduleModalError = '';
+    this.selectedPriorLocation = 'home';
+    this.travelModeArray = [];
+    this.otherLocationDetails = new Location();
   }
 
   isLoggedIn(message: string, isLoggedIn: boolean) {
@@ -171,16 +170,21 @@ export class CalendarViewComponent implements OnInit {
   selectAddress(place: any, location: string) {
     switch (location) {
       case 'home':
-        this.homeLocation = new Location(place.place_id, place.formatted_address);
+        this.homeLocation = new Location(place.place_id, place.formatted_address,
+          place.geometry.location.lat(), place.geometry.location.lng());
         break;
       case 'work':
-        this.workLocation = new Location(place.place_id, place.formatted_address);
+        this.workLocation = new Location(place.place_id, place.formatted_address,
+          place.geometry.location.lat(), place.geometry.location.lng());
         break;
       case 'event':
-        this.event.destination = new Location(place.place_id, place.formatted_address);
+        this.event.destination = new Location(place.place_id, place.formatted_address,
+          place.geometry.location.lat(), place.geometry.location.lng());
+        this.changeLocation();
         break;
-      case 'event':
-        this.otherLocationDetails = new Location(place.place_id, place.formatted_address);
+      case 'other':
+        this.otherLocationDetails = new Location(place.place_id, place.formatted_address,
+          place.geometry.location.lat(), place.geometry.location.lng());
         break;
     }
   }
@@ -207,8 +211,29 @@ export class CalendarViewComponent implements OnInit {
   }
 
   saveEvent(): void {
-    console.log(this.event);
-    console.log(this.selectedPriorLocation);
+    this.eventPayload = Object.assign({}, this.event);
+    this.eventPayload.eventStart = new Date(this.eventPayload.eventStart).getTime();
+    this.eventPayload.eventEnd = new Date(this.eventPayload.eventEnd).getTime();
+    for (let i = 0; i < this.travelModeArray.length; i++) {
+      if (this.eventPayload.travelMode === this.travelModeArray[i].mode) {
+        this.eventPayload.travelMode = {
+          mode: this.travelModeArray[i].mode,
+          distance: this.travelModeArray[i].value.distance,
+          duration: this.travelModeArray[i].value.duration
+        };
+      }
+    }
+    this.eventsService.saveEvent(this.eventPayload, this.forceSaveEvent).subscribe((data) => {
+      if (data.errorMessage && data.errorMessage === 'Conflict') {
+        this.displayModalError = true;
+        this.forceSaveEvent = true;
+        this.scheduleModalError = 'This event conflicts with another scheduled event. Click Continue to proceed anyways.';
+      } else {
+        this.addEvent(data,this.eventPayload.eventTitle, this.eventPayload.eventStart, this.eventPayload.eventEnd);
+        $('#eventModal').modal('hide');
+        this.initEvent();
+      }
+    });
   }
 
   eventTimesChanged({
@@ -227,17 +252,37 @@ export class CalendarViewComponent implements OnInit {
     this.modal.open(this.modalContent, { size: 'lg' });
   }
 
-  addEvent(): void {
+  openEventModal(): void {
+    this.displayEventModal = true;
+  }
+
+  changeLocation(): void {
+    this.event.travelMode = null;
+    if (!(this.event.origin && this.event.origin.place_id)) {
+      this.event.origin = this.homeLocation;
+    }
+    if (this.event.origin && this.event.origin.place_id && this.event.destination && this.event.destination.place_id) {
+      this.calendarService.fetchTransitDetails(this.event.origin, this.event.destination).subscribe((data) => {
+        this.travelModeArray = data;
+        this.displayTravelModes = true;
+        this.ref.tick();
+      });
+    }
+  }
+
+  addEvent(eventId, eventTitle, eventStart, eventEnd): void {
     this.events.push({
-      title: 'New event',
-      start: startOfDay(new Date()),
-      end: endOfDay(new Date()),
+      id: eventId
+      title: eventTitle,
+      start: new Date(eventStart),
+      end: new Date(eventEnd),
       color: colors.red,
       draggable: true,
       resizable: {
         beforeStart: true,
         afterEnd: true
-      }
+      },
+      actions: this.eventActions
     });
     this.refresh.next();
   }

@@ -9,13 +9,11 @@ export class EventsService {
   constructor(public centralAPIService: CentralApiService) { }
 
   fetchEvents(): Observable<any> {
-    console.log('within fetch events');
     const payload = {
       operation: 'fetchEvents'
     };
     return this.centralAPIService.callAPI('events', payload, 'post');
   }
-
 
   deleteEvent(eventID): Observable<any> {
     console.log('within delete event.');
@@ -24,6 +22,15 @@ export class EventsService {
       eventID: eventID
     };
     return this.centralAPIService.callAPI('events', payload, "post");
+  }
+
+  saveEvent(eventDetails: any, forceSaveEvent: boolean): Observable<any> {
+    const payload = {
+      operation: 'saveEvent',
+      eventDetails: eventDetails,
+      forceSaveEvent: forceSaveEvent
+    };
+    return this.centralAPIService.callAPI('events', payload, 'post');
   }
 
 }
