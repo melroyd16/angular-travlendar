@@ -70,6 +70,7 @@ export class CalendarViewComponent implements OnInit {
   eventStartMinDate: Date = new Date();
   viewDate: Date = new Date();
   activeDayIsOpen = false;
+  displayEventModal = false;
 
   modalData: {
     action: string;
@@ -209,6 +210,10 @@ export class CalendarViewComponent implements OnInit {
   handleEvent(action: string, event: CalendarEvent): void {
     this.modalData = { event, action };
     this.modal.open(this.modalContent, { size: 'lg' });
+  }
+
+  openEventModal(): void {
+    this.displayEventModal = true;
   }
 
   addEvent(): void {
