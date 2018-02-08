@@ -62,10 +62,10 @@
 </div>
 
 <div class="row add-event-row">
-  <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#eventModal"><i class="fa fa-plus add-icon" aria-hidden="true"></i>Add Event</button>
+  <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#eventModal" (click)="openEventModal()"><i class="fa fa-plus add-icon" aria-hidden="true"></i>Add Event</button>
 </div>
 
-<div class="modal fade" id="eventModal" tabindex="-1" role="dialog" aria-labelledby="eventModalLabel" aria-hidden="true">
+<div class="modal fade" id="eventModal" tabindex="-1" role="dialog" aria-labelledby="eventModalLabel" aria-hidden="true" *ngIf="displayEventModal">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -75,11 +75,58 @@
         </button>
       </div>
       <div class="modal-body">
-        Body of the Modal
+        <form>
+          <div class="form-group">
+            <label for="eventTitle">Event Title</label>
+            <input type="text" name="eventTitle" [(ngModel)]="event.eventTitle" class="form-control" id="eventTitle" placeholder="Enter event title">
+          </div>
+          <div class="form-group row">
+            <div class="col-xs-12 col-md-6">
+              <label for="eventStart">Event Start</label>
+              <input name="eventStart" [(ngModel)]="event.eventStart" class="form-control" [owlDateTimeTrigger]="dtPicker1" [owlDateTime]="dtPicker1" [min]="eventStartMinDate">
+              <owl-date-time #dtPicker1></owl-date-time>
+            </div>
+            <div class="col-xs-12 col-md-6">
+              <label for="eventEnd">Event End</label>
+              <input name="eventEnd" [(ngModel)]="event.eventEnd" class="form-control" [owlDateTimeTrigger]="dtPicker2" [owlDateTime]="dtPicker2" [min]="event.eventStart">
+              <owl-date-time #dtPicker2></owl-date-time>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="eventLocation">Event Location</label>
+            <input id="eventLocation" class="form-control" (onSelect)="selectAddress($event, 'event')" appGpComplete/>
+          </div>
+          <div class="form-group">
+            <label for="previousLocation">Previous Location</label>
+            <select class="form-control" id="previousLocation" [(ngModel)]="selectedPriorLocation" name="previousLocation">
+            <option *ngFor="let locationType of locationTypes" [value]="locationType">{{locationType}}</option>
+          </select>
+          </div>
+          <div [ngSwitch]="selectedPriorLocation">
+            <p *ngSwitchCase="'home'" class="text-info">{{homeLocation.formatted_address}}</p>
+            <p *ngSwitchCase="'work'" class="text-info">{{workLocation.formatted_address}}</p>
+            <div *ngSwitchCase="'other'" class="form-group">
+              <label for="otherLocation">Event Location</label>
+              <input id="otherLocation" class="form-control" (onSelect)="selectAddress($event, 'other')" appGpComplete/>
+            </div>
+          </div>
+          <div class="form-group" *ngIf="displayTravelModes">
+            <label>Travel Mode:</label>
+            <table class="travel-mode-table">
+              <tr *ngFor="let travelMode of travelModeArray">
+                <td><input type="radio" [(ngModel)]="event.travelMode" [value]="travelMode.mode" name="travelMode"></td>
+                <td><i class="fa fa-{{travelMode.icon}} travel-mode-icon"></i></td>
+                <td>{{travelMode.mode}}</td>
+                <td>{{travelMode.value.distance.text}}</td>
+                <td>{{travelMode.value.duration.text}}</td>
+              </tr>
+            </table>
+          </div>
+        </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
+        <button type="button" class="btn btn-primary" (click)="saveEvent()">Save changes</button>
       </div>
     </div>
   </div>
@@ -97,7 +144,6 @@
           <div class="form-group">
             <label for="homeAddress">Home Address</label>
             <input id="homeAddress" class="form-control" (onSelect)="selectAddress($event, 'home')" appGpComplete/>
-            <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
           </div>
           <div class="form-group">
             <label for="workAddress">Work Address</label>

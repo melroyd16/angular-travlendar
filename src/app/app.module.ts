@@ -15,6 +15,7 @@ import { CalendarViewComponent } from './calendar-view/calendar-view.component';
 import { HeaderComponent } from './header/header.component';
 import { ProfileComponent } from './profile/profile.component';
 import { GpCompleteDirective } from './directives/gp-complete.directive';
+import { OwlDateTimeModule, OwlNativeDateTimeModule } from 'ng-pick-datetime';
 
 import { CognitoUtil } from './services/cognito.service';
 import { routing } from './app.routes';
@@ -25,9 +26,11 @@ import { UserLoginService } from './services/user-login.service';
 import { CentralApiService } from './services/central-api.service';
 import { ProfileService } from './profile/shared/profile.service';
 import { EventsService } from './calendar-view/shared/events.service';
+import { CalendarService } from './calendar-view/shared/calendar.service';
 
 import * as $ from 'jquery';
 import * as bootstrap from 'bootstrap';
+import * as moment from 'moment';
 
 
 
@@ -71,7 +74,10 @@ import {IonRangeSliderModule} from 'ng2-ion-range-slider';
     IonRangeSliderModule,
     HttpModule,
     HttpClientModule,
-    routing
+    routing,
+    OwlDateTimeModule,
+    OwlNativeDateTimeModule,
+    BrowserAnimationsModule
   ],
   providers: [CognitoUtil,
     AwsUtil,
@@ -85,7 +91,8 @@ import {IonRangeSliderModule} from 'ng2-ion-range-slider';
       useClass: AuthInterceptor,
       multi: true,
     },
-    EventsService
+    EventsService,
+    CalendarService
 
   ],
   bootstrap: [AppComponent]

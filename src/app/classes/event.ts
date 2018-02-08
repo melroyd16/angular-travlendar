@@ -2,20 +2,20 @@ import { Location } from './location';
 import { TravelMode } from './travel-mode';
 
 export class Event {
-  eventTitle: String;
-  eventStart: number;
-  eventEnd: number;
-  destination: Location;
-  origin: Location;
-  travelMode: TravelMode;
+  eventTitle?: String;
+  eventStart?: any;
+  eventEnd?: any;
+  destination?: Location;
+  origin?: Location;
+  travelMode?: TravelMode;
 
   constructor(
-    eventTitle: String,
-    eventStart: number,
-    eventEnd: number,
-    destination: Location,
-    origin: Location,
-    travelMode: TravelMode
+    eventTitle: String = '',
+    eventStart: any = '',
+    eventEnd: any = '',
+    destination: Location = null,
+    origin: Location = null,
+    travelMode: TravelMode = null
   ) {
     this.eventTitle = eventTitle;
     this.eventStart = eventStart;
