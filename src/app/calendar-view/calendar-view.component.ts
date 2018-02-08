@@ -63,9 +63,13 @@ export class CalendarViewComponent implements OnInit {
   eventsLoaded = false;
   homeLocation: Location;
   workLocation: Location;
+  locationTypes: String[];
+  selectedPriorLocation: String;
+  event: Event;
+  otherLocationDetails: Location;
   eventStartMinDate: Date = new Date();
-
   viewDate: Date = new Date();
+  activeDayIsOpen = false;
 
   modalData: {
     action: string;
@@ -90,47 +94,15 @@ export class CalendarViewComponent implements OnInit {
 
   refresh: Subject<any> = new Subject();
 
-  events: CalendarEvent[] = [
-    {
-      start: subDays(startOfDay(new Date()), 1),
-      end: addDays(new Date(), 1),
-      title: 'A 3 day event',
-      color: colors.red,
-      actions: this.actions
-    },
-    {
-      start: startOfDay(new Date()),
-      title: 'An event with no end date',
-      color: colors.yellow,
-      actions: this.actions
-    },
-    {
-      start: subDays(endOfMonth(new Date()), 3),
-      end: addDays(endOfMonth(new Date()), 3),
-      title: 'A long event that spans 2 months',
-      color: colors.blue
-    },
-    {
-      start: addHours(startOfDay(new Date()), 2),
-      end: new Date(),
-      title: 'A draggable and resizable event',
-      color: colors.yellow,
-      actions: this.actions,
-      resizable: {
-        beforeStart: true,
-        afterEnd: true
-      },
-      draggable: true
-    }
-  ];
-
-  activeDayIsOpen = true;
+  events: CalendarEvent[] = [];
 
   constructor(private modal: NgbModal, public router: Router,
     public userService: UserLoginService,
     public profileService: ProfileService,
     public eventsService: EventsService) {
     this.userService.isAuthenticated(this);
+    this.locationTypes = ['home', 'work', 'prior event location', 'other'];
+    this.selectedPriorLocation = 'home';
   }
 
   ngOnInit() {
@@ -139,13 +111,16 @@ export class CalendarViewComponent implements OnInit {
       this.profileService.fetchUserProfile().subscribe((locationDetails) => {
         if (!locationDetails.Item || !locationDetails.Item.homeLocation) {
           $('#locationModal').modal('toggle');
+        } else {
+          this.homeLocation = locationDetails.Item.homeLocation;
+          this.workLocation = locationDetails.Item.workLocation;
         }
       });
     } else {
       this.homeLocation = this.profileService.userProfile.homeLocation;
       this.workLocation = this.profileService.userProfile.workLocation;
     }
-
+    console.log(userProfile);
     this.eventsService.fetchEvents().subscribe((eventList) => {
       this.eventsLoaded = true;
       for (let i = 0; i < eventList.Items.length; i++) {
@@ -178,12 +153,19 @@ export class CalendarViewComponent implements OnInit {
   }
 
   selectAddress(place: any, location: string) {
-    if (location === 'home') {
-      this.homeLocation = new Location(place.place_id, place.formatted_address);
-    } else if (location === 'work') {
-      this.workLocation = new Location(place.place_id, place.formatted_address);
-    } else {
-      this.event.destination = new Location(place.place_id, place.formatted_address);
+    switch (location) {
+      case 'home':
+        this.homeLocation = new Location(place.place_id, place.formatted_address);
+        break;
+      case 'work':
+        this.workLocation = new Location(place.place_id, place.formatted_address);
+        break;
+      case 'event':
+        this.event.destination = new Location(place.place_id, place.formatted_address);
+        break;
+      case 'event':
+        this.otherLocationDetails = new Location(place.place_id, place.formatted_address);
+        break;
     }
   }
 
@@ -210,6 +192,7 @@ export class CalendarViewComponent implements OnInit {
 
   saveEvent(): void {
     console.log(this.event);
+    console.log(this.selectedPriorLocation);
   }
 
   eventTimesChanged({

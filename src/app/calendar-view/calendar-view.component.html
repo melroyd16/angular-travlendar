@@ -65,7 +65,7 @@
   <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#eventModal"><i class="fa fa-plus add-icon" aria-hidden="true"></i>Add Event</button>
 </div>
 
-<div class="modal fade" id="eventModal" tabindex="-1" role="dialog" aria-labelledby="eventModalLabel" aria-hidden="true">
+<div class="modal fade" id="eventModal" tabindex="-1" role="dialog" aria-labelledby="eventModalLabel" aria-hidden="true" *ngIf="eventsLoaded">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -95,6 +95,20 @@
           <div class="form-group">
             <label for="eventLocation">Event Location</label>
             <input id="eventLocation" class="form-control" (onSelect)="selectAddress($event, 'event')" appGpComplete/>
+          </div>
+          <div class="form-group">
+            <label for="previousLocation">Previous Location</label>
+            <select class="form-control" id="previousLocation" [(ngModel)]="selectedPriorLocation" name="previousLocation">
+            <option *ngFor="let locationType of locationTypes" [value]="locationType">{{locationType}}</option>
+          </select>
+          </div>
+          <div [ngSwitch]="selectedPriorLocation">
+            <p *ngSwitchCase="'home'" class="text-info">{{homeLocation.formatted_address}}</p>
+            <p *ngSwitchCase="'work'" class="text-info">{{workLocation.formatted_address}}</p>
+            <div *ngSwitchCase="'other'" class="form-group">
+              <label for="otherLocation">Event Location</label>
+              <input id="otherLocation" class="form-control" (onSelect)="selectAddress($event, 'other')" appGpComplete/>
+            </div>
           </div>
         </form>
       </div>

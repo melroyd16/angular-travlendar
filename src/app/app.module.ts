@@ -16,7 +16,6 @@ import { HeaderComponent } from './header/header.component';
 import { ProfileComponent } from './profile/profile.component';
 import { GpCompleteDirective } from './directives/gp-complete.directive';
 import { OwlDateTimeModule, OwlNativeDateTimeModule } from 'ng-pick-datetime';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { CognitoUtil } from './services/cognito.service';
 import { routing } from './app.routes';
