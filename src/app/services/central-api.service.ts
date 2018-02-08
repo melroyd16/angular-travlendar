@@ -10,6 +10,9 @@ export class CentralApiService {
   constructor(private http: HttpClient) { }
 
   callAPI(module: string, payload: any, method: string): Observable<any> {
+
+    // Spinner Loader
+
     let url = '';
     switch (module) {
       case 'calendar':

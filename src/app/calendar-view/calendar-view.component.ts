@@ -71,6 +71,7 @@ export class CalendarViewComponent implements OnInit {
   eventStartMinDate: Date = new Date();
   viewDate: Date = new Date();
   activeDayIsOpen = false;
+  displayDeleteModal: boolean;
   displayEventModal = false;
   displayTravelModes = false;
   displayModalError = false;
@@ -85,7 +86,7 @@ export class CalendarViewComponent implements OnInit {
     event: CalendarEvent;
   };
 
-  actions: CalendarEventAction[] = [
+  eventActions: CalendarEventAction[] = [
     {
       label: '<i class="fa fa-fw fa-pencil"></i>',
       onClick: ({ event }: { event: CalendarEvent }): void => {
@@ -95,8 +96,12 @@ export class CalendarViewComponent implements OnInit {
     {
       label: '<i class="fa fa-fw fa-times"></i>',
       onClick: ({ event }: { event: CalendarEvent }): void => {
-        this.events = this.events.filter(iEvent => iEvent !== event);
-        this.handleEvent('Deleted', event);
+        $('#deleteModal').modal('toggle');
+        this.deleteEventId = event.id;
+        // console.log(this.deleteEventId);
+        // console.log(this.events[0].title);
+        // this.events = this.events.filter(iEvent => iEvent !== event);
+        // this.handleEvent('Deleted', event);
       }
     }
   ];
@@ -115,6 +120,9 @@ export class CalendarViewComponent implements OnInit {
   }
 
   ngOnInit() {
+
+    this.displayDeleteModal = false;
+
     const userProfile = this.profileService.getUserProfile();
     if (!this.profileService.userProfile || !this.profileService.userProfile.homeLocation) {
       this.profileService.fetchUserProfile().subscribe((locationDetails) => {
@@ -130,9 +138,10 @@ export class CalendarViewComponent implements OnInit {
       this.workLocation = this.profileService.userProfile.workLocation;
     }
     this.eventsService.fetchEvents().subscribe((eventList) => {
+
       this.eventsLoaded = true;
       for (let i = 0; i < eventList.Items.length; i++) {
-        this.addEvent(eventList.Items[i].eventTitle, eventList.Items[i].eventStart, eventList.Items[i].eventEnd);
+        this.addEvent(eventList.Items[i].id, eventList.Items[i].eventTitle, eventList.Items[i].eventStart, eventList.Items[i].eventEnd);
       }
     });
     this.initEvent();
@@ -220,7 +229,7 @@ export class CalendarViewComponent implements OnInit {
         this.forceSaveEvent = true;
         this.scheduleModalError = 'This event conflicts with another scheduled event. Click Continue to proceed anyways.';
       } else {
-        this.addEvent(this.eventPayload.eventTitle, this.eventPayload.eventStart, this.eventPayload.eventEnd);
+        this.addEvent(data,this.eventPayload.eventTitle, this.eventPayload.eventStart, this.eventPayload.eventEnd);
         $('#eventModal').modal('hide');
         this.initEvent();
       }
@@ -261,8 +270,9 @@ export class CalendarViewComponent implements OnInit {
     }
   }
 
-  addEvent(eventTitle, eventStart, eventEnd): void {
+  addEvent(eventId, eventTitle, eventStart, eventEnd): void {
     this.events.push({
+      id: eventId
       title: eventTitle,
       start: new Date(eventStart),
       end: new Date(eventEnd),
@@ -271,8 +281,34 @@ export class CalendarViewComponent implements OnInit {
       resizable: {
         beforeStart: true,
         afterEnd: true
-      }
+      },
+      actions: this.eventActions
     });
     this.refresh.next();
   }
+
+// REQUIRED??
+  closeDeleteModal(): void {
+    $("#deleteModal").modal('toggle');
+    // $timeout(function () {
+    //     vm.displayDeleteModal = false;
+    // }, 1000);
+  }
+
+// DELETE EVENT
+deleteEvent(): void {
+  console.log(this.deleteEventId);
+  this.closeDeleteModal();
+  this.eventsService.deleteEvent(this.deleteEventId).subscribe(() => {
+    for (let i = 0; i < this.events.length; i++) {
+      if (this.events[i].id === this.deleteEventId) {
+        this.events.splice(i, 1);
+        this.ref.tick();
+        console.log("SUCCESSFULLY DELETED!!");
+      }
+    }
+  });
+}
+
+
 }
