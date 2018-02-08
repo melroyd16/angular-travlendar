@@ -72,12 +72,4 @@ export class CalendarService {
     });
     return simpleObservable;
   }
-
-  saveEvent(eventDetails: any, forceSaveEvent: boolean): Observable<any> {
-    const payload = {
-      operation: 'saveEvent',
-      eventDetails: eventDetails
-    };
-    return this.centralAPIService.callAPI('events', payload, 'post');
-  }
 }
