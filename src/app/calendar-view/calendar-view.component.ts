@@ -142,6 +142,14 @@ export class CalendarViewComponent implements OnInit {
     this.event = new Event();
     this.event.eventStart = new Date();
     this.event.eventEnd = moment().add(1, 'hours');
+    this.displayEventModal = false;
+    this.displayTravelModes = false;
+    this.displayModalError = false;
+    this.forceSaveEvent = false;
+    this.scheduleModalError = '';
+    this.selectedPriorLocation = 'home';
+    this.travelModeArray = [];
+    this.otherLocationDetails = new Location();
   }
 
   isLoggedIn(message: string, isLoggedIn: boolean) {
@@ -214,6 +222,7 @@ export class CalendarViewComponent implements OnInit {
       } else {
         this.addEvent(this.eventPayload.eventTitle, this.eventPayload.eventStart, this.eventPayload.eventEnd);
         $('#eventModal').modal('hide');
+        this.initEvent();
       }
     });
   }
@@ -239,7 +248,6 @@ export class CalendarViewComponent implements OnInit {
   }
 
   changeLocation(): void {
-    // this.displayTravelModes = false;
     this.event.travelMode = null;
     if (!(this.event.origin && this.event.origin.place_id)) {
       this.event.origin = this.homeLocation;
