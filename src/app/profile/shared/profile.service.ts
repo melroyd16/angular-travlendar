@@ -41,14 +41,12 @@ export class ProfileService {
       cyclingDistance: cyclingDistance,
       preferredModes: preferredModes
     };
-    console.log(payload);
+    
     return this.centralAPIService.callAPI('profile', payload, 'post');
   }
 
-  setUserDetails(homeLocation: Location, workLocation: Location, walkingDistance: number,
+  setUserDetails( walkingDistance: number,
      cyclingDistance: number, preferredModes:any[]): void {
-    this.userProfile.homeLocation = homeLocation;
-    this.userProfile.workLocation = workLocation;
     this.userProfile.walkingDistance = walkingDistance;
     this.userProfile.cyclingDistance = cyclingDistance;
     this.userProfile.preferredMode= preferredModes;

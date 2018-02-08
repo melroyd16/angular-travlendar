@@ -104,52 +104,53 @@ export class ProfileComponent implements OnInit {
   }
 
   ngOnInit() {
-    if (!this.profileService.userProfile.homeLocation) {
+    if (!this.profileService.userProfile.homeLocation || !this.profileService.userProfile.preferredMode) {
       this.profileService.fetchUserProfile().subscribe((data) => {
         if (data.Item) {
-
           this.profileService.setLocationDetails(data.Item.homeLocation, data.Item.workLocation);
-          this.profileService.setUserDetails(data.Item.homeLocation, data.Item.workLocation,data.Item.walkingDistance,
-          data.Item.cyclingDistance, data.Item.preferredMode);
           this.homeLocation=this.profileService.userProfile.homeLocation;
           this.workLocation=this.profileService.userProfile.workLocation;
           this.homeLocationText = this.profileService.userProfile.homeLocation.formatted_address;
           this.workLocationText = this.profileService.userProfile.workLocation.formatted_address;
-          this.walking = this.profileService.userProfile.walkingDistance;
-          this.cycling = this.profileService.userProfile.cyclingDistance;
-          this.travelMode=this.profileService.userProfile.preferredMode;
 
-          if(this.travelMode.indexOf('walking')> -1){
-            this.walk=true;
-          }
-          else{
-            this.walk=false;
-          }
+          if(data.Item.walkingDistance){
+            this.profileService.setUserDetails(data.Item.walkingDistance,
+            data.Item.cyclingDistance, data.Item.preferredMode);
+            this.walking = this.profileService.userProfile.walkingDistance;
+            this.cycling = this.profileService.userProfile.cyclingDistance;
+            this.travelMode=this.profileService.userProfile.preferredMode;
+            if(this.travelMode.indexOf('walking')> -1){
+              this.walk=true;
+            }
+            else{
+              this.walk=false;
+            }
 
-          if(this.travelMode.indexOf('driving')> -1){
-            this.drive=true;
-          }
-          else{
-            this.drive=false;
-          }
+            if(this.travelMode.indexOf('driving')> -1){
+              this.drive=true;
+            }
+            else{
+              this.drive=false;
+            }
 
-          if(this.travelMode.indexOf('cycling')> -1){
-            this.cycle=true;
-          }
-          else{
-            this.cycle=false;
-          }
+            if(this.travelMode.indexOf('cycling')> -1){
+              this.cycle=true;
+            }
+            else{
+              this.cycle=false;
+            }
 
-          if(this.travelMode.indexOf('transit')> -1){
-            this.trans=true;
+            if(this.travelMode.indexOf('transit')> -1){
+              this.trans=true;
+            }
+            else{
+              this.trans=false;
+            }
           }
-          else{
-            this.trans=false;
-          }
-
         }
       });
-    } else {
+    }
+    else {
       this.homeLocation=this.profileService.userProfile.homeLocation;
       this.workLocation=this.profileService.userProfile.workLocation;
       this.homeLocationText = this.profileService.userProfile.homeLocation.formatted_address;
@@ -197,7 +198,6 @@ export class ProfileComponent implements OnInit {
   }
 
   saveUserProfile(): void {
-    console.log("Inside Save user"+ this.homeLocation);
     this.profileService.saveUserProfile(this.homeLocation, this.workLocation, this.walking, this.cycling, this.travelMode).subscribe((data) => {
     this.profileService.setUserDetails(this.homeLocation, this.workLocation, this.walking, this.cycling, this.travelMode);
     });
