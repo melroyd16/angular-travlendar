@@ -75,6 +75,9 @@
         </button>
       </div>
       <div class="modal-body">
+        <div class="alert alert-danger" role="alert" *ngIf="displayModalError">
+          {{scheduleModalError}}
+        </div>
         <form>
           <div class="form-group">
             <label for="eventTitle">Event Title</label>

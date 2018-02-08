@@ -73,6 +73,9 @@ export class CalendarViewComponent implements OnInit {
   activeDayIsOpen = false;
   displayEventModal = false;
   displayTravelModes = false;
+  displayModalError = false;
+  forceSaveEvent = false;
+  scheduleModalError = '';
   locationTypes = ['home', 'work', 'prior event location', 'other'];
   selectedPriorLocation = 'home';
   travelModeArray = [];
@@ -126,7 +129,6 @@ export class CalendarViewComponent implements OnInit {
       this.homeLocation = this.profileService.userProfile.homeLocation;
       this.workLocation = this.profileService.userProfile.workLocation;
     }
-    console.log(userProfile);
     this.eventsService.fetchEvents().subscribe((eventList) => {
       this.eventsLoaded = true;
       for (let i = 0; i < eventList.Items.length; i++) {
@@ -139,7 +141,7 @@ export class CalendarViewComponent implements OnInit {
   initEvent(): void {
     this.event = new Event();
     this.event.eventStart = new Date();
-    this.event.eventEnd = moment().add('hours', 1);
+    this.event.eventEnd = moment().add(1, 'hours');
   }
 
   isLoggedIn(message: string, isLoggedIn: boolean) {
@@ -204,12 +206,14 @@ export class CalendarViewComponent implements OnInit {
         };
       }
     }
-    this.calendarService.saveEvent(this.eventPayload, false).subscribe((data) => {
+    this.eventsService.saveEvent(this.eventPayload, this.forceSaveEvent).subscribe((data) => {
       if (data.errorMessage && data.errorMessage === 'Conflict') {
-        console.log('A conflict occured');
+        this.displayModalError = true;
+        this.forceSaveEvent = true;
+        this.scheduleModalError = 'This event conflicts with another scheduled event. Click Continue to proceed anyways.';
       } else {
         this.addEvent(this.eventPayload.eventTitle, this.eventPayload.eventStart, this.eventPayload.eventEnd);
-        $('eventModal').modal('hide');
+        $('#eventModal').modal('hide');
       }
     });
   }
@@ -251,7 +255,7 @@ export class CalendarViewComponent implements OnInit {
 
   addEvent(eventTitle, eventStart, eventEnd): void {
     this.events.push({
-      title: 'New event',
+      title: eventTitle,
       start: new Date(eventStart),
       end: new Date(eventEnd),
       color: colors.red,
