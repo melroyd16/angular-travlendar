@@ -158,6 +158,7 @@ export class ProfileComponent implements OnInit {
       this.walking = this.profileService.userProfile.walkingDistance;
       this.cycling = this.profileService.userProfile.cyclingDistance;
       this.travelMode=this.profileService.userProfile.preferredMode;
+      console.log(this.profileService.userProfile);
       if(this.travelMode.indexOf('walking')> -1){
         this.walk=true;
       }
@@ -191,15 +192,15 @@ export class ProfileComponent implements OnInit {
   selectAddress(place: any, location: string) {
 
     if (location === 'home') {
-      this.homeLocation = new Location(place.place_id, place.formatted_address);
+      this.homeLocation = new Location(place.place_id, place.formatted_address, place.geometry.location.lat(), place.geometry.location.lng());
     } else {
-      this.workLocation = new Location(place.place_id, place.formatted_address);
+      this.workLocation = new Location(place.place_id, place.formatted_address, place.geometry.location.lat(), place.geometry.location.lng());
     }
   }
 
   saveUserProfile(): void {
     this.profileService.saveUserProfile(this.homeLocation, this.workLocation, this.walking, this.cycling, this.travelMode).subscribe((data) => {
-    this.profileService.setUserDetails(this.homeLocation, this.workLocation, this.walking, this.cycling, this.travelMode);
+    this.profileService.setUserDetails(this.walking, this.cycling, this.travelMode);
     });
   }
 
