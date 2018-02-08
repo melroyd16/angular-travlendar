@@ -4,9 +4,9 @@ export class UserProfile {
 
   homeLocation?: Location;
   workLocation?: Location;
-  walkingDistance: number;
-  cyclingDistance: number;
-  preferredMode: any[];
+  walkingDistance?: number;
+  cyclingDistance?: number;
+  preferredMode?: any[];
 
   constructor(home: Location, work: Location, walk: number, cycle: number, mode: any[]) {
     this.homeLocation = home;
