@@ -17,5 +17,9 @@ export const environment = {
   cognito_identity_endpoint: '',
   sts_endpoint: '',
   dynamodb_endpoint: '',
-  s3_endpoint: ''
+  s3_endpoint: '',
+  calendar_api: 'https://j24dhhvp0a.execute-api.us-west-2.amazonaws.com/dev/calendar',
+  profile_api: 'https://j24dhhvp0a.execute-api.us-west-2.amazonaws.com/dev/profile',
+  events_api: 'https://j24dhhvp0a.execute-api.us-west-2.amazonaws.com/dev/events',
+  google_api_key: 'AIzaSyBOD1obaKMooT5SVbWwukvqImOLPdQBMHE'
 };
