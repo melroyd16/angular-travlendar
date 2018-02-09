@@ -8,6 +8,8 @@ import { ProfileService } from './profile/shared/profile.service';
 import { Component, ViewEncapsulation, OnInit } from '@angular/core';
 import { } from '@types/googlemaps';
 
+import * as moment from 'moment';
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',

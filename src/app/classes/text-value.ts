@@ -1,8 +1,8 @@
 export class TextValue {
   text: String;
-  value: int;
+  value: number;
 
-  constructor(text: String, value: int) {
+  constructor(text: String, value: number) {
     this.text = text;
     this.value = value;
   }

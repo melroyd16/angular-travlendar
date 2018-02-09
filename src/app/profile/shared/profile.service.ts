@@ -29,6 +29,31 @@ export class ProfileService {
     this.userProfile.workLocation = workLocation;
   }
 
+
+
+  saveUserProfile(homeLocation: Location, workLocation: Location, walkingDistance: number,
+     cyclingDistance: number, preferredModes:any[] ): Observable<any> {
+    const payload = {
+      operation: 'saveProfile',
+      homeLocation: homeLocation,
+      workLocation: workLocation,
+      walkingDistance: walkingDistance,
+      cyclingDistance: cyclingDistance,
+      preferredModes: preferredModes
+    };
+    
+    return this.centralAPIService.callAPI('profile', payload, 'post');
+  }
+
+  setUserDetails( walkingDistance: number,
+     cyclingDistance: number, preferredModes:any[]): void {
+    this.userProfile.walkingDistance = walkingDistance;
+    this.userProfile.cyclingDistance = cyclingDistance;
+    this.userProfile.preferredMode= preferredModes;
+  }
+
+
+
   getUserProfile(): UserProfile {
     return this.userProfile;
   }

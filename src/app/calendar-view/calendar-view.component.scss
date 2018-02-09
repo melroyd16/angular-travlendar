@@ -21,3 +21,15 @@ pre {
         margin-right: 5px;
     }
 }
+
+.travel-mode-table {
+    td {
+        padding-right: 7px;
+        .travel-mode-icon {
+            margin-right: 10px;
+            margin-left: 5px;
+            width: 16px;
+            text-align: center;
+        }
+    }
+}
