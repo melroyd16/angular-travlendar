@@ -80,22 +80,23 @@ export class CalendarViewComponent implements OnInit {
   locationTypes = ['home', 'work', 'prior event location', 'other'];
   selectedPriorLocation = 'home';
   travelModeArray = [];
+  deleteEventId = '';
 
   modalData: {
     action: string;
-    event: CalendarEvent;
+    event: any;
   };
 
   eventActions: CalendarEventAction[] = [
     {
       label: '<i class="fa fa-fw fa-pencil"></i>',
-      onClick: ({ event }: { event: CalendarEvent }): void => {
+      onClick: ({ event }: { event: any }): void => {
         this.handleEvent('Edited', event);
       }
     },
     {
       label: '<i class="fa fa-fw fa-times"></i>',
-      onClick: ({ event }: { event: CalendarEvent }): void => {
+      onClick: ({ event }: { event: any }): void => {
         $('#deleteModal').modal('toggle');
         this.deleteEventId = event.id;
         // console.log(this.deleteEventId);
@@ -108,7 +109,7 @@ export class CalendarViewComponent implements OnInit {
 
   refresh: Subject<any> = new Subject();
 
-  events: CalendarEvent[] = [];
+  events: any[] = [];
 
   constructor(private modal: NgbModal, public router: Router,
     public userService: UserLoginService,
@@ -196,7 +197,7 @@ export class CalendarViewComponent implements OnInit {
     });
   }
 
-  dayClicked({ date, events }: { date: Date; events: CalendarEvent[] }): void {
+  dayClicked({ date, events }: { date: Date; events: any[] }): void {
     if (isSameMonth(date, this.viewDate)) {
       if (
         (isSameDay(this.viewDate, date) && this.activeDayIsOpen === true) ||
@@ -229,7 +230,7 @@ export class CalendarViewComponent implements OnInit {
         this.forceSaveEvent = true;
         this.scheduleModalError = 'This event conflicts with another scheduled event. Click Continue to proceed anyways.';
       } else {
-        this.addEvent(data,this.eventPayload.eventTitle, this.eventPayload.eventStart, this.eventPayload.eventEnd);
+        this.addEvent(data, this.eventPayload.eventTitle, this.eventPayload.eventStart, this.eventPayload.eventEnd);
         $('#eventModal').modal('hide');
         this.initEvent();
       }
@@ -247,7 +248,7 @@ export class CalendarViewComponent implements OnInit {
     this.refresh.next();
   }
 
-  handleEvent(action: string, event: CalendarEvent): void {
+  handleEvent(action: string, event: any): void {
     this.modalData = { event, action };
     this.modal.open(this.modalContent, { size: 'lg' });
   }
@@ -272,7 +273,7 @@ export class CalendarViewComponent implements OnInit {
 
   addEvent(eventId, eventTitle, eventStart, eventEnd): void {
     this.events.push({
-      id: eventId
+      id: eventId,
       title: eventTitle,
       start: new Date(eventStart),
       end: new Date(eventEnd),
@@ -287,28 +288,28 @@ export class CalendarViewComponent implements OnInit {
     this.refresh.next();
   }
 
-// REQUIRED??
+  // REQUIRED??
   closeDeleteModal(): void {
-    $("#deleteModal").modal('toggle');
+    $('#deleteModal').modal('toggle');
     // $timeout(function () {
     //     vm.displayDeleteModal = false;
     // }, 1000);
   }
 
-// DELETE EVENT
-deleteEvent(): void {
-  console.log(this.deleteEventId);
-  this.closeDeleteModal();
-  this.eventsService.deleteEvent(this.deleteEventId).subscribe(() => {
-    for (let i = 0; i < this.events.length; i++) {
-      if (this.events[i].id === this.deleteEventId) {
-        this.events.splice(i, 1);
-        this.ref.tick();
-        console.log("SUCCESSFULLY DELETED!!");
+  // DELETE EVENT
+  deleteEvent(): void {
+    // console.log(this.deleteEventId);
+    this.closeDeleteModal();
+    this.eventsService.deleteEvent(this.deleteEventId).subscribe(() => {
+      for (let i = 0; i < this.events.length; i++) {
+        if (this.events[i].id === this.deleteEventId) {
+          this.events.splice(i, 1);
+          this.ref.tick();
+          console.log('SUCCESSFULLY DELETED!!');
+        }
       }
-    }
-  });
-}
+    });
+  }
 
 
 }
