@@ -9,7 +9,7 @@ var username = "";
 
 exports.handler = (event, context, callback) => {
     console.log(event)
-
+    //Some comment
     function saveEvent() {
         var id = new Date().getTime() + "_" + username
         var payload = {
