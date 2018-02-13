@@ -76,7 +76,9 @@ export class CalendarViewComponent implements OnInit {
   displayTravelModes = false;
   displayModalError = false;
   forceSaveEvent = false;
+  displaySuccess = false;
   scheduleModalError = '';
+  successMessage = '';
   locationTypes = ['home', 'work', 'prior event location', 'other'];
   selectedPriorLocation = 'home';
   travelModeArray = [];
@@ -186,6 +188,8 @@ export class CalendarViewComponent implements OnInit {
       case 'other':
         this.otherLocationDetails = new Location(place.place_id, place.formatted_address,
           place.geometry.location.lat(), place.geometry.location.lng());
+        this.event.origin = Object.assign({}, this.otherLocationDetails);
+        this.changeLocation();
         break;
     }
   }
@@ -233,6 +237,12 @@ export class CalendarViewComponent implements OnInit {
         this.addEvent(data, this.eventPayload.eventTitle, this.eventPayload.eventStart, this.eventPayload.eventEnd);
         $('#eventModal').modal('hide');
         this.initEvent();
+        this.successMessage = 'Event has been successfully added';
+        this.displaySuccess = true;
+        const timeoutId = setTimeout(() => {
+          this.displaySuccess = false;
+          clearTimeout(timeoutId);
+        }, 2000);
       }
     });
   }
@@ -258,7 +268,9 @@ export class CalendarViewComponent implements OnInit {
   }
 
   changeLocation(): void {
+    this.displayTravelModes = false;
     this.event.travelMode = null;
+    this.travelModeArray = [];
     if (!(this.event.origin && this.event.origin.place_id)) {
       this.event.origin = this.homeLocation;
     }
@@ -268,6 +280,22 @@ export class CalendarViewComponent implements OnInit {
         this.displayTravelModes = true;
         this.ref.tick();
       });
+    }
+  }
+
+  changePreviousLocation(): void {
+    this.displayTravelModes = false;
+    this.event.travelMode = null;
+    this.travelModeArray = [];
+    switch (this.selectedPriorLocation) {
+      case 'home':
+        this.event.origin = this.homeLocation;
+        this.changeLocation();
+        break;
+      case 'work':
+        this.event.origin = this.workLocation;
+        this.changeLocation();
+        break;
     }
   }
 

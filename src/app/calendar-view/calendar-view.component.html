@@ -52,6 +52,9 @@
   </div>
 </div>
 <br>
+<div class="alert alert-success" role="alert" *ngIf="displaySuccess">
+  {{successMessage}}
+</div>
 <div [ngSwitch]="view" *ngIf="eventsLoaded">
   <mwl-calendar-month-view *ngSwitchCase="'month'" [viewDate]="viewDate" [events]="events" [refresh]="refresh" [activeDayIsOpen]="activeDayIsOpen" (dayClicked)="dayClicked($event.day)" (eventClicked)="handleEvent('Clicked', $event.event)" (eventTimesChanged)="eventTimesChanged($event)">
   </mwl-calendar-month-view>
@@ -82,17 +85,9 @@
 
           <div class="form-group">
             <label for="eventTitle">Event Title</label>
-            <input type="text"
-                   name="eventTitle"
-                   [(ngModel)]="event.eventTitle"
-                   class="form-control"
-                   id="eventTitle"
-                   placeholder="Enter event title"
-                   required
-                   name="eventTitle"
-                   #eventTitle="ngModel">
+            <input type="text" name="eventTitle" [(ngModel)]="event.eventTitle" class="form-control" id="eventTitle" placeholder="Enter event title" required name="eventTitle" #eventTitle="ngModel">
             <div [hidden]="eventTitle.valid || eventTitle.pristine" class="alert alert-danger">
-                 Event Title is Required
+              Event Title is Required
             </div>
           </div>
 
@@ -111,21 +106,14 @@
 
           <div class="form-group">
             <label for="eventLocation">Event Location</label>
-            <input id="eventLocation"
-                   class="form-control"
-                   (onSelect)="selectAddress($event, 'event')"
-                   appGpComplete
-                   required
-                   [(ngModel)]="event.eventLocation"
-                   name="eventLocation"
-                   #eventLocation="ngModel"/>
+            <input id="eventLocation" class="form-control" (onSelect)="selectAddress($event, 'event')" appGpComplete required [(ngModel)]="event.eventLocation" name="eventLocation" #eventLocation="ngModel" />
             <div [hidden]="eventLocation.valid || eventLocation.pristine" class="alert alert-danger">
-                Event Location is required
+              Event Location is required
             </div>
           </div>
           <div class="form-group">
             <label for="previousLocation">Previous Location</label>
-            <select class="form-control" id="previousLocation" [(ngModel)]="selectedPriorLocation" name="previousLocation">
+            <select class="form-control" id="previousLocation" [(ngModel)]="selectedPriorLocation" name="previousLocation" (ngModelChange)="changePreviousLocation()">
               <option *ngFor="let locationType of locationTypes" [value]="locationType">{{locationType}}</option>
             </select>
           </div>
@@ -134,16 +122,9 @@
             <p *ngSwitchCase="'work'" class="text-info">{{workLocation.formatted_address}}</p>
             <div *ngSwitchCase="'other'" class="form-group">
               <label for="otherLocation">Event Location</label>
-              <input id="otherLocation"
-                     class="form-control"
-                     (onSelect)="selectAddress($event, 'other')"
-                     appGpComplete
-                     required
-                     [(ngModel)]="event.otherLocation"
-                     name="otherLocation"
-                     #otherLocation="ngModel"/>
+              <input id="otherLocation" class="form-control" (onSelect)="selectAddress($event, 'other')" appGpComplete required [(ngModel)]="event.otherLocation" name="otherLocation" #otherLocation="ngModel" />
               <div [hidden]="otherLocation.valid || otherLocation.pristine" class="alert alert-danger">
-                 Other Event Location is required
+                Other Event Location is required
               </div>
             </div>
           </div>
@@ -151,11 +132,11 @@
             <label>Travel Mode:</label>
             <table class="travel-mode-table">
               <tr *ngFor="let travelMode of travelModeArray">
-                <td><input type="radio" [(ngModel)]="event.travelMode" [value]="travelMode.mode" name="travelMode"></td>
-                <td><i class="fa fa-{{travelMode.icon}} travel-mode-icon"></i></td>
-                <td>{{travelMode.mode}}</td>
-                <td>{{travelMode.value.distance.text}}</td>
-                <td>{{travelMode.value.duration.text}}</td>
+                <td *ngIf="travelMode.value.distance"><input type="radio" [(ngModel)]="event.travelMode" [value]="travelMode.mode" name="travelMode"></td>
+                <td *ngIf="travelMode.value.distance"><i class="fa fa-{{travelMode.icon}} travel-mode-icon"></i></td>
+                <td *ngIf="travelMode.value.distance">{{travelMode.mode}}</td>
+                <td *ngIf="travelMode.value.distance">{{travelMode.value.distance.text}}</td>
+                <td *ngIf="travelMode.value.distance">{{travelMode.value.duration.text}}</td>
               </tr>
             </table>
           </div>
