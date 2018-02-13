@@ -55,27 +55,34 @@ exports.handler = (event, context, callback) => {
 
 
     function isConflictPresent(data, eventID, eventStart, eventEnd) {
-        if (data == null || data.Count == 0){
-            return false;
-        }
-        console.log("Inside is conflict present", data);
-        var itemList = data.Items
-        var isMeetingOverlaps = false
+      console.log("CONFLICT CHECK")
+      console.log(data)
+      if (data == null || data.Count == 0){
+          return [false, null];
+      }
+      console.log("Inside is conflict present");
+      var itemList = data.Items
+      var isMeetingOverlaps = false
 
-        for (var i = 0; i < itemList.length; i++) {
-            if(itemList[i].id == eventID)
-                continue;
-            var item_start_time = itemList[i].eventStart;
-            var item_end_time = itemList[i].eventEnd;
+      for (var i = 0; i < itemList.length; i++) {
+          if(itemList[i].id == eventID)
+              continue;
+          var item_start_time = itemList[i].eventStart;
+          var item_end_time = itemList[i].eventEnd;
 
-            var min = Math.min(eventStart, item_start_time)
-            var max = Math.max(eventEnd, item_end_time)
-            if ((max - min) < ((eventEnd - eventStart) + (item_end_time - item_start_time))) {
-                isMeetingOverlaps = true
-                break;
-            }
-        }
-        return isMeetingOverlaps
+          var min = Math.min(eventStart, item_start_time)
+          var max = Math.max(eventEnd, item_end_time)
+          if ((max - min) < ((eventEnd - eventStart) + (item_end_time - item_start_time))) {
+              isMeetingOverlaps = true
+              break;
+          }
+      }
+      if(isMeetingOverlaps) {
+          return [isMeetingOverlaps, itemList[i].eventTitle];
+      }
+      else {
+          return [isMeetingOverlaps, null];
+      }
     }
 
 
@@ -206,7 +213,7 @@ exports.handler = (event, context, callback) => {
 
         distance -= currentEvent.body.eventDetails.travelMode.distance.value;
         if (distance < 0) {
-            return false;
+            return [false, currentEvent.body.eventDetails.eventTitle];
         }
         for(var i= 0; i < allEvents.length; i++){
             if (allEvents[i].id == currentEvent.id) {
@@ -218,12 +225,12 @@ exports.handler = (event, context, callback) => {
                     distance -= allEvents[i].travelMode.distance.value;
                     if (distance < 0) {
                         console.log("Distance Overboard");
-                        return false;
+                        return [false, allEvents[i].eventTitle];
                     }
                 }
             }
         }
-        return true;
+        return [true, null];
     }
 
 
@@ -271,20 +278,25 @@ exports.handler = (event, context, callback) => {
                     } else {
                         console.log("Query succeeded.");
                         var user_distance = dist.Items[0];
-                        if(travelMode == 'walking' || travelMode == 'biking') {
-                            var s = isUnderPreferredTransportation(event, travelMode, user_distance, data);
-                            console.log("Walking Response: : ", s);
-                            if (s == false) {
-                                context.fail("Conflict");
+                        if(isNaN(user_distance) == false || user_distance != null) {
+                            if(travelMode == 'walking' || travelMode == 'biking') {
+                                var s = isUnderPreferredTransportation(event, travelMode, user_distance, data);
+                                console.log("Walking Response: : ", s);
+                                if (s[0] == false) {
+                                    console.log("Your " + travelMode + " distance exceeds your daily preference: " + user_distance/1609 + " miles");
+                                    context.fail("Conflict");
+                                }
                             }
-                        }
-                        // #NOTE -  UnComment for PRODUCTION
-                        var s2 = isConflictPresent(data, eventID, eventStart, eventEnd);
-                        console.log("Time Conflict Response: ", s2);
-                        if(s2 == true) {
-                            context.fail("Conflict");
+
                         }
 
+
+                        var s2 = isConflictPresent(data, eventID, eventStart, eventEnd);
+                        console.log("Time Conflict Response: ", s2);
+                        if(s2[0] == true) {
+                            console.log("This time overlaps with meeting: " + s2[1]);
+                            context.fail("Conflict");
+                        }
 
 
                         var locationConflict = checkConflictOnLocationBasis(data, eventID, eventStart, eventEnd, origin, destination, travelMode);
