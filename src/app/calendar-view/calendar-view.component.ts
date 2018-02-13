@@ -286,6 +286,7 @@ export class CalendarViewComponent implements OnInit {
   changePreviousLocation(): void {
     this.displayTravelModes = false;
     this.event.travelMode = null;
+    // reinitialing
     this.travelModeArray = [];
     switch (this.selectedPriorLocation) {
       case 'home':
