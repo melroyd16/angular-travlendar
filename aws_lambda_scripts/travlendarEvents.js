@@ -55,27 +55,34 @@ exports.handler = (event, context, callback) => {
 
 
     function isConflictPresent(data, eventID, eventStart, eventEnd) {
-        if (data == null || data.Count == 0){
-            return false;
-        }
-        console.log("Inside is conflict present", data);
-        var itemList = data.Items
-        var isMeetingOverlaps = false
+      console.log("CONFLICT CHECK")
+      console.log(data)
+      if (data == null || data.Count == 0){
+          return [false, null];
+      }
+      console.log("Inside is conflict present");
+      var itemList = data.Items
+      var isMeetingOverlaps = false
 
-        for (var i = 0; i < itemList.length; i++) {
-            if(itemList[i].id == eventID)
-                continue;
-            var item_start_time = itemList[i].eventStart;
-            var item_end_time = itemList[i].eventEnd;
+      for (var i = 0; i < itemList.length; i++) {
+          if(itemList[i].id == eventID)
+              continue;
+          var item_start_time = itemList[i].eventStart;
+          var item_end_time = itemList[i].eventEnd;
 
-            var min = Math.min(eventStart, item_start_time)
-            var max = Math.max(eventEnd, item_end_time)
-            if ((max - min) < ((eventEnd - eventStart) + (item_end_time - item_start_time))) {
-                isMeetingOverlaps = true
-                break;
-            }
-        }
-        return isMeetingOverlaps
+          var min = Math.min(eventStart, item_start_time)
+          var max = Math.max(eventEnd, item_end_time)
+          if ((max - min) < ((eventEnd - eventStart) + (item_end_time - item_start_time))) {
+              isMeetingOverlaps = true
+              break;
+          }
+      }
+      if(isMeetingOverlaps) {
+          return [isMeetingOverlaps, itemList[i].eventTitle];
+      }
+      else {
+          return [isMeetingOverlaps, null];
+      }
     }
 
 
@@ -165,7 +172,66 @@ exports.handler = (event, context, callback) => {
     });
     }
 
+    function isUnderPreferredTransportation(currentEvent, travelMode, user_distance, allEvents) {
+        console.log("Checking Walking/Biking Criteria");
+        var eventID = currentEvent.body.eventID;
+        var eventStart = currentEvent.body.eventDetails.eventStart;
+        var eventEnd = currentEvent.body.eventDetails.eventEnd;
+        var origin = currentEvent.body.eventDetails.origin;
+        var destination = currentEvent.body.eventDetails.destination;
+        var currentTravelMode = currentEvent.body.eventDetails.travelMode.mode;
 
+        var distance = 0;
+        console.log(username, currentTravelMode);
+
+        if(currentTravelMode == 'walking') {
+            distance = user_distance.walkingDistance;
+        }
+        else if (currentTravelMode == 'biking') {
+            distance = user_distance.bikingDistance;
+        }
+        console.log(distance);
+        console.log("Preferred distance", distance);
+        console.log("Alfred", eventStart)
+        var date = new Date(eventStart);
+        var yy = date.getFullYear();
+        var mm = date.getMonth();
+        var dd = date.getDate();
+        var h = date.getHours();
+        var m = date.getMinutes();
+        var s = date.getSeconds();
+        console.log(mm+'/'+dd+'/'+yy, h+':'+m+':'+s)
+
+        var milliStart = new Date(Date.UTC(yy,mm,dd,0,0,0)).getTime();
+        console.log(milliStart);
+        var milliEnd = new Date(Date.UTC(yy,mm,dd+1,0,0,0)).getTime();
+        console.log(milliEnd);
+
+        console.log(allEvents);
+
+        distance = distance * 1609; //converting to meters
+
+        distance -= currentEvent.body.eventDetails.travelMode.distance.value;
+        if (distance < 0) {
+            return [false, currentEvent.body.eventDetails.eventTitle];
+        }
+        for(var i= 0; i < allEvents.length; i++){
+            if (allEvents[i].id == currentEvent.id) {
+                continue;
+            }
+            if (allEvents[i].eventStart > milliStart && allEvents[i].eventStart < milliEnd) {
+                console.log("Daily Event: ", allEvents[i]);
+                if (allEvents[i].travelMode.mode == currentTravelMode) {
+                    distance -= allEvents[i].travelMode.distance.value;
+                    if (distance < 0) {
+                        console.log("Distance Overboard");
+                        return [false, allEvents[i].eventTitle];
+                    }
+                }
+            }
+        }
+        return [true, null];
+    }
 
 
     function queryForFetchingNearMeetings(status) {
@@ -194,24 +260,60 @@ exports.handler = (event, context, callback) => {
         };
 
         dynamo.query(params, function (err, data) {
-
             if (err) {
                 context.fail(err);
             } else {
-                console.log(data);
-                //var result =getDurationFromDistanceAPI("ChIJ55fLWVtBkFQR0v31eadEoLM","ChIJSxh5JbJqkFQRxI1KoO7oZHs", "bicycling")
-                if (isConflictPresent(data, eventID, eventStart, eventEnd)) {
-                    context.fail("Conflict");
-                }
-
-
-                else {
-                    if(status == "new") {
-                        saveEvent();
-                    } else {
-                        saveModifiedEvent();
+                var payload = {
+                    TableName: "user_preferences",
+                    KeyConditionExpression: "username = :u",
+                    ProjectionExpression: "walkingDistance",
+                    ExpressionAttributeValues: {
+                        ":u": username
                     }
                 }
+                dynamo.query(payload, function(err, dist) {
+                    console.log(dist.Items[0]);
+                    if (err) {
+                        console.error("Unable to query. Error:", JSON.stringify(err, null, 2));
+                    } else {
+                        console.log("Query succeeded.");
+                        var user_distance = dist.Items[0];
+                        if(isNaN(user_distance) == false || user_distance != null) {
+                            if(travelMode == 'walking' || travelMode == 'biking') {
+                                var s = isUnderPreferredTransportation(event, travelMode, user_distance, data);
+                                console.log("Walking Response: : ", s);
+                                if (s[0] == false) {
+                                    console.log("Your " + travelMode + " distance exceeds your daily preference: " + user_distance/1609 + " miles");
+                                    context.fail("Conflict");
+                                }
+                            }
+
+                        }
+
+
+                        var s2 = isConflictPresent(data, eventID, eventStart, eventEnd);
+                        console.log("Time Conflict Response: ", s2);
+                        if(s2[0] == true) {
+                            console.log("This time overlaps with meeting: " + s2[1]);
+                            context.fail("Conflict");
+                        }
+
+
+                        var locationConflict = checkConflictOnLocationBasis(data, eventID, eventStart, eventEnd, origin, destination, travelMode);
+                        console.log("Location Conflict Response: ", locationConflict);
+                        if(locationConflict == true){
+                            context.fail("Conflict");
+                        }
+
+                        else {
+                            if(status == "new") {
+                                saveEvent();
+                            } else {
+                                saveModifiedEvent();
+                            }
+                        }
+                    }
+                });
             }
         });
     }
