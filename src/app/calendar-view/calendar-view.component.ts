@@ -188,6 +188,8 @@ export class CalendarViewComponent implements OnInit {
       case 'other':
         this.otherLocationDetails = new Location(place.place_id, place.formatted_address,
           place.geometry.location.lat(), place.geometry.location.lng());
+        this.event.origin = Object.assign({}, this.otherLocationDetails);
+        this.changeLocation();
         break;
     }
   }
@@ -268,6 +270,7 @@ export class CalendarViewComponent implements OnInit {
   changeLocation(): void {
     this.displayTravelModes = false;
     this.event.travelMode = null;
+    this.travelModeArray = [];
     if (!(this.event.origin && this.event.origin.place_id)) {
       this.event.origin = this.homeLocation;
     }
@@ -281,7 +284,9 @@ export class CalendarViewComponent implements OnInit {
   }
 
   changePreviousLocation(): void {
-    console.log(this.selectedPriorLocation);
+    this.displayTravelModes = false;
+    this.event.travelMode = null;
+    this.travelModeArray = [];
     switch (this.selectedPriorLocation) {
       case 'home':
         this.event.origin = this.homeLocation;

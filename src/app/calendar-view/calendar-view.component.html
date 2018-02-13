@@ -132,11 +132,11 @@
             <label>Travel Mode:</label>
             <table class="travel-mode-table">
               <tr *ngFor="let travelMode of travelModeArray">
-                <td><input type="radio" [(ngModel)]="event.travelMode" [value]="travelMode.mode" name="travelMode"></td>
-                <td><i class="fa fa-{{travelMode.icon}} travel-mode-icon"></i></td>
-                <td>{{travelMode.mode}}</td>
-                <td>{{travelMode.value.distance.text}}</td>
-                <td>{{travelMode.value.duration.text}}</td>
+                <td *ngIf="travelMode.value.distance"><input type="radio" [(ngModel)]="event.travelMode" [value]="travelMode.mode" name="travelMode"></td>
+                <td *ngIf="travelMode.value.distance"><i class="fa fa-{{travelMode.icon}} travel-mode-icon"></i></td>
+                <td *ngIf="travelMode.value.distance">{{travelMode.mode}}</td>
+                <td *ngIf="travelMode.value.distance">{{travelMode.value.distance.text}}</td>
+                <td *ngIf="travelMode.value.distance">{{travelMode.value.duration.text}}</td>
               </tr>
             </table>
           </div>
