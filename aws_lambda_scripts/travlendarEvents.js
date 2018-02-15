@@ -278,7 +278,22 @@ exports.handler = (event, context, callback) => {
                     } else {
                         console.log("Query succeeded.");
                         var user_distance = dist.Items[0];
-                        if(isNaN(user_distance) == false || user_distance != null) {
+                        var error_message = null;
+                        console.log(user_distance);
+
+                        var max_dist_status = false;
+
+                        if(travelMode == "walking") {
+                            if("walkingDistance" in user_distance) {
+                                max_dist_status = true;
+                            }
+                        }
+                        if(travelMode == "biking") {
+                            if("bikingDistance" in user_distance) {
+                                max_dist_status = true;
+                            }
+                        }
+                        if(max_dist_status) {
                             if(travelMode == 'walking' || travelMode == 'biking') {
                                 var s = isUnderPreferredTransportation(event, travelMode, user_distance, data);
                                 if (s[0] == false) {
@@ -325,7 +340,7 @@ exports.handler = (event, context, callback) => {
                             error_message = {
                                 "errorMessage": {
                                     "code": 4,
-                                    "value": "MEHUL EVENT"
+                                    "value": "CONFLICTING EVENT TITLE"
                                 }
                             }
                             context.succeed(error_message);
