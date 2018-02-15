@@ -300,7 +300,6 @@ exports.handler = (event, context, callback) => {
                                     };
                                     console.log("Your " + travelMode + " distance exceeds your daily preference: " + user_miles + " miles");
                                     context.succeed(error_message);
-                                    // context.done("Conflict", error_message);
                                 }
                             }
 
