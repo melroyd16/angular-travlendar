@@ -105,11 +105,11 @@ exports.handler = (event, context, callback) => {
                     continue
                 }
 
-            if(endMeetinfDetails.eventStart > itemList[i].eventStart){
-                endMeetinfDetails = itemList[i]
+                if(endMeetinfDetails.eventStart > itemList[i].eventStart){
+                    endMeetinfDetails = itemList[i]
+                }
             }
-
-            }else{
+            else {
                 //First Meeting Information
                 if (startmeetingDetails == null){
                     startmeetingDetails = itemList[i];
@@ -135,41 +135,42 @@ exports.handler = (event, context, callback) => {
     function getDurationFromDistanceAPIInMins(startlocation, endLocation,mode){
         console.log("Inside the call Lambda function")
         var aws = require('aws-sdk');
-        var params = {"start_placeid": ["place_id:"+startlocation],
-             "end_placeid" : ["place_id:"+endLocation],
-             "mode": mode
-             };
+        var params = {
+            "start_placeid": ["place_id:"+startlocation],
+            "end_placeid" : ["place_id:"+endLocation],
+            "mode": mode
+        };
 
         var lambda = new aws.Lambda({
             region: 'us-west-2'
         });
 
-    lambda.invoke({
-      FunctionName: 'getLocationInformation',
-      Payload: JSON.stringify(params, null, null) // pass params
-    }, function(error, data) {
+        lambda.invoke({
+          FunctionName: 'getLocationInformation',
+          Payload: JSON.stringify(params, null, null) // pass params
+        }, function(error, data) {
 
-      if (error) {
-        console.log("Error" + error)
-        return 0;
-      }
-      console.log(data)
-
-     // var response = data
-      console.log("SSSS")
-      var response = data.Payload;
-      if (data ==null || data.Payload == null){
+        if (error) {
+          console.log("Error" + error)
           return 0;
-      }
-      var res = JSON.parse(response)
-      var result = 0;
+        }
+        console.log(data)
 
-      if (res.status == 'Ok' && res.result[0].status == 'Ok' ){
-                 result = res.result[0].duration_value;
-             }
+       // var response = data
+        console.log("SSSS")
+        var response = data.Payload;
+        if (data ==null || data.Payload == null){
+            return 0;
+        }
+        var res = JSON.parse(response)
+        var result = 0;
 
-    return result;
-    });
+        if (res.status == 'Ok' && res.result[0].status == 'Ok' ){
+           result = res.result[0].duration_value;
+        }
+
+        return result;
+        });
     }
 
     function isUnderPreferredTransportation(currentEvent, travelMode, user_distance, allEvents) {
@@ -192,7 +193,6 @@ exports.handler = (event, context, callback) => {
         }
         console.log(distance);
         console.log("Preferred distance", distance);
-        console.log("Alfred", eventStart)
         var date = new Date(eventStart);
         var yy = date.getFullYear();
         var mm = date.getMonth();
@@ -266,7 +266,7 @@ exports.handler = (event, context, callback) => {
                 var payload = {
                     TableName: "user_preferences",
                     KeyConditionExpression: "username = :u",
-                    ProjectionExpression: "walkingDistance",
+                    ProjectionExpression: "walkingDistance, bikingDistance",
                     ExpressionAttributeValues: {
                         ":u": username
                     }
@@ -278,31 +278,72 @@ exports.handler = (event, context, callback) => {
                     } else {
                         console.log("Query succeeded.");
                         var user_distance = dist.Items[0];
-                        if(isNaN(user_distance) == false || user_distance != null) {
+                        var error_message = null;
+                        console.log(user_distance);
+
+                        var max_dist_status = false;
+
+                        if(travelMode == "walking") {
+                            if("walkingDistance" in user_distance) {
+                                max_dist_status = true;
+                            }
+                        }
+                        if(travelMode == "biking") {
+                            if("bikingDistance" in user_distance) {
+                                max_dist_status = true;
+                            }
+                        }
+                        if(max_dist_status) {
                             if(travelMode == 'walking' || travelMode == 'biking') {
                                 var s = isUnderPreferredTransportation(event, travelMode, user_distance, data);
-                                console.log("Walking Response: : ", s);
                                 if (s[0] == false) {
-                                    console.log("Your " + travelMode + " distance exceeds your daily preference: " + user_distance/1609 + " miles");
-                                    context.fail("Conflict");
+                                    var user_miles = null;
+                                    var error_code = -1;
+                                    if(travelMode == "walking") {
+                                        user_miles = user_distance.walkingDistance;
+                                        error_code = 1;
+                                    }
+                                    else if(travelMode == "biking") {
+                                        user_miles = user_distance.bikingDistance;
+                                        error_code = 2;
+                                    }
+                                    error_message = {
+                                        "errorMessage": {
+                                            "code": error_code,
+                                            "value": user_miles
+                                        }
+                                    };
+                                    console.log("Your " + travelMode + " distance exceeds your daily preference: " + user_miles + " miles");
+                                    context.succeed(error_message);
                                 }
                             }
 
                         }
 
-
                         var s2 = isConflictPresent(data, eventID, eventStart, eventEnd);
                         console.log("Time Conflict Response: ", s2);
                         if(s2[0] == true) {
                             console.log("This time overlaps with meeting: " + s2[1]);
-                            context.fail("Conflict");
+                            error_message = {
+                                "errorMessage": {
+                                    "code": 3,
+                                    "value": s2[1]
+                                }
+                            }
+                            context.succeed(error_message);
                         }
 
 
                         var locationConflict = checkConflictOnLocationBasis(data, eventID, eventStart, eventEnd, origin, destination, travelMode);
                         console.log("Location Conflict Response: ", locationConflict);
                         if(locationConflict == true){
-                            context.fail("Conflict");
+                            error_message = {
+                                "errorMessage": {
+                                    "code": 4,
+                                    "value": "CONFLICTING EVENT TITLE"
+                                }
+                            }
+                            context.succeed(error_message);
                         }
 
                         else {
