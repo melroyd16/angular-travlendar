@@ -73,7 +73,9 @@ export class CalendarViewComponent implements OnInit {
   activeDayIsOpen = false;
   displayDeleteModal: boolean;
   displayEventModal = false;
+  displayRepeatEventModal = false;
   displayTravelModes = false;
+  repeatEvents=false;
   displayModalError = false;
   forceSaveEvent = false;
   scheduleModalError = '';
@@ -153,7 +155,9 @@ export class CalendarViewComponent implements OnInit {
     this.event.eventStart = new Date();
     this.event.eventEnd = moment().add(1, 'hours');
     this.displayEventModal = false;
+    this.displayRepeatEventModal = false;
     this.displayTravelModes = false;
+    this.repeatEvents=false;
     this.displayModalError = false;
     this.forceSaveEvent = false;
     this.scheduleModalError = '';
@@ -198,6 +202,7 @@ export class CalendarViewComponent implements OnInit {
   }
 
   dayClicked({ date, events }: { date: Date; events: any[] }): void {
+    console.log("handle event");
     if (isSameMonth(date, this.viewDate)) {
       if (
         (isSameDay(this.viewDate, date) && this.activeDayIsOpen === true) ||
@@ -249,12 +254,21 @@ export class CalendarViewComponent implements OnInit {
   }
 
   handleEvent(action: string, event: any): void {
+
     this.modalData = { event, action };
     this.modal.open(this.modalContent, { size: 'lg' });
   }
 
   openEventModal(): void {
     this.displayEventModal = true;
+  }
+
+  openRepeatEventModal() : void{
+      $('#repeatEventsModal').modal('toggle');
+  }
+
+  triggerRepeat(): void {
+    this.repeatEvents=true;
   }
 
   changeLocation(): void {
@@ -266,6 +280,7 @@ export class CalendarViewComponent implements OnInit {
       this.calendarService.fetchTransitDetails(this.event.origin, this.event.destination).subscribe((data) => {
         this.travelModeArray = data;
         this.displayTravelModes = true;
+        this.repeatEvents=true;
         this.ref.tick();
       });
     }
