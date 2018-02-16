@@ -16,6 +16,7 @@ import { HeaderComponent } from './header/header.component';
 import { ProfileComponent } from './profile/profile.component';
 import { GpCompleteDirective } from './directives/gp-complete.directive';
 import { OwlDateTimeModule, OwlNativeDateTimeModule } from 'ng-pick-datetime';
+import { Ng4LoadingSpinnerModule } from 'ng4-loading-spinner';
 
 import { CognitoUtil } from './services/cognito.service';
 import { routing } from './app.routes';
@@ -67,6 +68,7 @@ import {IonRangeSliderModule} from 'ng2-ion-range-slider';
     NgbModule.forRoot(),
     NgbModalModule.forRoot(),
     CalendarModule.forRoot(),
+    Ng4LoadingSpinnerModule.forRoot(),
     BrowserModule,
     BrowserAnimationsModule,
     CommonModule,
