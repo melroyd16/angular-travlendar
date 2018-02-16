@@ -12,11 +12,11 @@ export class CentralApiService {
   constructor(private http: HttpClient,
               private spinnerService: Ng4LoadingSpinnerService) { }
 
+  hideSpinner = this.spinnerService.hide();
+
   callAPI(module: string, payload: any, method: string): Observable<any> {
 
-    // Spinner Loader
-    
-    // this.spinnerService.show();
+    this.spinnerService.show();
 
     let url = '';
     switch (module) {
@@ -32,8 +32,13 @@ export class CentralApiService {
       default:
         url = environment.calendar_api;
     }
-    // this.spinnerService.hide();
-    return this.http[method](url, payload);
+    
+    return this.http[method](url, payload).map(res => {
+      this.spinnerService.hide();
+      return res;
+    });
+    // return this.http[method](url, payload);
+
   }
 
 }

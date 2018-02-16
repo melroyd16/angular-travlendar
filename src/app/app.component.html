@@ -1,6 +1,6 @@
 <!--The content below is only a placeholder and can be replaced.-->
 <app-header *ngIf="currentRoute !== 'home'"></app-header>
-<ng4-loading-spinner> </ng4-loading-spinner>
+<ng4-loading-spinner [threshold]="10"> </ng4-loading-spinner>
 <div [class.main-view]="currentRoute !== 'home'">
   <router-outlet></router-outlet>
 </div>
