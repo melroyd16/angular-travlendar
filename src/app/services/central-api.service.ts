@@ -32,7 +32,7 @@ export class CentralApiService {
       default:
         url = environment.calendar_api;
     }
-    //comment
+    
     return this.http[method](url, payload).map(res => {
       this.spinnerService.hide();
       return res;
