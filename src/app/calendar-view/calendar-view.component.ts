@@ -286,6 +286,7 @@ export class CalendarViewComponent implements OnInit {
   changePreviousLocation(): void {
     this.displayTravelModes = false;
     this.event.travelMode = null;
+    // reinitialing
     this.travelModeArray = [];
     switch (this.selectedPriorLocation) {
       case 'home':
@@ -296,6 +297,12 @@ export class CalendarViewComponent implements OnInit {
         this.event.origin = this.workLocation;
         this.changeLocation();
         break;
+    }
+  }
+
+  changeStartDate(): void {
+    if (this.event.eventStart > this.event.eventEnd) {
+      this.event.eventEnd = moment(this.event.eventStart).add(1, 'hours');
     }
   }
 

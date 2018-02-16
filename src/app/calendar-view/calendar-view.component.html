@@ -94,12 +94,12 @@
           <div class="form-group row">
             <div class="col-xs-12 col-md-6">
               <label for="eventStart">Event Start</label>
-              <input name="eventStart" [(ngModel)]="event.eventStart" class="form-control" [owlDateTimeTrigger]="dtPicker1" [owlDateTime]="dtPicker1" [min]="eventStartMinDate">
-              <owl-date-time #dtPicker1></owl-date-time>
+              <input required name="eventStart" [(ngModel)]="event.eventStart" class="form-control" [owlDateTimeTrigger]="dt1" [owlDateTime]="dt1" [min]="eventStartMinDate" (ngModelChange)="changeStartDate()">
+              <owl-date-time #dt1></owl-date-time>
             </div>
             <div class="col-xs-12 col-md-6">
               <label for="eventEnd">Event End</label>
-              <input name="eventEnd" [(ngModel)]="event.eventEnd" class="form-control" [owlDateTimeTrigger]="dtPicker2" [owlDateTime]="dtPicker2" [min]="event.eventStart">
+              <input required name="eventEnd" [(ngModel)]="event.eventEnd" class="form-control" [owlDateTimeTrigger]="dtPicker2" [owlDateTime]="dtPicker2" [min]="event.eventStart" #dateTime="ngModel">
               <owl-date-time #dtPicker2></owl-date-time>
             </div>
           </div>
