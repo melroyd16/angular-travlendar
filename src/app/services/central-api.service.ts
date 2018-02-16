@@ -4,14 +4,19 @@ import { environment } from '../../environments/environment';
 import { Observable } from 'rxjs/Observable';
 import { of } from 'rxjs/observable/of';
 
+import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
+
 @Injectable()
 export class CentralApiService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient,
+              private spinnerService: Ng4LoadingSpinnerService) { }
 
   callAPI(module: string, payload: any, method: string): Observable<any> {
 
     // Spinner Loader
+    
+    // this.spinnerService.show();
 
     let url = '';
     switch (module) {
@@ -27,6 +32,7 @@ export class CentralApiService {
       default:
         url = environment.calendar_api;
     }
+    // this.spinnerService.hide();
     return this.http[method](url, payload);
   }
 
