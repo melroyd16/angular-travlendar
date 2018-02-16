@@ -300,6 +300,12 @@ export class CalendarViewComponent implements OnInit {
     }
   }
 
+  changeStartDate(): void {
+    if (this.event.eventStart > this.event.eventEnd) {
+      this.event.eventEnd = moment(this.event.eventStart).add(1, 'hours');
+    }
+  }
+
   addEvent(eventId, eventTitle, eventStart, eventEnd): void {
     this.events.push({
       id: eventId,
