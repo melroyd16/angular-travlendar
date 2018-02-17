@@ -102,10 +102,6 @@ export class CalendarViewComponent implements OnInit {
       onClick: ({ event }: { event: any }): void => {
         $('#deleteModal').modal('toggle');
         this.deleteEventId = event.id;
-        // console.log(this.deleteEventId);
-        // console.log(this.events[0].title);
-        // this.events = this.events.filter(iEvent => iEvent !== event);
-        // this.handleEvent('Deleted', event);
       }
     }
   ];
@@ -327,24 +323,21 @@ export class CalendarViewComponent implements OnInit {
     this.refresh.next();
   }
 
-  // REQUIRED??
   closeDeleteModal(): void {
     $('#deleteModal').modal('toggle');
-    // $timeout(function () {
-    //     vm.displayDeleteModal = false;
-    // }, 1000);
   }
 
   // DELETE EVENT
   deleteEvent(): void {
-    // console.log(this.deleteEventId);
     this.closeDeleteModal();
     this.eventsService.deleteEvent(this.deleteEventId).subscribe(() => {
       for (let i = 0; i < this.events.length; i++) {
         if (this.events[i].id === this.deleteEventId) {
           this.events.splice(i, 1);
           this.ref.tick();
-          console.log('SUCCESSFULLY DELETED!!');
+          this.refresh.next();
+          this.activeDayIsOpen = false;
+          break;
         }
       }
     });
