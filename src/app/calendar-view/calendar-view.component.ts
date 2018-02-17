@@ -321,7 +321,7 @@ export class CalendarViewComponent implements OnInit {
       },
       // PREVENT EDIT/DELETION OF PAST EVENTS
 
-      actions: this.getEventActions(eventTitle, eventEnd)
+      actions: this.getEventActions(eventEnd)
       // actions: this.eventActions
     });
     this.refresh.next();
@@ -350,9 +350,7 @@ export class CalendarViewComponent implements OnInit {
     });
   }
 
-  getEventActions(eventTitle, eventEndTime): CalendarEventAction[] {
-    console.log(eventTitle, eventEndTime);
-    console.log(isPast(eventEndTime))
+  getEventActions(eventEndTime): CalendarEventAction[] {
     if (isPast(eventEndTime)) {
       return [];
     } else return this.eventActions;
