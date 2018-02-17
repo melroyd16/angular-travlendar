@@ -83,7 +83,7 @@ export class CalendarViewComponent implements OnInit {
   selectedPriorLocation = 'home';
   travelModeArray = [];
   deleteEventId = '';
-  choices=[{id: 'choice1'}]
+  dates=[{}];
 
   modalData: {
     action: string;
@@ -203,7 +203,6 @@ export class CalendarViewComponent implements OnInit {
   }
 
   dayClicked({ date, events }: { date: Date; events: any[] }): void {
-    console.log("handle event");
     if (isSameMonth(date, this.viewDate)) {
       if (
         (isSameDay(this.viewDate, date) && this.activeDayIsOpen === true) ||
@@ -269,7 +268,6 @@ export class CalendarViewComponent implements OnInit {
         console.log(element.checked);
         $('#repeatEventsModal').modal('toggle');
       }
-
   }
 
   closeRepeatModal(): void {
@@ -277,20 +275,23 @@ export class CalendarViewComponent implements OnInit {
   }
 
   repeatEvent(): void{
+  console.log(this.dates);
   this.closeRepeatModal();
   }
 
   triggerRepeat(): void {
     this.repeatEvents=true;
   }
+
   addNewChoice(): void{
-    let newItemNo= this.choices.length+1;
-    this.choices.push({'id': 'choice' +newItemNo});
+    let newItemNo= this.dates.length+1;
+    this.dates.push({});
   }
+
   removeChoice(): void {
-    if(this.choices.length>1){
-      let lastItem = this.choices.length-1;
-         this.choices.splice(lastItem);
+    if(this.dates.length>1){
+      let lastItem = this.dates.length-1;
+         this.dates.splice(lastItem);
         }
     }
 

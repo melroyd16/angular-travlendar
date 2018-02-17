@@ -203,17 +203,18 @@
        </div>
        <div class="modal-body">
          <p>Select the dates you want to repeat this event</p>
-         <fieldset *ngFor="let choice of choices">
-         <input [owlDateTimeTrigger]="dt3" [owlDateTime]="dt3"  [min]="event.eventStart" [selectMode]="'single'">
+         <fieldset *ngFor="let date of dates">
+         <input [owlDateTimeTrigger]="dt3" [owlDateTime]="dt3"  [min]="event.eventStart" [selectMode]="'single'" [(ngModel)]="date.value">
          <owl-date-time [pickerType]="'calendar'" #dt3></owl-date-time>
           <button class="add"  (click)="addNewChoice()">+</button>
-          <button class="remove" (show)="last" (click)="removeChoice()">-</button>
+          <button class="remove" (click)="removeChoice()">-</button>
         </fieldset>
        </div>
        <div class="modal-footer">
-         <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="closeRepeatModal()">Close</button>
-         <button type="button" class="btn btn-primary" (click)="repeatEvent()">Yes</button>
+         <button class="addMore" type="button" class="btn btn-secondary" title="Hit me" data-dismiss="modal" (click)="closeRepeatModal()">Cancel</button>
+         <button type="button" class="btn btn-primary" (click)="repeatEvent()">Confirm</button>
        </div>
+
      </div>
    </div>
  </div>
