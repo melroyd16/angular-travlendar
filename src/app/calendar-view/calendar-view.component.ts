@@ -15,7 +15,8 @@ import {
   endOfMonth,
   isSameDay,
   isSameMonth,
-  addHours
+  addHours,
+  isPast
 } from 'date-fns';
 import { Subject } from 'rxjs/Subject';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -158,7 +159,7 @@ export class CalendarViewComponent implements OnInit {
     this.travelModeArray = [];
     this.otherLocationDetails = new Location();
   }
-
+  
   addEvent(eventId, eventTitle, eventStart, eventEnd): void {
     this.events.push({
       id: eventId,
@@ -171,11 +172,14 @@ export class CalendarViewComponent implements OnInit {
         beforeStart: true,
         afterEnd: true
       },
-      actions: this.eventActions
+      // PREVENT EDIT/DELETION OF PAST EVENTS
+
+      actions: this.getEventActions(eventEnd)
+      // actions: this.eventActions
     });
     this.refresh.next();
   }
-
+  
   selectAddress(place: any, location: string) {
     switch (location) {
       case 'home':
@@ -299,6 +303,7 @@ export class CalendarViewComponent implements OnInit {
           this.refresh.next();
           this.activeDayIsOpen = false;
           this.displaySuccessMessage('Event has been deleted successfully');
+          break;
         }
       }
     });
@@ -316,6 +321,12 @@ export class CalendarViewComponent implements OnInit {
         this.viewDate = date;
       }
     }
+  }
+  
+  getEventActions(eventEndTime): CalendarEventAction[] {
+    if (isPast(eventEndTime)) {
+      return [];
+    } else return this.eventActions;
   }
 
   eventTimesChanged({
