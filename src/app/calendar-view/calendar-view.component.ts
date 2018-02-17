@@ -15,7 +15,8 @@ import {
   endOfMonth,
   isSameDay,
   isSameMonth,
-  addHours
+  addHours,
+  isPast
 } from 'date-fns';
 import { Subject } from 'rxjs/Subject';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -318,7 +319,10 @@ export class CalendarViewComponent implements OnInit {
         beforeStart: true,
         afterEnd: true
       },
-      actions: this.eventActions
+      // PREVENT EDIT/DELETION OF PAST EVENTS
+
+      actions: this.getEventActions(eventEnd)
+      // actions: this.eventActions
     });
     this.refresh.next();
   }
@@ -344,6 +348,12 @@ export class CalendarViewComponent implements OnInit {
         }
       }
     });
+  }
+
+  getEventActions(eventEndTime): CalendarEventAction[] {
+    if (isPast(eventEndTime)) {
+      return [];
+    } else return this.eventActions;
   }
 
 
