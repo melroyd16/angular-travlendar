@@ -61,7 +61,6 @@ export class CalendarViewComponent implements OnInit {
   @ViewChild('modalContent') modalContent: TemplateRef<any>;
 
   view = 'month';
-  displayLocationModal: boolean;
   eventsLoaded = false;
   homeLocation: Location;
   workLocation: Location;
@@ -84,16 +83,10 @@ export class CalendarViewComponent implements OnInit {
   travelModeArray = [];
   deleteEventId = '';
 
-  modalData: {
-    action: string;
-    event: any;
-  };
-
   eventActions: CalendarEventAction[] = [
     {
-      label: '<i class="fa fa-fw fa-pencil"></i>',
+      label: '<i class="fas fa-edit"></i>',
       onClick: ({ event }: { event: any }): void => {
-        this.handleEvent('Edited', event);
       }
     },
     {
@@ -101,10 +94,6 @@ export class CalendarViewComponent implements OnInit {
       onClick: ({ event }: { event: any }): void => {
         $('#deleteModal').modal('toggle');
         this.deleteEventId = event.id;
-        // console.log(this.deleteEventId);
-        // console.log(this.events[0].title);
-        // this.events = this.events.filter(iEvent => iEvent !== event);
-        // this.handleEvent('Deleted', event);
       }
     }
   ];
@@ -120,6 +109,12 @@ export class CalendarViewComponent implements OnInit {
     public calendarService: CalendarService,
     private ref: ApplicationRef) {
     this.userService.isAuthenticated(this);
+  }
+
+  isLoggedIn(message: string, isLoggedIn: boolean) {
+    if (!isLoggedIn) {
+      this.router.navigate(['/home/login']);
+    }
   }
 
   ngOnInit() {
@@ -164,10 +159,21 @@ export class CalendarViewComponent implements OnInit {
     this.otherLocationDetails = new Location();
   }
 
-  isLoggedIn(message: string, isLoggedIn: boolean) {
-    if (!isLoggedIn) {
-      this.router.navigate(['/home/login']);
-    }
+  addEvent(eventId, eventTitle, eventStart, eventEnd): void {
+    this.events.push({
+      id: eventId,
+      title: eventTitle,
+      start: new Date(eventStart),
+      end: new Date(eventEnd),
+      color: colors.red,
+      draggable: true,
+      resizable: {
+        beforeStart: true,
+        afterEnd: true
+      },
+      actions: this.eventActions
+    });
+    this.refresh.next();
   }
 
   selectAddress(place: any, location: string) {
@@ -201,18 +207,8 @@ export class CalendarViewComponent implements OnInit {
     });
   }
 
-  dayClicked({ date, events }: { date: Date; events: any[] }): void {
-    if (isSameMonth(date, this.viewDate)) {
-      if (
-        (isSameDay(this.viewDate, date) && this.activeDayIsOpen === true) ||
-        events.length === 0
-      ) {
-        this.activeDayIsOpen = false;
-      } else {
-        this.activeDayIsOpen = true;
-        this.viewDate = date;
-      }
-    }
+  openEventModal(): void {
+    this.displayEventModal = true;
   }
 
   saveEvent(): void {
@@ -237,34 +233,18 @@ export class CalendarViewComponent implements OnInit {
         this.addEvent(data, this.eventPayload.eventTitle, this.eventPayload.eventStart, this.eventPayload.eventEnd);
         $('#eventModal').modal('hide');
         this.initEvent();
-        this.successMessage = 'Event has been successfully added';
-        this.displaySuccess = true;
-        const timeoutId = setTimeout(() => {
-          this.displaySuccess = false;
-          clearTimeout(timeoutId);
-        }, 2000);
+        this.displaySuccessMessage('Event has been added successfully');
       }
     });
   }
 
-  eventTimesChanged({
-    event,
-    newStart,
-    newEnd
-  }: CalendarEventTimesChangedEvent): void {
-    event.start = newStart;
-    event.end = newEnd;
-    this.handleEvent('Dropped or resized', event);
-    this.refresh.next();
-  }
-
-  handleEvent(action: string, event: any): void {
-    this.modalData = { event, action };
-    this.modal.open(this.modalContent, { size: 'lg' });
-  }
-
-  openEventModal(): void {
-    this.displayEventModal = true;
+  displaySuccessMessage(message): void {
+    this.successMessage = message;
+    this.displaySuccess = true;
+    const timeoutId = setTimeout(() => {
+      this.displaySuccess = false;
+      clearTimeout(timeoutId);
+    }, 3000);
   }
 
   changeLocation(): void {
@@ -306,45 +286,45 @@ export class CalendarViewComponent implements OnInit {
     }
   }
 
-  addEvent(eventId, eventTitle, eventStart, eventEnd): void {
-    this.events.push({
-      id: eventId,
-      title: eventTitle,
-      start: new Date(eventStart),
-      end: new Date(eventEnd),
-      color: colors.red,
-      draggable: true,
-      resizable: {
-        beforeStart: true,
-        afterEnd: true
-      },
-      actions: this.eventActions
-    });
-    this.refresh.next();
-  }
-
-  // REQUIRED??
   closeDeleteModal(): void {
     $('#deleteModal').modal('toggle');
-    // $timeout(function () {
-    //     vm.displayDeleteModal = false;
-    // }, 1000);
   }
 
-  // DELETE EVENT
   deleteEvent(): void {
-    // console.log(this.deleteEventId);
     this.closeDeleteModal();
     this.eventsService.deleteEvent(this.deleteEventId).subscribe(() => {
       for (let i = 0; i < this.events.length; i++) {
         if (this.events[i].id === this.deleteEventId) {
           this.events.splice(i, 1);
-          this.ref.tick();
-          console.log('SUCCESSFULLY DELETED!!');
+          this.refresh.next();
+          this.activeDayIsOpen = false;
+          this.displaySuccessMessage('Event has been deleted successfully');
         }
       }
     });
   }
 
+  dayClicked({ date, events }: { date: Date; events: any[] }): void {
+    if (isSameMonth(date, this.viewDate)) {
+      if (
+        (isSameDay(this.viewDate, date) && this.activeDayIsOpen === true) ||
+        events.length === 0
+      ) {
+        this.activeDayIsOpen = false;
+      } else {
+        this.activeDayIsOpen = true;
+        this.viewDate = date;
+      }
+    }
+  }
 
+  eventTimesChanged({
+    event,
+    newStart,
+    newEnd
+  }: CalendarEventTimesChangedEvent): void {
+    event.start = newStart;
+    event.end = newEnd;
+    this.refresh.next();
+  }
 }
