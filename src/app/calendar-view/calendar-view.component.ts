@@ -92,7 +92,7 @@ export class CalendarViewComponent implements OnInit {
 
   eventActions: CalendarEventAction[] = [
     {
-      label: '<i class="fa fa-fw fa-pencil"></i>',
+      label: '<i class="fas fa-edit"></i>',
       onClick: ({ event }: { event: any }): void => {
         this.handleEvent('Edited', event);
       }
@@ -234,14 +234,18 @@ export class CalendarViewComponent implements OnInit {
         this.addEvent(data, this.eventPayload.eventTitle, this.eventPayload.eventStart, this.eventPayload.eventEnd);
         $('#eventModal').modal('hide');
         this.initEvent();
-        this.successMessage = 'Event has been successfully added';
-        this.displaySuccess = true;
-        const timeoutId = setTimeout(() => {
-          this.displaySuccess = false;
-          clearTimeout(timeoutId);
-        }, 2000);
+        this.displaySuccessMessage('Event has been added successfully');
       }
     });
+  }
+
+  displaySuccessMessage(message): void {
+    this.successMessage = message;
+    this.displaySuccess = true;
+    const timeoutId = setTimeout(() => {
+      this.displaySuccess = false;
+      clearTimeout(timeoutId);
+    }, 2000);
   }
 
   eventTimesChanged({
@@ -337,6 +341,7 @@ export class CalendarViewComponent implements OnInit {
           this.ref.tick();
           this.refresh.next();
           this.activeDayIsOpen = false;
+          this.displaySuccessMessage('Event has been deleted successfully');
           break;
         }
       }
@@ -346,7 +351,7 @@ export class CalendarViewComponent implements OnInit {
   getEventActions(eventEndTime): CalendarEventAction[] {
     if (isPast(eventEndTime)) {
       return [];
-    } else return this.eventActions;
+    } else { return this.eventActions; }
   }
 
 
