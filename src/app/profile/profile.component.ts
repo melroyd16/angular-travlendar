@@ -41,7 +41,7 @@ export class ProfileComponent implements OnInit {
   walk:boolean = true;
   drive:boolean = true;
   cycle:boolean = true;
-  trans:boolean = true;
+  trans:boolean = true
 
   travelMode = ['walking','driving','cycling','transit'];
 

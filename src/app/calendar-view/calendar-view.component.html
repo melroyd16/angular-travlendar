@@ -127,7 +127,7 @@
           </div>
           <div class="form-group" *ngIf="repeatEvents">
             <label>
-              <input type="checkbox" data-toggle="modal" data-target="#repeatEventsModal" value="repeat" (click)="openRepeatEventModal()"> Repeat Event
+              <input #repeat type="checkbox" data-toggle="modal" value="repeat" (change)="openRepeatEventModal(repeat)"> Repeat Event
             </label>
           </div>
         </form>
@@ -203,12 +203,16 @@
        </div>
        <div class="modal-body">
          <p>Select the dates you want to repeat this event</p>
-         <input [owlDateTimeTrigger]="dt3" [owlDateTime]="dt3">
+         <fieldset *ngFor="let choice of choices">
+         <input [owlDateTimeTrigger]="dt3" [owlDateTime]="dt3"  [min]="event.eventStart" [selectMode]="'single'">
          <owl-date-time [pickerType]="'calendar'" #dt3></owl-date-time>
+          <button class="add"  (click)="addNewChoice()">+</button>
+          <button class="remove" (show)="last" (click)="removeChoice()">-</button>
+        </fieldset>
        </div>
        <div class="modal-footer">
-         <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="closeDeleteModal()">Close</button>
-         <button type="button" class="btn btn-primary" (click)="deleteEvent()">Yes</button>
+         <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="closeRepeatModal()">Close</button>
+         <button type="button" class="btn btn-primary" (click)="repeatEvent()">Yes</button>
        </div>
      </div>
    </div>
