@@ -1,16 +1,16 @@
 <form>
   <div class="form-group">
     <label for="homeAddress">Home Address</label>
-    <input id="homeAddress" class="form-control" [(ngModel)]="homeLocationText"(onSelect)="selectAddress($event, 'home')"appGpComplete name="home-location"/>
-    
+    <input id="homeAddress" class="form-control" [(ngModel)]="homeLocationText"
+           (onSelect)="selectAddress($event, 'home')" appGpComplete name="home-location"/>
+
   </div>
   <div class="form-group">
     <label for="workAddress">Work Address</label>
-    <input id="workAddress" class="form-control" [(ngModel)]="workLocationText" (onSelect)="selectAddress($event, 'work')" appGpComplete name="work-location"/>
+    <input id="workAddress" class="form-control" [(ngModel)]="workLocationText"
+           (onSelect)="selectAddress($event, 'work')" appGpComplete name="work-location"/>
   </div>
   <div class="form-group">
-    <button (click)="setAdvancedSliderTo(0,16)">Update Slider to 0 - 16</button>
-
     <label>Lunch Time</label>
 
     <ion-range-slider #lunchSliderElement
@@ -28,7 +28,7 @@
                       [prettify_enabled]="true"
                       (onUpdate)="update(advancedSlider1,$event)"
                       (onChange)="update(advancedSlider1, $event)"
-                      (onFinish)="finish(advancedSlider1, $event)"></ion-range-slider>
+                      (onFinish)="finishStart(advancedSlider1, $event)"></ion-range-slider>
   </div>
   <div class="form-group">
 
@@ -49,19 +49,21 @@
                       [prettify_enabled]="true"
                       (onUpdate)="update(advancedSlider,$event)"
                       (onChange)="update(advancedSlider, $event)"
-                      (onFinish)="finish(advancedSlider, $event)"></ion-range-slider>
+                      (onFinish)="finishDinner(advancedSlider, $event)"></ion-range-slider>
   </div>
   <br>
 
   <div class="form-group" novalidate class="col-xs-12 col-md-4">
     <p>
       <label for="walkingDistance">Maximum Walking Distance (in miles)</label>
-        <input id="walkingDistance"  type="number" min="0" max="10" class="form-control" [(ngModel)]="walking" [ngModelOptions]="{standalone: true}"/>
+      <input id="walkingDistance" type="number" min="0" max="10" class="form-control" [(ngModel)]="walking"
+             [ngModelOptions]="{standalone: true}"/>
     </p>
-    <br />
+    <br/>
     <p>
       <label for="cyclingDistance">Maximum Cycling Distance (in miles)</label>
-        <input id="cyclingDistance"  type="number" min="0" max="10" class="form-control" [(ngModel)]="cycling" [ngModelOptions]="{standalone: true}"/>
+      <input id="cyclingDistance" type="number" min="0" max="10" class="form-control" [(ngModel)]="cycling"
+             [ngModelOptions]="{standalone: true}"/>
     </p>
   </div>
 

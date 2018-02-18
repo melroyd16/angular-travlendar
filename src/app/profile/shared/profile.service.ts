@@ -29,32 +29,36 @@ export class ProfileService {
     this.userProfile.workLocation = workLocation;
   }
 
-
-
   saveUserProfile(homeLocation: Location, workLocation: Location, walkingDistance: number,
-     cyclingDistance: number, preferredModes:any[] ): Observable<any> {
+                  cyclingDistance: number, preferredModes: any[] ): Observable<any> {
     const payload = {
       operation: 'saveProfile',
       homeLocation: homeLocation,
       workLocation: workLocation,
       walkingDistance: walkingDistance,
       cyclingDistance: cyclingDistance,
-      preferredModes: preferredModes
+      preferredModes: preferredModes,
+      lunchTime : {
+        'end_time': '12:30pm',
+        'start_time': '11:30am'
+      },
+      dinnerTime : {
+        'end_time': '08:30pm',
+        'start_time': '07:30pm'
+      }
     };
-    
+    console.log(payload);
     return this.centralAPIService.callAPI('profile', payload, 'post');
   }
 
-  setUserDetails( walkingDistance: number,
-     cyclingDistance: number, preferredModes:any[]): void {
+  setUserDetails( walkingDistance: number, cyclingDistance: number, preferredModes: any[]): void {
     this.userProfile.walkingDistance = walkingDistance;
     this.userProfile.cyclingDistance = cyclingDistance;
-    this.userProfile.preferredMode= preferredModes;
+    this.userProfile.preferredMode = preferredModes;
   }
 
-
-
   getUserProfile(): UserProfile {
+    console.log(this.userProfile);
     return this.userProfile;
   }
 }
