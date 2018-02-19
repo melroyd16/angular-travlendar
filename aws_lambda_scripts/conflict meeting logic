@@ -1,183 +1,226 @@
-
 import requests
 import json
 
+key = "AIzaSyAFcqYxQE7IZjZtZ7tgMt_wb_1ghRCKbXk"
+
+"""
+New method to handle
+"""
+# def getLocationInformation_aws(event, context):
+#     print(context)
+#     if event is None:
+#         return {'status': 'Error'}
+#     print(event)
+#     if event['start_placeid'] is None or len(event['start_placeid']) == 0:
+#         return {'status': 'Error'}
+#
+#     if event['end_placeid'] is None or len(event['end_placeid']) == 0:
+#         return {'status': 'Error'}
+#
+#     if event['mode'] is None or len(event['mode']) == 0:
+#         return {'status': 'Error'}
+#
+#     start_placeid = ""
+#     for placeid in event['start_placeid']:
+#         start_placeid += placeid + "|"
+#
+#     start_placeid = start_placeid[0:-1]
+#
+#     end_placeid = ""
+#     for placeid in event['end_placeid']:
+#         end_placeid += placeid + '|'
+#
+#     end_placeid = end_placeid[0:-1]
+#
+#     # start_placeid = "place_id:ChIJSxh5JbJqkFQRxI1KoO7oZHs"
+#     # end_placeid = "place_id:ChIJ55fLWVtBkFQR0v31eadEoLM|place_id:ChIJ3S-JXmauEmsRUcIaWtf4MzE"
+#     # mode = "bicycling"
+#
+#     mode = event['mode']
+#     url = "https://maps.googleapis.com/maps/api/distancematrix/json"
+#     params = {"origins": start_placeid,
+#               "destinations": end_placeid,
+#               "mode": mode,
+#               "key": key}
+#
+#     response = requests.get(url, params)
+#
+#     if not response.ok:
+#         return {'status': 'Error'}
+#
+#     json_response = json.loads(response.content)
+#     if json_response['status'] != 'OK':
+#         return {'status': 'Error'}
+#
+#     print(json_response)
+#
+#     if json_response is None:
+#         return {'status': 'Error'}
+#
+#     result = []
+#
+#     if 'rows' not in json_response or len(json_response['rows']) == 0:
+#         return None
+#
+#     for row in json_response['rows']:
+#         if 'elements' not in row or len(row['elements']) == 0:
+#             continue
+#         for element in row['elements']:
+#             elem = {}
+#             if element['status'] == 'OK':
+#                 elem['status'] = 'Ok'
+#                 elem['distance_text'] = element['distance']['text']
+#                 elem['distance_value'] = element['distance']['value']
+#                 elem['duration_text'] = element['duration']['text']
+#                 elem['duration_value'] = element['duration']['value']
+#             else:
+#                 elem['status'] = 'Error'
+#             result.append(elem)
+#
+#     print(result)
+#     return {'status': 'Ok', "result": result}
 
 
+# Sending duration of four distances
+# 1. Previous Meeting End Location to Current Meeting origin location
+# 2. Previous Meeting End Location to Current Meeting destination location
+# 3. current Meeting End Location to next Meeting Origin Location
+# 4. current Meeting End Location to next Meeting Destination Location
 def getLocationInformation(event, context):
+
+    result = [0,0,0,0]
     if event is None:
-        return {'status': 'Error'}
-    print(event)
-    if event['start_placeid'] is None or len(event['start_placeid']) == 0:
-        return {'status': 'Error'}
+        return result
 
-    if event['end_placeid'] is None or len(event['end_placeid']) == 0:
-        return {'status': 'Error'}
+    currentLocationOrigin = ""
+    currentLocationDestination = ""
+    previousMeetingDestinationPlacId = ""
+    nextMeetingOriginPlaceId = ""
+    nextMeetingDestinationPlaceId = ""
+    travelMode = ""
 
-    if event['mode'] is None or len(event['mode']) == 0:
-        return {'status': 'Error'}
+    if event['travelMode'] is not None and len(event['travelMode'].strip()) == 0:
+        travelMode = event['travelMode'].strip()
+    else:
+        return result
+
+    if event['origin'] is not None and len(event['origin'].strip()) == 0:
+        currentLocationOrigin = event['origin'].strip()
+
+    if event['destination'] is not None and len(event['destination'].strip()) == 0:
+        currentLocationDestination = "place_id:" + event['destination'].strip()
+
+    if event['previousMeetingOriginPlaceId']is not None and len(event['previousMeetingOriginPlaceId'].strip()) == 0:
+        previousMeetingDestinationPlacId = "place_id:" + event['previousMeetingOriginPlaceId'].strip()
+
+    if event['nextMeetingOriginPlaceId'] is not None and len(event['nextMeetingOriginPlaceId'].strip()) == 0:
+        nextMeetingOriginPlaceId =  "place_id:" +event['nextMeetingOriginPlaceId'].strip()
+
+    if event['nextMeetingDestinationPlaceId'] is not None and len(event['nextMeetingDestinationPlaceId'].strip()) == 0:
+        nextMeetingDestinationPlaceId =  "place_id:" + event['nextMeetingDestinationPlaceId'].strip()
 
 
-    start_placeid = ""
-    for placeid in event['start_placeid']:
-        start_placeid += placeid + "|"
+    result[0] = getDurationbetweenTwoLocations(previousMeetingDestinationPlacId, currentLocationOrigin,travelMode)
+    result[1] = getDurationbetweenTwoLocations(previousMeetingDestinationPlacId, currentLocationDestination,travelMode)
+    result[2] = getDurationbetweenTwoLocations(currentLocationDestination, nextMeetingOriginPlaceId,travelMode)
+    result[3] = getDurationbetweenTwoLocations(currentLocationDestination, nextMeetingDestinationPlaceId,travelMode)
 
 
-    start_placeid = start_placeid[0:-1]
+def getDurationbetweenTwoLocations(start_placeid, end_placeid, mode):
+    duration_in_milleseconds = 0
 
-    end_placeid = ""
-    for placeid in event['end_placeid']:
-        end_placeid += placeid + '|'
-
-    end_placeid = end_placeid[0:-1]
+    if start_placeid is None or end_placeid is None or start_placeid.strip()== "" or end_placeid.strip() == "":
+        return duration_in_milleseconds
 
 
-    #start_placeid = "place_id:ChIJSxh5JbJqkFQRxI1KoO7oZHs"
-    #end_placeid = "place_id:ChIJ55fLWVtBkFQR0v31eadEoLM|place_id:ChIJ3S-JXmauEmsRUcIaWtf4MzE"
-    #mode = "bicycling"
-
-    key = "AIzaSyAFcqYxQE7IZjZtZ7tgMt_wb_1ghRCKbXk"
-    mode = event['mode']
     url = "https://maps.googleapis.com/maps/api/distancematrix/json"
-    params = {"origins":start_placeid,
+    params = {"origins": start_placeid,
               "destinations": end_placeid,
-              "mode":mode,
+              "mode": mode,
               "key": key}
 
-    response = requests.get(url, params)
+    try:
+        response = requests.get(url, params)
 
-    if not response.ok:
-        return {'status': 'Error'}
-
-    json_response = json.loads(response.content)
-    if json_response['status'] != 'OK':
-        return {'status': 'Error'}
-
-    print(json_response)
-
-    if json_response is None:
-        return {'status': 'Error'}
-
-    var aws = require('aws-sdk');
-const doc = require("dynamodb-doc");
-const dynamo = new doc.DynamoDB();
-
-var lambda = new aws.Lambda({
-    region: 'us-west-2'
-});
-var username = "";
-
-exports.handler = (event, context, callback) => {
-    console.log(event)
-
-    function isConflictPresent(data, eventID, eventStart, eventEnd) {
-        if (data == null || data.Count == 0){
-            return false;
-        }
-        console.log("Inside is conflict present");
-        var itemList = data.Items
-        var isMeetingOverlaps = false
-
-        for (var i = 0; i < itemList.length; i++) {
-            if(itemList[i].id == eventID)
-                continue;
-            var item_start_time = itemList[i].eventStart;
-            var item_end_time = itemList[i].eventEnd;
-
-            var min = Math.min(eventStart, item_start_time)
-            var max = Math.max(eventEnd, item_end_time)
-            if ((max - min) < ((eventEnd - eventStart) + (item_end_time - item_start_time))) {
-                isMeetingOverlaps = true
-                break;
-            }
-        }
-        return isMeetingOverlaps
-    }
+        if not response.ok:
+            return duration_in_milleseconds
 
 
+        json_response = json.loads(response.content)
+        if json_response['status'] != 'OK':
+            return duration_in_milleseconds
 
-    function checkConflictOnLocationBasis(data,eventID, eventStart, eventEnd, origin, destination, travelMode){
-        var itemList = data.Items
+        print(json_response)
 
-        var startmeetingDetails = null
-        var endMeetinfDetails = null
+        if json_response is None:
+            return duration_in_milleseconds
 
-        for(var i= 0; i < itemList.length; i++){
-            if(itemList[i].id == eventID){
-                continue;
-            }
+        if 'rows' not in json_response or len(json_response['rows']) == 0:
+            return duration_in_milleseconds
 
-            if (itemList[i].eventStart > eventStart){
-                //Next Meeting Information
-                if (endMeetinfDetails == null){
-                    endMeetinfDetails = itemList[i];
-                    continue
-                }
+        for row in json_response['rows']:
+            if 'elements' not in row or len(row['elements']) == 0:
+                continue
+            for element in row['elements']:
+                if element['status'] == 'OK':
+                    duration_in_milleseconds = element['distance']['value']
+                    break
+                else:
+                    break
+    except :
+        return duration_in_milleseconds
 
-            if(endMeetinfDetails.eventStart > itemList[i].eventStart){
-                endMeetinfDetails = itemList[i]
-            }
-
-            }else{
-                //First Meeting Information
-                if (startmeetingDetails == null){
-                    startmeetingDetails = itemList[i];
-                    continue;
-                }
-
-                if (startmeetingDetails.eventEnd < itemList[i].eventEnd){
-                    startmeetingDetails = itemList[i];
-                }
-            }
-        }
+    return duration_in_milleseconds
 
 
-        if (startmeetingDetails != null){
-            var previous_response = getDurationFromDistanceAPIInMins(startmeetingDetails.destination, origin, travelMode);
-            var data = []
-            startmeetingDetails.eventStart = startmeetingDetails.eventStart + previous_response
-            data.push(startmeetingDetails)
-            var result = isConflictPresent(data.Items,eventID,eventStart, eventEnd)
-            if (result == true){
-                return true;
-            }
-        }
+# def getLocationInformation(event, context):
+#
+#     end_placeid = "place_id:ChIJ55fLWVtBkFQR0v31eadEoLM|place_id:ChIJ3S-JXmauEmsRUcIaWtf4MzE"
+#     start_placeid = "place_id:ChIJSxh5JbJqkFQRxI1KoO7oZHs"
+#     mode = "bicycling"
+#     key = "AIzaSyAFcqYxQE7IZjZtZ7tgMt_wb_1ghRCKbXk"
+#
+#     url = "https://maps.googleapis.com/maps/api/distancematrix/json"
+#     params = {"origins":start_placeid,
+#               "destinations": end_placeid,
+#               "mode":mode,
+#               "key": key}
+#
+#     response = requests.get(url, params)
+#
+#     if not response.ok:
+#         return {'status': 'Error'}
+#
+#     json_response = json.loads(response.content)
+#     if json_response['status'] != 'OK':
+#         return {'status': 'Error'}
+#
+#     print(json_response)
+#
+#     if json_response is None:
+#         return {'status': 'Error'}
+#
+#
+#     result = []
+#
+#     if 'rows' not in  json_response or len(json_response['rows']) == 0:
+#         return  None
+#
+#     for row in json_response['rows']:
+#         if 'elements' not in row or len(row['elements']) == 0:
+#             continue
+#         for element in row['elements']:
+#             elem = {}
+#             if element['status'] == 'OK':
+#                 elem['status'] = 'Ok'
+#                 elem['distance_text'] = element['distance']['text']
+#                 elem['distance_value'] = element['distance']['value']
+#                 elem['duration_text'] = element['duration']['text']
+#                 elem['duration_value'] = element['duration']['value']
+#             else:
+#                 elem['status'] = 'Error'
+#             result.append(elem)
+#
+#     return {'status': 'Ok' , "result":result}
 
-        if(endMeetinfDetails != null){
-        var next_response = getDurationFromDistanceAPIInMins(destination, endMeetinfDetails.eventStart,travelMode);
-        var data = []
-        data.push(endMeetinfDetails)
-
-        var result = isConflictPresent(data.Items,eventID,eventStart + next_response , eventEnd)
-        if(result == true){
-            return true;
-            }
-        }
-        return false;
-    }
-
-}
-
-    result = []
-
-    if 'rows' not in  json_response or len(json_response['rows']) == 0:
-        return  None
-
-    for row in json_response['rows']:
-        if 'elements' not in row or len(row['elements']) == 0:
-            continue
-        for element in row['elements']:
-            elem = {}
-            if element['status'] == 'OK':
-                elem['status'] = 'Ok'
-                elem['distance_text'] = element['distance']['text']
-                elem['distance_value'] = element['distance']['value']
-                elem['duration_text'] = element['duration']['text']
-                elem['duration_value'] = element['duration']['value']
-            else:
-                elem['status'] = 'Error'
-            result.append(elem)
-
-
-    print result
-    return {'status': 'Ok' , "result":result}
+print(getDurationbetweenTwoLocations("place_id:ChIJSxh5JbJqkFQRxI1KoO7oZHs","place_id:ChIJ034zhcYLK4cRcKOE0My7Bog", "bicycling"))
