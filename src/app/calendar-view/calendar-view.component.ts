@@ -15,7 +15,8 @@ import {
   endOfMonth,
   isSameDay,
   isSameMonth,
-  addHours
+  addHours,
+  isPast
 } from 'date-fns';
 import { Subject } from 'rxjs/Subject';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
@@ -76,7 +77,9 @@ export class CalendarViewComponent implements OnInit {
   displayTravelModes = false;
   displayModalError = false;
   forceSaveEvent = false;
+  displaySuccess = false;
   scheduleModalError = '';
+  successMessage = '';
   locationTypes = ['home', 'work', 'prior event location', 'other'];
   selectedPriorLocation = 'home';
   travelModeArray = [];
@@ -89,7 +92,7 @@ export class CalendarViewComponent implements OnInit {
 
   eventActions: CalendarEventAction[] = [
     {
-      label: '<i class="fa fa-fw fa-pencil"></i>',
+      label: '<i class="fas fa-edit"></i>',
       onClick: ({ event }: { event: any }): void => {
         this.handleEvent('Edited', event);
       }
@@ -99,10 +102,6 @@ export class CalendarViewComponent implements OnInit {
       onClick: ({ event }: { event: any }): void => {
         $('#deleteModal').modal('toggle');
         this.deleteEventId = event.id;
-        // console.log(this.deleteEventId);
-        // console.log(this.events[0].title);
-        // this.events = this.events.filter(iEvent => iEvent !== event);
-        // this.handleEvent('Deleted', event);
       }
     }
   ];
@@ -186,6 +185,8 @@ export class CalendarViewComponent implements OnInit {
       case 'other':
         this.otherLocationDetails = new Location(place.place_id, place.formatted_address,
           place.geometry.location.lat(), place.geometry.location.lng());
+        this.event.origin = Object.assign({}, this.otherLocationDetails);
+        this.changeLocation();
         break;
     }
   }
@@ -233,8 +234,18 @@ export class CalendarViewComponent implements OnInit {
         this.addEvent(data, this.eventPayload.eventTitle, this.eventPayload.eventStart, this.eventPayload.eventEnd);
         $('#eventModal').modal('hide');
         this.initEvent();
+        this.displaySuccessMessage('Event has been added successfully');
       }
     });
+  }
+
+  displaySuccessMessage(message): void {
+    this.successMessage = message;
+    this.displaySuccess = true;
+    const timeoutId = setTimeout(() => {
+      this.displaySuccess = false;
+      clearTimeout(timeoutId);
+    }, 2000);
   }
 
   eventTimesChanged({
@@ -258,7 +269,9 @@ export class CalendarViewComponent implements OnInit {
   }
 
   changeLocation(): void {
+    this.displayTravelModes = false;
     this.event.travelMode = null;
+    this.travelModeArray = [];
     if (!(this.event.origin && this.event.origin.place_id)) {
       this.event.origin = this.homeLocation;
     }
@@ -268,6 +281,29 @@ export class CalendarViewComponent implements OnInit {
         this.displayTravelModes = true;
         this.ref.tick();
       });
+    }
+  }
+
+  changePreviousLocation(): void {
+    this.displayTravelModes = false;
+    this.event.travelMode = null;
+    // reinitialing
+    this.travelModeArray = [];
+    switch (this.selectedPriorLocation) {
+      case 'home':
+        this.event.origin = this.homeLocation;
+        this.changeLocation();
+        break;
+      case 'work':
+        this.event.origin = this.workLocation;
+        this.changeLocation();
+        break;
+    }
+  }
+
+  changeStartDate(): void {
+    if (this.event.eventStart > this.event.eventEnd) {
+      this.event.eventEnd = moment(this.event.eventStart).add(1, 'hours');
     }
   }
 
@@ -283,32 +319,39 @@ export class CalendarViewComponent implements OnInit {
         beforeStart: true,
         afterEnd: true
       },
-      actions: this.eventActions
+      // PREVENT EDIT/DELETION OF PAST EVENTS
+
+      actions: this.getEventActions(eventEnd)
+      // actions: this.eventActions
     });
     this.refresh.next();
   }
 
-  // REQUIRED??
   closeDeleteModal(): void {
     $('#deleteModal').modal('toggle');
-    // $timeout(function () {
-    //     vm.displayDeleteModal = false;
-    // }, 1000);
   }
 
   // DELETE EVENT
   deleteEvent(): void {
-    // console.log(this.deleteEventId);
     this.closeDeleteModal();
     this.eventsService.deleteEvent(this.deleteEventId).subscribe(() => {
       for (let i = 0; i < this.events.length; i++) {
         if (this.events[i].id === this.deleteEventId) {
           this.events.splice(i, 1);
           this.ref.tick();
-          console.log('SUCCESSFULLY DELETED!!');
+          this.refresh.next();
+          this.activeDayIsOpen = false;
+          this.displaySuccessMessage('Event has been deleted successfully');
+          break;
         }
       }
     });
+  }
+
+  getEventActions(eventEndTime): CalendarEventAction[] {
+    if (isPast(eventEndTime)) {
+      return [];
+    } else { return this.eventActions; }
   }
 
 

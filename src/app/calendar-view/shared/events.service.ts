@@ -18,10 +18,10 @@ export class EventsService {
   deleteEvent(eventID): Observable<any> {
     console.log('within delete event.');
     const payload = {
-      operation: "deleteEvent",
+      operation: 'deleteEvent',
       eventID: eventID
     };
-    return this.centralAPIService.callAPI('events', payload, "post");
+    return this.centralAPIService.callAPI('events', payload, 'post');
   }
 
   saveEvent(eventDetails: any, forceSaveEvent: boolean): Observable<any> {
