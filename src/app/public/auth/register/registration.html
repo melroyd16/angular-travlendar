@@ -5,27 +5,44 @@
   <div *ngIf="errorMessage!=null" class="alert alert-danger">
     {{ errorMessage }}
   </div>
+
+  <!-- Username -->
   <div class="form-group">
     <label class="control-label" for="signupName">Name</label>
-    <input id="signupName" type="text" maxlength="50" class="form-control" [(ngModel)]="registrationUser.name" [ngModelOptions]="{standalone: true}" required name="signupName" #signupName="ngModel">
-    <div [hidden]="signupName.valid || signupName.pristine" class="alert alert-danger">
-      Event Title is Required
+    <input id="signupName" name="signupName" type="text" maxlength="50" pattern="[a-zA-Z ]+" class="form-control" [(ngModel)]="registrationUser.name" [ngModelOptions]="{standalone: true}" #signupName="ngModel" required>
+    <div *ngIf="signupName.invalid && (signupName.dirty || signupName.touched)" class="alert alert-danger">
+      <div *ngIf="signupName.invalid && signupName.touched && signupName.pristine">
+        Please enter your name
+      </div>
+      <div *ngIf="signupName.invalid && signupName.dirty">
+        Please enter name in correct format
+      </div>
     </div>
   </div>
-  
+
+  <!-- Email -->
   <div class="form-group">
     <label class="control-label" for="signupEmail">Email</label>
-    <input id="signupEmail" type="email" maxlength="50" class="form-control" [(ngModel)]="registrationUser.email" [ngModelOptions]="{standalone: true}">
+    <input id="signupEmail" name="signupEmail" type="email" maxlength="50" class="form-control" [(ngModel)]="registrationUser.email" [ngModelOptions]="{standalone: true}" #signupEmail="ngModel" required>
+    <div *ngIf="signupEmail.errors && (signupEmail.dirty || signupEmail.touched)" class="alert alert-danger">
+      Please enter correct email
+    </div>
+
   </div>
+
+  <!-- Password -->
   <div class="form-group">
     <label class="control-label" for="signupPassword">Password</label>
-    <input id="signupPassword" type="password" maxlength="25" class="form-control" placeholder="at least 8 characters" length="40" [(ngModel)]="registrationUser.password" [ngModelOptions]="{standalone: true}">
+    <input id="signupPassword" type="password" maxlength="25" class="form-control" placeholder="at least 8 characters" length="40" [(ngModel)]="registrationUser.password" [ngModelOptions]="{standalone: true}" required>
   </div>
+
+  <!-- Submit -->
   <div class="form-group">
     <button (click)="onRegister()" id="signupSubmit" type="submit" class="btn btn-info btn-block">
             Create your account
         </button>
   </div>
+
   <hr>
   <p>Already have an account? <a [routerLink]="['/home/login']"> <i class="fa fa-fw fa-lock"></i>Login</a></p>
 </form>
