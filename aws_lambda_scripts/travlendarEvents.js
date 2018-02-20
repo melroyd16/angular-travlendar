@@ -312,26 +312,123 @@ exports.handler = (event, context, callback) => {
         }
       }
     }
-    console.log("SSSSS");
-    console.log(startmeetingDetails);
 
-    console.log("EEEE");
-    console.log(endMeetinfDetails);
+    var params = {}
+
+    var currentLocationOrigin = origin;
+    var currentLocationDestination = destination;
+    var previousMeetingOriginPlaceId = "";
+    var previousMeetingDestinationPlaceId = "";
+    var nextMeetingOriginPlaceId = "";
+    var nextMeetingDestinationPlaceId = "";
+    var travelMode = travelMode;
+
+    var previousMeetingEndTime = 0;
+    var previousMeetingStartTime = 0;
+    var currentMeetingStartTime = eventStart;
+    var currentMeetingEndTime = eventEnd;
+    var nextMeetingStartTime = 0;
+    var nextMeetingEndTime = 0;
 
     if (startmeetingDetails != null){
-      var previous_response = getDurationFromDistanceAPIInMins(startmeetingDetails.destination.place_id, origin, travelMode);
-      //var previous_response = getDurationFromDistanceAPIInMins("ChIJ-c0dQ52tK4cR0o7GfBfBnC0","ChIJ44CqppgIK4cRH7QsOa1K3aI", "driving")
+      // params["previousMeeting"] = startmeetingDetails
+      // var previous_response = getDurationFromDistanceAPIInMins(startmeetingDetails.destination.place_id, origin, travelMode);
+      // //var previous_response = getDurationFromDistanceAPIInMins("ChIJ-c0dQ52tK4cR0o7GfBfBnC0","ChIJ44CqppgIK4cRH7QsOa1K3aI", "driving")
 
-      console.log("Previous location duration ", previous_response)
+      // console.log("Previous location duration ", previous_response)
 
-      startmeetingDetails.eventStart = startmeetingDetails.eventStart + previous_response * 1000 //millesec
+      // startmeetingDetails.eventStart = startmeetingDetails.eventStart + previous_response * 1000 //millesec
 
-      //startmeetingDetails.eventStart = startmeetingDetails.eventStart + 100 * 1000
-      var result = isConflictPresentForTwoLocations(startmeetingDetails.eventStart, startmeetingDetails.eventEnd,eventStart, eventEnd)
+      // //startmeetingDetails.eventStart = startmeetingDetails.eventStart + 100 * 1000
+      // var result = isConflictPresentForTwoLocations(startmeetingDetails.eventStart, startmeetingDetails.eventEnd,eventStart, eventEnd)
 
-      if (result == true){
-        return true;
+      // if (result == true){
+      //     return true;
+      // }
+
+      previousMeetingOriginPlaceId = startmeetingDetails.origin.place_id;
+      previousMeetingDestinationPlaceId = startmeetingDetails.destination.place_id;
+      previousMeetingStartTime = startmeetingDetails.eventStart;
+      previousMeetingEndTime = startmeetingDetails.eventEnd;
+    }
+
+
+    if(endMeetinfDetails != null){
+
+      // var next_response = getDurationFromDistanceAPIInMins(destination, endMeetinfDetails.origin.place_id,travelMode);
+      // //var next_response = getDurationFromDistanceAPIInMins("ChIJ-c0dQ52tK4cR0o7GfBfBnC0","ChIJ44CqppgIK4cRH7QsOa1K3aI", "driving")
+
+      // console.log("Next location duration ", next_response)
+      // var result = isConflictPresentForTwoLocations(endMeetinfDetails.eventStart,endMeetinfDetails.eventEnd,eventStart , eventEnd+ next_response  * 1000) // millesec
+      //     if(result == true){
+      //         return true;
+      //     }
+      // }
+      nextMeetingOriginPlaceId = endMeetinfDetails.origin.place_id;
+      nextMeetingDestinationPlaceId = endMeetinfDetails.destination.place_id;
+      nextMeetingStartTime = endMeetinfDetails.eventStart;
+      nextMeetingEndTime = endMeetinfDetails.eventEnd;
+    }
+
+
+    var params = {"currentLocationOrigin": currentLocationOrigin,
+      "currentLocationDestination":currentLocationDestination,
+      "previousMeetingOriginPlaceId": previousMeetingOriginPlaceId,
+      "previousMeetingDestinationPlaceId":previousMeetingDestinationPlaceId,
+      "nextMeetingOriginPlaceId":nextMeetingOriginPlaceId,
+      "nextMeetingDestinationPlaceId":nextMeetingDestinationPlaceId,
+      "travelMode":travelMode,
+      "previousMeetingStartTime":previousMeetingStartTime,
+      "previousMeetingEndTime":previousMeetingEndTime,
+      "currentMeetingStartTime":currentMeetingStartTime,
+      "currentMeetingEndTime":currentMeetingEndTime,
+      "nextMeetingStartTime":nextMeetingStartTime,
+      "nextMeetingEndTime":nextMeetingEndTime
+    }
+
+
+    var AWS = require("aws-sdk");
+    AWS.config.update({
+      region: "us-west-2"
+    });
+    var aws = require('aws-sdk');
+
+
+    var lambda = new aws.Lambda({
+      region: 'us-west-2'
+    });
+
+    lambda.invoke({
+      FunctionName: 'getLocationInformation',
+      Payload: JSON.stringify(params, null, null) // pass params
+    }, function(error, data) {
+
+      if (error) {
+        console.log("Error" + error);
+        return 0;
       }
+
+    });
+
+    console.log("PPPPPPP", params);
+    return false;
+  }
+
+    /*
+    if (startmeetingDetails != null){
+      // var previous_response = getDurationFromDistanceAPIInMins(startmeetingDetails.destination.place_id, origin, travelMode);
+      // //var previous_response = getDurationFromDistanceAPIInMins("ChIJ-c0dQ52tK4cR0o7GfBfBnC0","ChIJ44CqppgIK4cRH7QsOa1K3aI", "driving")
+      //
+      // console.log("Previous location duration ", previous_response)
+      //
+      // startmeetingDetails.eventStart = startmeetingDetails.eventStart + previous_response * 1000 //millesec
+      //
+      // //startmeetingDetails.eventStart = startmeetingDetails.eventStart + 100 * 1000
+      // var result = isConflictPresentForTwoLocations(startmeetingDetails.eventStart, startmeetingDetails.eventEnd,eventStart, eventEnd)
+      //
+      // if (result == true){
+      //   return true;
+      // }
     }
 
     if(endMeetinfDetails != null){
@@ -348,7 +445,7 @@ exports.handler = (event, context, callback) => {
 
 
     return false;
-  }
+  }*/
 
 
   function queryForFetchingNearMeetings(status) {
