@@ -83,6 +83,8 @@ export class CalendarViewComponent implements OnInit {
   selectedPriorLocation = 'home';
   travelModeArray = [];
   deleteEventId = '';
+  date=[];
+  repeatCheckbox: any;
   dates=[{}];
 
   modalData: {
@@ -264,13 +266,14 @@ export class CalendarViewComponent implements OnInit {
   }
 
   openRepeatEventModal(element: HTMLInputElement) : void{
+    this.repeatCheckbox=element;
       if(element.checked){
-        console.log(element.checked);
         $('#repeatEventsModal').modal('toggle');
       }
   }
 
   closeRepeatModal(): void {
+    this.repeatCheckbox.checked=false;
     $('#repeatEventsModal').modal('hide');
   }
 
@@ -283,17 +286,28 @@ export class CalendarViewComponent implements OnInit {
     this.repeatEvents=true;
   }
 
-  addNewChoice(): void{
-    let newItemNo= this.dates.length+1;
+  addNewChoice(temp : Date): void{
     this.dates.push({});
   }
 
-  removeChoice(): void {
-    if(this.dates.length>1){
+  removeChoice(temp : Date): void {
+    if(this.dates.length > 1){
+      for(let i=0; i<this.dates.length; i++){
+        if(this.dates[i].value===temp){
+            this.dates.splice(i, 1);
+            break;
+        }
+      }
+    }
+    else{
+      this.dates=[{}];
+    }
+  }
+
+/*    if(this.dates.length>1){
       let lastItem = this.dates.length-1;
          this.dates.splice(lastItem);
-        }
-    }
+       }*/
 
   changeLocation(): void {
     this.event.travelMode = null;
