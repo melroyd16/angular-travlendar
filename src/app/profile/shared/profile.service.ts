@@ -30,7 +30,8 @@ export class ProfileService {
   }
 
   saveUserProfile(homeLocation: Location, workLocation: Location, walkingDistance: number,
-                  cyclingDistance: number, preferredModes: any[] ): Observable<any> {
+                  cyclingDistance: number, preferredModes: any[], lunchStartTime, lunchEndTime,
+                  dinnerStartTime, dinnerEndTime ): Observable<any> {
     const payload = {
       operation: 'saveProfile',
       homeLocation: homeLocation,
@@ -39,12 +40,12 @@ export class ProfileService {
       cyclingDistance: cyclingDistance,
       preferredModes: preferredModes,
       lunchTime : {
-        'end_time': '12:30pm',
-        'start_time': '11:30am'
+        'end_time': lunchEndTime,
+        'start_time': lunchStartTime
       },
       dinnerTime : {
-        'end_time': '08:30pm',
-        'start_time': '07:30pm'
+        'end_time': dinnerEndTime,
+        'start_time': dinnerStartTime
       }
     };
     console.log(payload);

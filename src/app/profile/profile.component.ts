@@ -23,13 +23,57 @@ export class ProfileComponent implements OnInit {
   homeLocation: Location;
   workLocation: Location;
 
-  mapLunchTime = new Map<string, number>();
-  mapDinnerTime = new Map<string, number>();
-  lunchStart = 4;
-  lunchEnd = 6;
+  mapLunchTime = new Map<string, number>(
+    [
+      ['11:00am', 0],
+      ['11:15am', 1],
+      ['11:30am', 2],
+      ['11:45am', 3],
+      ['12:00pm', 4],
+      ['12:15pm', 5],
+      ['12:30pm', 6],
+      ['12:45pm', 7],
+      ['01:00pm', 8],
+      ['01:15pm', 9],
+      ['01:30pm', 10],
+      ['01:45pm', 11],
+      ['02:00pm', 12],
+      ['02:15pm', 13],
+      ['02:30pm', 14],
+      ['02:45pm', 15],
+      ['03:00pm', 16]
+    ]
+  );
+  lunchStart : number;
+  lunchEnd: number;
+  lunchStartTime: string;
+  lunchEndTime: string;
 
-  dinnerStart = 7;
-  dinnerEnd = 8;
+  mapDinnerTime = new Map<string, number>(
+    [
+      ['06:00pm', 0],
+      ['06:15pm', 1],
+      ['06:30pm', 2],
+      ['06:45pm', 3],
+      ['07:00pm', 4],
+      ['07:15pm', 5],
+      ['07:30pm', 6],
+      ['07:45pm', 7],
+      ['08:00pm', 8],
+      ['08:15pm', 9],
+      ['08:30pm', 10],
+      ['08:45pm', 11],
+      ['09:00pm', 12],
+      ['09:15pm', 13],
+      ['09:30pm', 14],
+      ['09:45pm', 15],
+      ['10:00pm', 16]
+    ]
+  );
+  dinnerStartTime: string;
+  dinnerEndTime: string;
+  dinnerStart: number;
+  dinnerEnd: number;
 
   index: number;
   walking = 0;
@@ -101,43 +145,10 @@ export class ProfileComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.mapLunchTime.set('11:00am', 0);
-    this.mapLunchTime.set('11:15am', 1);
-    this.mapLunchTime.set('11:30am', 2);
-    this.mapLunchTime.set('11:45am', 3);
-    this.mapLunchTime.set('12:00pm', 4);
-    this.mapLunchTime.set('12:15am', 5);
-    this.mapLunchTime.set('12:30pm', 6);
-    this.mapLunchTime.set('12:45pm', 7);
-    this.mapLunchTime.set('01:00pm', 8);
-    this.mapLunchTime.set('01:15pm', 9);
-    this.mapLunchTime.set('01:30pm', 10);
-    this.mapLunchTime.set('01:45pm', 11);
-    this.mapLunchTime.set('02:00pm', 12);
-    this.mapLunchTime.set('02:15pm', 13);
-    this.mapLunchTime.set('02:30pm', 14);
-    this.mapLunchTime.set('02:45pm', 15);
-    this.mapLunchTime.set('03:00pm', 16);
-    this.mapDinnerTime.set('06:00pm', 0);
-    this.mapDinnerTime.set('06:15pm', 1);
-    this.mapDinnerTime.set('06:30pm', 2);
-    this.mapDinnerTime.set('06:45pm', 3);
-    this.mapDinnerTime.set('07:00pm', 4);
-    this.mapDinnerTime.set('07:15am', 5);
-    this.mapDinnerTime.set('07:30pm', 6);
-    this.mapDinnerTime.set('07:45pm', 7);
-    this.mapDinnerTime.set('08:00pm', 8);
-    this.mapDinnerTime.set('08:15pm', 9);
-    this.mapDinnerTime.set('08:30pm', 10);
-    this.mapDinnerTime.set('08:45pm', 11);
-    this.mapDinnerTime.set('09:00pm', 12);
-    this.mapDinnerTime.set('09:15pm', 13);
-    this.mapDinnerTime.set('09:30pm', 14);
-    this.mapDinnerTime.set('09:45pm', 15);
-    this.mapDinnerTime.set('10:00pm', 16);
     if (!this.profileService.userProfile.homeLocation || !this.profileService.userProfile.preferredMode) {
       this.profileService.fetchUserProfile().subscribe((data) => {
         if (data.Item) {
+          console.log(data);
           this.profileService.setLocationDetails(data.Item.homeLocation, data.Item.workLocation);
           this.homeLocation = this.profileService.userProfile.homeLocation;
           this.workLocation = this.profileService.userProfile.workLocation;
@@ -147,20 +158,23 @@ export class ProfileComponent implements OnInit {
           this.lunchEnd = this.mapLunchTime.get(data.Item.lunchTime.end_time);
           this.dinnerStart = this.mapDinnerTime.get(data.Item.dinnerTime.start_time);
           this.dinnerEnd = this.mapDinnerTime.get(data.Item.dinnerTime.end_time);
-
+          this.lunchStartTime = data.Item.lunchTime.start_time;
+          this.lunchEndTime = data.Item.lunchTime.end_time;
+          this.dinnerStartTime = data.Item.dinnerTime.start_time;
+          this.dinnerEndTime = data.Item.dinnerTime.end_time;
+          console.log(this.lunchStart);
+          console.log(this.lunchEnd);
+          console.log(this.dinnerStart);
+          console.log(this.dinnerEnd);
           if (data.Item.walkingDistance) {
             this.profileService.setUserDetails(data.Item.walkingDistance,
               data.Item.cyclingDistance, data.Item.preferredMode);
             this.walking = this.profileService.userProfile.walkingDistance;
             this.cycling = this.profileService.userProfile.cyclingDistance;
             this.travelMode = this.profileService.userProfile.preferredMode;
-
             this.walk = this.travelMode.indexOf('walking') > -1;
-
             this.drive = this.travelMode.indexOf('driving') > -1;
-
             this.cycle = this.travelMode.indexOf('cycling') > -1;
-
             this.trans = this.travelMode.indexOf('transit') > -1;
           }
         }
@@ -175,17 +189,13 @@ export class ProfileComponent implements OnInit {
       this.travelMode = this.profileService.userProfile.preferredMode;
       console.log(this.profileService.userProfile);
       this.walk = this.travelMode.indexOf('walking') > -1;
-
       this.drive = this.travelMode.indexOf('driving') > -1;
-
       this.cycle = this.travelMode.indexOf('cycling') > -1;
-
       this.trans = this.travelMode.indexOf('transit') > -1;
     }
   }
 
   selectAddress(place: any, location: string) {
-
     if (location === 'home') {
       this.homeLocation = new Location(place.place_id, place.formatted_address, place.geometry.location.lat(),
         place.geometry.location.lng());
@@ -197,7 +207,8 @@ export class ProfileComponent implements OnInit {
 
   saveUserProfile(): void {
     this.profileService.saveUserProfile(this.homeLocation, this.workLocation, this.walking,
-      this.cycling, this.travelMode).subscribe((data) => {
+      this.cycling, this.travelMode, this.lunchStartTime, this.lunchEndTime, this.dinnerStartTime,
+      this.dinnerEndTime).subscribe((data) => {
       this.profileService.setUserDetails(this.walking, this.cycling, this.travelMode);
     });
   }
@@ -208,17 +219,29 @@ export class ProfileComponent implements OnInit {
 
   finishStart(slider, event) {
     slider.onFinish = event;
-    this.lunchStart = this.mapLunchTime.get(event.from);
-    this.lunchEnd = this.mapLunchTime.get(event.to);
-    console.log(this.mapLunchTime.get(event.from));
-    console.log(event.to);
+    this.mapLunchTime.forEach((value, key) => {
+      if (value === event.from) {
+        this.lunchStartTime = key;
+      }
+      if (value === event.to) {
+        this.lunchEndTime = key;
+      }
+    });
+    console.log(this.lunchStartTime);
+    console.log(this.lunchEndTime);
   }
 
   finishDinner(slider, event) {
     slider.onFinish = event;
-    this.dinnerStart = this.mapDinnerTime.get(event.from);
-    this.dinnerEnd = this.mapDinnerTime.get(event.to);
-    console.log(this.dinnerStart);
-    console.log(this.lunchEnd);
+    this.mapDinnerTime.forEach((value, key) => {
+      if (value === event.from) {
+        this.dinnerStartTime = key;
+      }
+      if (value === event.to) {
+        this.dinnerEndTime = key;
+      }
+    });
+    console.log(this.dinnerStartTime);
+    console.log(this.dinnerEndTime);
   }
 }
