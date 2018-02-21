@@ -24,12 +24,22 @@ export class EventsService {
     return this.centralAPIService.callAPI('events', payload, 'post');
   }
 
-  saveEvent(eventDetails: any, forceSaveEvent: boolean): Observable<any> {
-    const payload = {
-      operation: 'saveEvent',
-      eventDetails: eventDetails,
-      forceSaveEvent: forceSaveEvent
-    };
+  saveEvent(eventDetails: any, forceSaveEvent: boolean, eventType: string, eventId: string): Observable<any> {
+    let payload = {};
+    if (eventType === 'save') {
+      payload = {
+        operation: 'saveEvent',
+        eventDetails: eventDetails,
+        forceSaveEvent: forceSaveEvent
+      };
+    } else {
+      payload = {
+        operation: 'editEvent',
+        eventID: eventId,
+        eventDetails: eventDetails,
+        forceSaveEvent: forceSaveEvent
+      };
+    }
     return this.centralAPIService.callAPI('events', payload, 'post');
   }
 
