@@ -1,4 +1,4 @@
-<form class="form-signin" method="POST" action="#" role="form">
+<form class="form-signin" #regForm="ngForm">
   <div class="form-group">
     <h2>Create account</h2>
   </div>
@@ -6,7 +6,7 @@
     {{ errorMessage }}
   </div>
 
-  <!-- Username -->
+  <!-- Name -->
   <div class="form-group">
     <label class="control-label" for="signupName">Name</label>
     <input id="signupName" name="signupName" type="text" maxlength="50" pattern="[a-zA-Z ]+" class="form-control" [(ngModel)]="registrationUser.name" [ngModelOptions]="{standalone: true}" #signupName="ngModel" required>
@@ -23,7 +23,7 @@
   <!-- Email -->
   <div class="form-group">
     <label class="control-label" for="signupEmail">Email</label>
-    <input id="signupEmail" name="signupEmail" type="email" maxlength="50" pattern="[a-zA-Z]+[a-zA-Z0-9._]*@[a-zA-Z]+.[a-zA-Z]+" class="form-control" [(ngModel)]="registrationUser.email" [ngModelOptions]="{standalone: true}" #signupEmail="ngModel" required>
+    <input id="signupEmail" name="signupEmail" type="email" maxlength="50" pattern="[a-zA-Z]+[a-zA-Z0-9._]*@[a-zA-Z]+[.][a-zA-Z]+" class="form-control" [(ngModel)]="registrationUser.email" [ngModelOptions]="{standalone: true}" #signupEmail="ngModel" required>
     <div *ngIf="signupEmail.errors && (signupEmail.dirty || signupEmail.touched)" class="alert alert-danger">
       <div *ngIf="signupEmail.invalid && signupEmail.touched && signupEmail.pristine">
         Please enter your correct email
@@ -38,12 +38,15 @@
   <!-- Password -->
   <div class="form-group">
     <label class="control-label" for="signupPassword">Password</label>
-    <input id="signupPassword" type="password" maxlength="25" class="form-control" placeholder="at least 8 characters" length="40" [(ngModel)]="registrationUser.password" [ngModelOptions]="{standalone: true}" required>
+    <input id="signupPassword" type="password" minlength="8" maxlength="25" class="form-control" placeholder="at least 8 characters" length="40" [(ngModel)]="registrationUser.password" [ngModelOptions]="{standalone: true}" name="signupPassword" #signupPassword="ngModel" required>
+    <div *ngIf="signupPassword.errors && (signupPassword.dirty || signupPassword.touched)" class="alert alert-danger">
+        Please enter a longer password
+    </div>
   </div>
 
   <!-- Submit -->
-  <div class="form-group">
-    <button (click)="onRegister()" id="signupSubmit" type="submit" class="btn btn-info btn-block">
+  <div  class="form-group">
+    <button [disabled]="!regForm.form.valid" (click)="onRegister()" id="signupSubmit" type="submit" class="btn btn-info btn-block">
         Create your account
     </button>
   </div>
