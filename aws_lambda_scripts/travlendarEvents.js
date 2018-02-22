@@ -54,6 +54,36 @@ exports.handler = (event, context, callback) => {
   }
 
 
+  function isLunchPossible(lunchTimeMeetings, lunchStart, lunchEnd) {
+
+      // Loop through lunchTimeMeetings
+          // if event is last event and lunchEnd > eventEnd --> check if lunchEnd-eventEnd >= 30 ==> return true
+          // if not return false
+          // check if eventStart-LunchStart >= 30 ==> return true
+          // if not modify lunchStart to eventEnd
+
+      if (lunchTimeMeetings == null || lunchTimeMeetings.length == 0) {
+          return true;
+      }
+      var LUNCH_TIME = 30*60*000 ;    //30 minute lunch time
+      var itemList = lunchTimeMeetings.Items;
+      for (var i = 0; i < itemList.length; i++) {
+          if (i == itemList.length - 1) {
+              if (lunchEnd > itemList[i].eventEnd && lunchEnd - itemList[i].eventEnd > LUNCH_TIME) {
+                  return true;
+              }
+          }
+          if (itemList[i].eventStart - lunchStart >= LUNCH_TIME) {
+              return true;
+          }
+          else {
+              lunchStart = itemList[i].eventEnd;
+          }
+
+      }
+      return false;
+  }
+
 
   function getDurationFromDistanceAPIInMins(startlocation, endLocation,mode){
     return 3000
