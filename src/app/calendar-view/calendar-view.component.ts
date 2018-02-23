@@ -84,6 +84,7 @@ export class CalendarViewComponent implements OnInit {
   travelModeArray = [];
   deleteEventId = '';
   date=[];
+  difference : any;
   repeatCheckbox: any;
   dates=[{}];
 
@@ -222,6 +223,7 @@ export class CalendarViewComponent implements OnInit {
     this.eventPayload = Object.assign({}, this.event);
     this.eventPayload.eventStart = new Date(this.eventPayload.eventStart).getTime();
     this.eventPayload.eventEnd = new Date(this.eventPayload.eventEnd).getTime();
+    this.difference = this.eventPayload.eventEnd - this.eventPayload.eventStart;
     for (let i = 0; i < this.travelModeArray.length; i++) {
       if (this.eventPayload.travelMode === this.travelModeArray[i].mode) {
         this.eventPayload.travelMode = {
@@ -231,17 +233,39 @@ export class CalendarViewComponent implements OnInit {
         };
       }
     }
+
     this.eventsService.saveEvent(this.eventPayload, this.forceSaveEvent).subscribe((data) => {
       if (data.errorMessage && data.errorMessage === 'Conflict') {
         this.displayModalError = true;
         this.forceSaveEvent = true;
         this.scheduleModalError = 'This event conflicts with another scheduled event. Click Continue to proceed anyways.';
       } else {
-        this.addEvent(data, this.eventPayload.eventTitle, this.eventPayload.eventStart, this.eventPayload.eventEnd);
+        Location.reload();
+        //this.addEvent(data, this.eventPayload.eventTitle, this.eventPayload.eventStart, this.eventPayload.eventEnd);
         $('#eventModal').modal('hide');
         this.initEvent();
       }
     });
+
+
+    if(this.dates.length > 1){
+      for (let i =0 ; i < this.dates.length; i++){
+          this.eventPayload.eventStart = new Date(this.dates[i].value).getTime();
+          this.eventPayload.eventEnd = this.eventPayload.eventStart + this.difference;
+          this.eventsService.saveEvent(this.eventPayload, this.forceSaveEvent).subscribe((data) => {
+            if (data.errorMessage && data.errorMessage === 'Conflict') {
+              this.displayModalError = true;
+              this.forceSaveEvent = true;
+              this.scheduleModalError = 'This event conflicts with another scheduled event. Click Continue to proceed anyways.';
+            } else {
+              Location.reload();
+              //this.addEvent(data, this.eventPayload.eventTitle, this.eventPayload.eventStart, this.eventPayload.eventEnd);
+              this.initEvent();
+            }
+          });
+      }
+        $('#eventModal').modal('hide');
+    }
   }
 
   eventTimesChanged({
@@ -278,8 +302,8 @@ export class CalendarViewComponent implements OnInit {
   }
 
   repeatEvent(): void{
-  console.log(this.dates);
-  this.closeRepeatModal();
+    console.log(this.dates);
+    $('#repeatEventsModal').modal('hide');
   }
 
   triggerRepeat(): void {
@@ -304,10 +328,6 @@ export class CalendarViewComponent implements OnInit {
     }
   }
 
-/*    if(this.dates.length>1){
-      let lastItem = this.dates.length-1;
-         this.dates.splice(lastItem);
-       }*/
 
   changeLocation(): void {
     this.event.travelMode = null;
@@ -325,6 +345,7 @@ export class CalendarViewComponent implements OnInit {
   }
 
   addEvent(eventId, eventTitle, eventStart, eventEnd): void {
+
     this.events.push({
       id: eventId,
       title: eventTitle,
