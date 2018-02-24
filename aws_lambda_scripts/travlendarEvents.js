@@ -53,6 +53,27 @@ exports.handler = (event, context, callback) => {
     })
   }
 
+  function lunchConflicts(lunchData, lunchStart, lunchEnd) {
+        console.log("LUNCH CONFLICT CHECK");
+        console.log(lunchData);
+        if (lunchData == null || lunchData.Count == 0){
+            return [false, null];
+        }
+        var itemList = lunchData.Items;
+        var lunchOverlapMeetings = [];
+
+        for (var i = 0; i < itemList.length; i++) {
+            var item_start_time = itemList[i].eventStart;
+            var item_end_time = itemList[i].eventEnd;
+
+            var min = Math.min(lunchStart, item_start_time);
+            var max = Math.max(lunchEnd, item_end_time);
+            if ((max - min) < ((lunchEnd - lunchStart) + (item_end_time - item_start_time))) {
+                lunchOverlapMeetings.push(itemList[i]);
+            }
+        }
+        return lunchOverlapMeetings;
+}
 
 
   function getDurationFromDistanceAPIInMins(startlocation, endLocation,mode){
