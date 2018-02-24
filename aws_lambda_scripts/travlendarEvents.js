@@ -86,7 +86,7 @@ exports.handler = (event, context, callback) => {
       if (lunchTimeMeetings == null || lunchTimeMeetings.length == 0) {
           return true;
       }
-      var LUNCH_TIME = 30*60*000 ;    //30 minute lunch time
+      var LUNCH_TIME = 30*60*1000 ;    //30 minute lunch time
       var itemList = lunchTimeMeetings.Items;
       for (var i = 0; i < itemList.length; i++) {
           if (i == itemList.length - 1) {
@@ -550,6 +550,23 @@ exports.handler = (event, context, callback) => {
             var user_distance = dist.Items[0];
             var error_message = null;
             console.log(user_distance);
+
+            if (true) {
+                var lunchTest = data;
+                lunchTest.Items.push(eventObj);
+                var meetingList = lunchConflicts(lunchTest, lunchStart, lunchEnd);
+                console.log(meetingList);
+                var lunch = isLunchPossible(meetingList, lunchStart, lunchEnd);
+                if (lunch == false) {
+                    error_message = {
+                        "errorMessage": {
+                            "code": 5,
+                            "value": "No time for Lunch"
+                        }
+                    };
+                    context.succeed(error_message);
+                }
+            }
 
             var max_dist_status = false;
 
