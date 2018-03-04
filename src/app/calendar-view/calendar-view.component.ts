@@ -173,17 +173,11 @@ export class CalendarViewComponent implements OnInit {
       this.homeLocation = this.profileService.userProfile.homeLocation;
       this.workLocation = this.profileService.userProfile.workLocation;
     }
-    this.eventsService.fetchEvents().subscribe((eventList) => {
-
-      this.eventsLoaded = true;
-      for (let i = 0; i < eventList.Items.length; i++) {
-        this.addEvent(eventList.Items[i]);
-      }
-    });
     this.initEvent();
   }
 
   initEvent(): void {
+    this.dates=[{}];
     this.event = {};
     this.event.eventStart = new Date();
     this.event.eventEnd = moment().add(1, 'hours');
@@ -198,6 +192,13 @@ export class CalendarViewComponent implements OnInit {
     this.eventType = 'save';
     this.travelModeArray = [];
     this.otherLocationDetails = new Location();
+    this.eventsService.fetchEvents().subscribe((eventList) => {
+      this.eventsLoaded = true;
+      this.events=[];
+      for (let i = 0; i < eventList.Items.length; i++) {
+        this.addEvent(eventList.Items[i]);
+      }
+    });
   }
 
   addEvent(event): void {
@@ -287,7 +288,6 @@ export class CalendarViewComponent implements OnInit {
           this.displaySuccessMessage('Event has been edited successfully');
         } else {
           this.eventPayload.id = data;
-          this.addEvent(this.eventPayload);
           this.displaySuccessMessage('Event has been added successfully');
         }
         $('#eventModal').modal('hide');
@@ -295,7 +295,6 @@ export class CalendarViewComponent implements OnInit {
         this.activeDayIsOpen = false;
       }
     });
-
 
     if(this.dates.length > 1){
       for (let i =0 ; i < this.dates.length; i++){
@@ -307,12 +306,13 @@ export class CalendarViewComponent implements OnInit {
               this.forceSaveEvent = true;
               this.scheduleModalError = 'This event conflicts with another scheduled event. Click Continue to proceed anyways.';
             } else {
-              this.addEvent(this.eventPayload);
+              this.eventPayload.id = data;
+              this.refresh.next();
+              this.displaySuccessMessage('Event has been added successfully');
               this.initEvent();
             }
           });
       }
-        $('#eventModal').modal('hide');
     }
   }
 
@@ -338,6 +338,9 @@ export class CalendarViewComponent implements OnInit {
     this.repeatCheckbox=element;
       if(element.checked){
         $('#repeatEventsModal').modal('toggle');
+      }
+      else{
+        this.dates=[{}];
       }
   }
 

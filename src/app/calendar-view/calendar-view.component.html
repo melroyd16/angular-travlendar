@@ -219,10 +219,10 @@
        <div class="modal-body">
          <p>Select the dates you want to repeat this event</p>
          <fieldset *ngFor="let date of dates ;let last = last">
-         <input [owlDateTimeTrigger]="dt3" [owlDateTime]="dt3"  [min]="event.eventEnd" [selectMode]="'single'" [(ngModel)]="date.value">
+         <input required id="date" required [owlDateTimeTrigger]="dt3" [owlDateTime]="dt3"  [min]="event.eventEnd" [selectMode]="'single'" [(ngModel)]="date.value">
          <owl-date-time #dt3></owl-date-time>
-          <button class="add"  (click)="addNewChoice(date.value)">+</button>
-          <button class="remove" (click)="removeChoice(date.value)">-</button>
+         <button class="remove" (click)="removeChoice(date.value)">-</button>
+          <button class="add" *ngIf=last  (click)="addNewChoice(date.value)">+</button>
         </fieldset>
        </div>
        <div class="modal-footer">
