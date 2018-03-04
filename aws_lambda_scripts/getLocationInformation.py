@@ -78,53 +78,6 @@ exports.handler = (event, context, callback) => {
         return isMeetingOverlaps
     }
 
-
-    function checkConflictOnLocationBasis(data,eventID, eventStart, eventEnd, origin, destination){
-        var itemList = data.Items
-        var isMeetingOverlaps = false
-
-        var startmeetingDetails = null
-        var endMeetinfDetails = null
-
-        for(var i= 0; i < itemList.length; i++){
-            if(itemList[i].id == eventID){
-                continue;
-            }
-
-            if (itemList[i].eventStart > eventStart){
-                //Next Meeting Information
-                if (endMeetinfDetails == null){
-                    endMeetinfDetails = itemList[i];
-                    continue
-                }
-
-            if(endMeetinfDetails.eventStart > itemList[i].eventStart){
-                endMeetinfDetails = itemList[i]
-            }
-
-            }else{
-                //First Meeting Information
-                if (startmeetingDetails == null){
-                    startmeetingDetails = itemList[i];
-                    continue;
-                }
-
-                if (startmeetingDetails.eventEnd < itemList[i].eventEnd){
-                    startmeetingDetails = itemList[i];
-                }
-            }
-        }
-
-        //if (startmeetingDetails != null)
-            //var response = JSON.parse(getDurationFromDistanceAPI(startmeetingDetails.eventEnd, eventStart, travelMode))
-            // result = 0;
-            // if (response.status == 'Ok' && response.result[0].status == 'Ok' ){
-            //     result = int(response.result[0].duration.value);
-
-            // }
-    }
-
-
     function getDurationFromDistanceAPIInMins(startlocation, endLocation,mode){
         console.log("Inside the call Lambda function")
         var aws = require('aws-sdk');
@@ -165,7 +118,65 @@ exports.handler = (event, context, callback) => {
     });
     }
 
+    function checkConflictOnLocationBasis(data,eventID, eventStart, eventEnd, origin, destination, travelMode){
+        var itemList = data.Items
 
+        var startmeetingDetails = null
+        var endMeetinfDetails = null
+
+        for(var i= 0; i < itemList.length; i++){
+            if(itemList[i].id == eventID){
+                continue;
+            }
+
+            if (itemList[i].eventStart > eventStart){
+                //Next Meeting Information
+                if (endMeetinfDetails == null){
+                    endMeetinfDetails = itemList[i];
+                    continue
+                }
+
+            if(endMeetinfDetails.eventStart > itemList[i].eventStart){
+                endMeetinfDetails = itemList[i]
+            }
+
+            }else{
+                //First Meeting Information
+                if (startmeetingDetails == null){
+                    startmeetingDetails = itemList[i];
+                    continue;
+                }
+
+                if (startmeetingDetails.eventEnd < itemList[i].eventEnd){
+                    startmeetingDetails = itemList[i];
+                }
+            }
+        }
+
+
+        if (startmeetingDetails != null){
+            var previous_response = getDurationFromDistanceAPIInMins(startmeetingDetails.destination, origin, travelMode);
+            var data = []
+            startmeetingDetails.eventStart = startmeetingDetails.eventStart + previous_response
+            data.push(startmeetingDetails)
+            var result = isConflictPresent(data.Items,eventID,eventStart, eventEnd)
+            if (result == true){
+                return true;
+            }
+        }
+
+        if(endMeetinfDetails != null){
+        var next_response = getDurationFromDistanceAPIInMins(destination, endMeetinfDetails.eventStart,travelMode);
+        var data = []
+        data.push(endMeetinfDetails)
+
+        var result = isConflictPresent(data.Items,eventID,eventStart + next_response , eventEnd)
+        if(result == true){
+            return true;
+            }
+        }
+        return false;
+    }
 
 
     function queryForFetchingNearMeetings(status) {
@@ -174,6 +185,9 @@ exports.handler = (event, context, callback) => {
         var eventID = event.body.eventID;
         var eventStart = event.body.eventDetails.eventStart;
         var eventEnd = event.body.eventDetails.eventEnd;
+        var origin = event.body.eventDetails.origin;
+        var destination = event.body.eventDetails.destination;
+
         var travelMode = event.body.eventDetails.travelMode;
         var cal_eventStart = Number(eventStart) - 86400000; //24*60*60*1000
         var cal_eventEnd = Number(eventEnd) + 86400000; //24*60*60*1000
@@ -199,11 +213,14 @@ exports.handler = (event, context, callback) => {
                 context.fail(err);
             } else {
                 console.log(data);
-                //var result =getDurationFromDistanceAPI("ChIJ55fLWVtBkFQR0v31eadEoLM","ChIJSxh5JbJqkFQRxI1KoO7oZHs", "bicycling")
-                if (isConflictPresent(data, eventID, eventStart, eventEnd)) {
+
+                // if (isConflictPresent(data, eventID, eventStart, eventEnd)) {
+                //     context.fail("Conflict");
+                // }
+
+                if(checkConflictOnLocationBasis(data,eventID, eventStart, eventEnd, origin, destination, travelMode)){
                     context.fail("Conflict");
                 }
-
 
                 else {
                     if(status == "new") {
