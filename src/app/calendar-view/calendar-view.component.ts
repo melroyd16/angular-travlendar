@@ -262,7 +262,6 @@ export class CalendarViewComponent implements OnInit {
               this.events[i].origin = this.event.origin;
               this.events[i].destination = this.event.destination;
               this.events[i].travelMode = this.eventPayload.travelMode;
-              console.log(this.events[i]);
             }
           }
           this.refresh.next();
@@ -371,8 +370,17 @@ export class CalendarViewComponent implements OnInit {
     newStart,
     newEnd
   }: CalendarEventTimesChangedEvent): void {
-    event.start = newStart;
-    event.end = newEnd;
-    this.refresh.next();
+    this.alterTime(event, newStart, newEnd);
+    this.event.id = event.id;
+    this.event.eventTitle = event.title;
+    this.event.eventStart = new Date(newStart).getTime();
+    this.event.eventEnd = new Date(newEnd).getTime();
+    this.event.origin = event.origin;
+    this.event.otherLocation = event.origin.formatted_address;
+    this.event.destination = event.destination;
+    this.event.eventLocation = event.destination.formatted_address;
+    this.eventType = 'edit';
+    this.event.travelMode = event.travelMode.mode ? event.travelMode.mode : event.travelMode;
+    this.saveEvent();
   }
 }
