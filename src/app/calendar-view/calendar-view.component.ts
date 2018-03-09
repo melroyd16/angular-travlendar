@@ -159,14 +159,18 @@ export class CalendarViewComponent implements OnInit {
       this.homeLocation = this.profileService.userProfile.homeLocation;
       this.workLocation = this.profileService.userProfile.workLocation;
     }
-    this.eventsService.fetchEvents().subscribe((eventList) => {
+    this.fetchEvents();
+    this.initEvent();
+  }
 
+  fetchEvents(): void {
+    this.eventsService.fetchEvents().subscribe((eventList) => {
+      this.events = [];
       this.eventsLoaded = true;
       for (let i = 0; i < eventList.Items.length; i++) {
         this.addEvent(eventList.Items[i]);
       }
     });
-    this.initEvent();
   }
 
   initEvent(): void {
@@ -274,6 +278,7 @@ export class CalendarViewComponent implements OnInit {
         $('#eventModal').modal('hide');
         this.initEvent();
         this.activeDayIsOpen = false;
+        this.fetchEvents();
       }
     });
   }
@@ -370,17 +375,17 @@ export class CalendarViewComponent implements OnInit {
     newStart,
     newEnd
   }: CalendarEventTimesChangedEvent): void {
-    this.alterTime(event, newStart, newEnd);
-    this.event.id = event.id;
-    this.event.eventTitle = event.title;
+    const eventCopy: any = Object.assign({}, event);
+    this.event.id = eventCopy.id;
+    this.event.eventTitle = eventCopy.title;
     this.event.eventStart = new Date(newStart).getTime();
     this.event.eventEnd = new Date(newEnd).getTime();
-    this.event.origin = event.origin;
-    this.event.otherLocation = event.origin.formatted_address;
-    this.event.destination = event.destination;
-    this.event.eventLocation = event.destination.formatted_address;
+    this.event.origin = eventCopy.origin;
+    this.event.otherLocation = eventCopy.origin.formatted_address;
+    this.event.destination = eventCopy.destination;
+    this.event.eventLocation = eventCopy.destination.formatted_address;
     this.eventType = 'edit';
-    this.event.travelMode = event.travelMode.mode ? event.travelMode.mode : event.travelMode;
+    this.event.travelMode = eventCopy.travelMode;
     this.saveEvent();
   }
 }
