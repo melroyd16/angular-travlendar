@@ -72,7 +72,10 @@ export class CalendarViewComponent implements OnInit {
   viewDate: Date = new Date();
   activeDayIsOpen = false;
   displayDeleteModal: boolean;
+  displayEventModal = false;
+  displayRepeatEventModal = false;
   displayTravelModes = false;
+  repeatEvents=false;
   displayModalError = false;
   forceSaveEvent = false;
   displaySuccess = false;
@@ -82,10 +85,21 @@ export class CalendarViewComponent implements OnInit {
   selectedPriorLocation = 'home';
   travelModeArray = [];
   deleteEventId = '';
+  date=[];
+  difference : any;
+  repeatCheckbox: any;
+  dates=[{}];
+
+  modalData: {
+    action: string;
+    event: any;
+  };
+
   currentEventId = '';
   eventType = 'save';
   events: any[] = [];
   refresh: Subject<any> = new Subject();
+
 
   eventActions: CalendarEventAction[] = [
     {
@@ -174,10 +188,14 @@ export class CalendarViewComponent implements OnInit {
   }
 
   initEvent(): void {
+    this.dates=[{}];
     this.event = {};
     this.event.eventStart = new Date();
     this.event.eventEnd = moment().add(1, 'hours');
+    this.displayEventModal = false;
+    this.displayRepeatEventModal = false;
     this.displayTravelModes = false;
+    this.repeatEvents=false;
     this.displayModalError = false;
     this.forceSaveEvent = false;
     this.scheduleModalError = '';
@@ -185,6 +203,13 @@ export class CalendarViewComponent implements OnInit {
     this.eventType = 'save';
     this.travelModeArray = [];
     this.otherLocationDetails = new Location();
+    this.eventsService.fetchEvents().subscribe((eventList) => {
+      this.eventsLoaded = true;
+      this.events=[];
+      for (let i = 0; i < eventList.Items.length; i++) {
+        this.addEvent(eventList.Items[i]);
+      }
+    });
   }
 
   addEvent(event): void {
@@ -242,6 +267,7 @@ export class CalendarViewComponent implements OnInit {
     this.eventPayload = Object.assign({}, this.event);
     this.eventPayload.eventStart = new Date(this.eventPayload.eventStart).getTime();
     this.eventPayload.eventEnd = new Date(this.eventPayload.eventEnd).getTime();
+    this.difference = this.eventPayload.eventEnd - this.eventPayload.eventStart;
     for (let i = 0; i < this.travelModeArray.length; i++) {
       if (this.eventPayload.travelMode === this.travelModeArray[i].mode) {
         this.eventPayload.travelMode = {
@@ -272,7 +298,6 @@ export class CalendarViewComponent implements OnInit {
           this.displaySuccessMessage('Event has been edited successfully');
         } else {
           this.eventPayload.id = data;
-          this.addEvent(this.eventPayload);
           this.displaySuccessMessage('Event has been added successfully');
         }
         $('#eventModal').modal('hide');
@@ -281,8 +306,36 @@ export class CalendarViewComponent implements OnInit {
         this.fetchEvents();
       }
     });
+
+    if(this.dates.length > 1){
+      for (let i =0 ; i < this.dates.length; i++){
+          this.eventPayload.eventStart = new Date(this.dates[i].value).getTime();
+          this.eventPayload.eventEnd = this.eventPayload.eventStart + this.difference;
+          this.eventsService.saveEvent(this.eventPayload, this.forceSaveEvent, this.eventType, this.event.id).subscribe((data) => {
+            if (data.errorMessage && data.errorMessage === 'Conflict') {
+              this.displayModalError = true;
+              this.forceSaveEvent = true;
+              this.scheduleModalError = 'This event conflicts with another scheduled event. Click Continue to proceed anyways.';
+            } else {
+              this.eventPayload.id = data;
+              this.refresh.next();
+              this.displaySuccessMessage('Event has been added successfully');
+              this.initEvent();
+            }
+          });
+      }
+    }
   }
 
+  handleEvent(action: string, event: any): void {
+
+    this.modalData = { event, action };
+    this.modal.open(this.modalContent, { size: 'lg' });
+  }
+
+  openEventModal(): void {
+    this.displayEventModal = true;
+  }
   displaySuccessMessage(message): void {
     this.successMessage = message;
     this.displaySuccess = true;
@@ -291,6 +344,49 @@ export class CalendarViewComponent implements OnInit {
       clearTimeout(timeoutId);
     }, 3000);
   }
+
+  openRepeatEventModal(element: HTMLInputElement) : void{
+    this.repeatCheckbox=element;
+      if(element.checked){
+        $('#repeatEventsModal').modal('toggle');
+      }
+      else{
+        this.dates=[{}];
+      }
+  }
+
+  closeRepeatModal(): void {
+    this.repeatCheckbox.checked=false;
+    $('#repeatEventsModal').modal('hide');
+  }
+
+  repeatEvent(): void{
+    console.log(this.dates);
+    $('#repeatEventsModal').modal('hide');
+  }
+
+  triggerRepeat(): void {
+    this.repeatEvents=true;
+  }
+
+  addNewChoice(temp : Date): void{
+    this.dates.push({});
+  }
+
+  removeChoice(temp : Date): void {
+    if(this.dates.length > 1){
+      for(let i=0; i<this.dates.length; i++){
+        if(this.dates[i].value===temp){
+            this.dates.splice(i, 1);
+            break;
+        }
+      }
+    }
+    else{
+      this.dates=[{}];
+    }
+  }
+
 
   changeLocation(): void {
     this.displayTravelModes = false;
@@ -303,6 +399,7 @@ export class CalendarViewComponent implements OnInit {
       this.calendarService.fetchTransitDetails(this.event.origin, this.event.destination).subscribe((data) => {
         this.travelModeArray = data;
         this.displayTravelModes = true;
+        this.repeatEvents=true;
         this.ref.tick();
       });
     }

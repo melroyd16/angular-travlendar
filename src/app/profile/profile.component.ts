@@ -83,10 +83,10 @@ export class ProfileComponent implements OnInit {
   advancedSlider = {name: 'Dinner Slider', onUpdate: undefined, onFinish: undefined};
 
   // User preferred mode checkboxes
-  walk = true;
-  drive = true;
-  cycle = true;
-  trans = true;
+  walk:boolean = true;
+  drive:boolean = true;
+  cycle:boolean = true;
+  trans:boolean = true
   travelMode = ['walking', 'driving', 'cycling', 'transit'];
 
   constructor(public router: Router, public userService: UserLoginService, public profileService: ProfileService) {
