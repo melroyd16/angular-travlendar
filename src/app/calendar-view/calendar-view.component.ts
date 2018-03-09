@@ -173,7 +173,18 @@ export class CalendarViewComponent implements OnInit {
       this.homeLocation = this.profileService.userProfile.homeLocation;
       this.workLocation = this.profileService.userProfile.workLocation;
     }
+    this.fetchEvents();
     this.initEvent();
+  }
+
+  fetchEvents(): void {
+    this.eventsService.fetchEvents().subscribe((eventList) => {
+      this.events = [];
+      this.eventsLoaded = true;
+      for (let i = 0; i < eventList.Items.length; i++) {
+        this.addEvent(eventList.Items[i]);
+      }
+    });
   }
 
   initEvent(): void {
@@ -281,7 +292,6 @@ export class CalendarViewComponent implements OnInit {
               this.events[i].origin = this.event.origin;
               this.events[i].destination = this.event.destination;
               this.events[i].travelMode = this.eventPayload.travelMode;
-              console.log(this.events[i]);
             }
           }
           this.refresh.next();
@@ -293,6 +303,7 @@ export class CalendarViewComponent implements OnInit {
         $('#eventModal').modal('hide');
         this.initEvent();
         this.activeDayIsOpen = false;
+        this.fetchEvents();
       }
     });
 
@@ -461,8 +472,17 @@ export class CalendarViewComponent implements OnInit {
     newStart,
     newEnd
   }: CalendarEventTimesChangedEvent): void {
-    event.start = newStart;
-    event.end = newEnd;
-    this.refresh.next();
+    const eventCopy: any = Object.assign({}, event);
+    this.event.id = eventCopy.id;
+    this.event.eventTitle = eventCopy.title;
+    this.event.eventStart = new Date(newStart).getTime();
+    this.event.eventEnd = new Date(newEnd).getTime();
+    this.event.origin = eventCopy.origin;
+    this.event.otherLocation = eventCopy.origin.formatted_address;
+    this.event.destination = eventCopy.destination;
+    this.event.eventLocation = eventCopy.destination.formatted_address;
+    this.eventType = 'edit';
+    this.event.travelMode = eventCopy.travelMode;
+    this.saveEvent();
   }
 }
