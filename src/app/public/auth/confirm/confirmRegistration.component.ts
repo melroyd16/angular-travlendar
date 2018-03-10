@@ -18,10 +18,10 @@ export class LogoutComponent implements LoggedInCallback {
   isLoggedIn(message: string, isLoggedIn: boolean) {
     if (isLoggedIn) {
       this.userService.logout();
-      this.router.navigate(['/home/login']);
+      this.router.navigate(['/home']);
     }
 
-    this.router.navigate(['/home/login']);
+    this.router.navigate(['/home']);
   }
 }
 

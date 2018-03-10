@@ -14,7 +14,7 @@ import { CalendarViewComponent } from './calendar-view/calendar-view.component';
 const homeRoutes: Routes = [
   {
     path: '',
-    redirectTo: '/home/login',
+    redirectTo: '/home',
     pathMatch: 'full'
   },
   {

@@ -9,7 +9,7 @@ html {
     width: 100%;
     height: 100%;
 
-    background: url(../img/intro-bg.jpg) no-repeat center center;
+  //  background: url(../img/intro-bg.jpg) no-repeat center center;
     background-size: cover;
 }
 
@@ -33,11 +33,9 @@ h6 {
     font-weight: 400;
 }
 
-.intro-header {
-    padding-top: 50px; /* If you're making other pages, make sure there is 50px of padding to make sure the navbar doesn't overlap content! */
+.intro-header { /* If you're making other pages, make sure there is 50px of padding to make sure the navbar doesn't overlap content! */
     padding-bottom: 50px;
     text-align: center;
-    color: #0d6aad;
     /*background: url(../img/intro-bg.jpg) no-repeat center center;*/
     /*background-size: cover;*/
 }
@@ -170,4 +168,38 @@ footer {
 
 p.copyright {
     margin: 15px 0 0;
+}
+
+
+.marketing .col-lg-4 {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+.marketing h2 {
+  font-weight: normal;
+}
+.marketing .col-lg-4 p {
+  margin-right: .75rem;
+  margin-left: .75rem;
+}
+
+.jumbotron{
+    background-image: url(../img/hero-bg.jpg);
+    background-repeat: no-repeat;
+}
+
+div.transbox {
+    background-color: #ffffff;
+    opacity: 0.8;
+    filter: alpha(opacity=90); /* For IE8 and earlier */
+    text-align: center
+}
+div.transbox img{
+    opacity: 1.0;
+}
+
+div.transbox p {
+    margin: 5%;
+    font-weight: bold;
+    color: #000000;
 }
