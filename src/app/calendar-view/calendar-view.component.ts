@@ -316,6 +316,45 @@ export class CalendarViewComponent implements OnInit {
       }
     });
 
+    if(this.event.repeatPreference){
+      $('#eventModal').modal('hide');
+      switch(this.event.repeatPreference){
+        case 'Daily':
+          let i = this.event.eventStart;
+          while(i < this.event.repeatMax){
+            this.datesArray.push(new Date(i.setDate(i.getDate()+1)));
+          }
+          break;
+        case 'Weekly':
+        let i = this.event.eventStart;
+        i.setDate(i.getDate()+7);
+        while(i < this.event.repeatMax){
+          this.datesArray.push(new Date(i));
+          i.setDate(i.getDate()+7);
+        }
+        break;
+      }
+    }
+
+    if(this.datesArray.length > 1){
+      for (let i =0 ; i < this.datesArray.length; i++){
+        this.eventPayload.eventStart = new Date(this.datesArray[i]).getTime();
+        this.eventPayload.eventEnd = this.eventPayload.eventStart + this.difference;
+        this.eventsService.saveEvent(this.eventPayload, this.forceSaveEvent, this.eventType, this.event.id).subscribe((data) => {
+          if (data.errorMessage && data.errorMessage === 'Conflict') {
+            this.displayModalError = true;
+            this.forceSaveEvent = true;
+            this.scheduleModalError = 'This event conflicts with another scheduled event. Click Continue to proceed anyways.';
+          }
+          else {
+            this.eventPayload.id = data;
+            this.refresh.next();
+            this.displaySuccessMessage('Event has been added successfully');
+            this.initEvent();
+          }
+        });
+      }
+    }
   }
 
   handleEvent(action: string, event: any): void {
