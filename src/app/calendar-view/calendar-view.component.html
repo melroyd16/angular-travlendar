@@ -142,24 +142,24 @@
           </div>
           <div class="form-group">
             <label>
-              <input #repeat type="checkbox" data-toggle="modal" value="repeat" (change)="openRepeatEventModal(repeat)"> Repeat Event
+              <input #repeat type="checkbox" data-toggle="modal" value="repeat" (change)="openRepeatBlock(repeat)"> Repeat Event
             </label>
           </div>
           <div  class="col-xs-12 col-md-6" *ngIf="repeatEvents">
             <label for="repeatSelect">Options</label>
-            <select class="form-control" id="repeatSelect">
+            <select class="form-control" id="repeatSelect" name="repeatSelect" required [(ngModel)]="event.repeatPreference"  (ngModelChange)="enableMaxDateSelection()">
                 <option>Daily</option>
                 <option>Weekly</option>
             </select>
             <label for="repeatUntil">Repeat Until</label>
-            <input required name="Until" class="form-control" [owlDateTimeTrigger]="dt4" [owlDateTime]="dt4">
-            <owl-date-time #dt4></owl-date-time>  
+            <input required name="Until" class="form-control" [owlDateTimeTrigger]="dt4" [owlDateTime]="dt4" [min]="eventStartMinDate" [max]="maxRepeatDate"  [(ngModel)]="event.repeatMax" [disabled]="!ifSelected">
+            <owl-date-time [pickerType]="'calendar'" #dt4></owl-date-time>
           </div>
         </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="initEvent()">Close</button>
-        <button type="button" class="btn btn-primary" [disabled]="!eventForm.form.valid" (click)="saveEvent()">Save</button>
+        <button type="button" class="btn btn-primary"  (click)="saveEvent()">Save</button>
       </div>
     </div>
   </div>

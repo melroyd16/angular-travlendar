@@ -69,6 +69,8 @@ export class CalendarViewComponent implements OnInit {
   event: any;
   otherLocationDetails: Location;
   eventStartMinDate: Date = new Date();
+  maxRepeatDate: Date = new Date();
+  repeatMax : Date = new Date();
   viewDate: Date = new Date();
   activeDayIsOpen = false;
   displayDeleteModal: boolean;
@@ -84,8 +86,9 @@ export class CalendarViewComponent implements OnInit {
   locationTypes = ['home', 'work', 'prior event location', 'other'];
   selectedPriorLocation = 'home';
   travelModeArray = [];
+  datesArray=[];
   deleteEventId = '';
-  date=[];
+  ifSelected = false;
   difference : any;
   repeatCheckbox: any;
   modalData: {
@@ -157,6 +160,8 @@ export class CalendarViewComponent implements OnInit {
 
     this.displayDeleteModal = false;
 
+    this.maxRepeatDate.setMonth(this.maxRepeatDate.getMonth() + 2);
+
     const userProfile = this.profileService.getUserProfile();
     if (!this.profileService.userProfile || !this.profileService.userProfile.homeLocation) {
       this.profileService.fetchUserProfile().subscribe((locationDetails) => {
@@ -171,7 +176,18 @@ export class CalendarViewComponent implements OnInit {
       this.homeLocation = this.profileService.userProfile.homeLocation;
       this.workLocation = this.profileService.userProfile.workLocation;
     }
+    this.fetchEvents();
     this.initEvent();
+  }
+
+  fetchEvents(): void {
+    this.eventsService.fetchEvents().subscribe((eventList) => {
+      this.events = [];
+      this.eventsLoaded = true;
+      for (let i = 0; i < eventList.Items.length; i++) {
+        this.addEvent(eventList.Items[i]);
+      }
+    });
   }
 
   initEvent(): void {
@@ -183,11 +199,13 @@ export class CalendarViewComponent implements OnInit {
     this.displayTravelModes = false;
     this.repeatEvents=false;
     this.displayModalError = false;
+    this.ifSelected = false;
     this.forceSaveEvent = false;
     this.scheduleModalError = '';
     this.selectedPriorLocation = 'home';
     this.eventType = 'save';
     this.travelModeArray = [];
+    this.datesArray = [];
     this.otherLocationDetails = new Location();
     this.eventsService.fetchEvents().subscribe((eventList) => {
       this.eventsLoaded = true;
@@ -208,6 +226,8 @@ export class CalendarViewComponent implements OnInit {
       origin: event.origin,
       destination: event.destination,
       travelMode: event.travelMode,
+      repeatMax : event.repeatMax,
+      repeatPreference : event.repeatPreference,
       draggable: true,
       resizable: {
         beforeStart: true,
@@ -250,6 +270,7 @@ export class CalendarViewComponent implements OnInit {
   }
 
   saveEvent(): void {
+
     this.eventPayload = Object.assign({}, this.event);
     this.eventPayload.eventStart = new Date(this.eventPayload.eventStart).getTime();
     this.eventPayload.eventEnd = new Date(this.eventPayload.eventEnd).getTime();
@@ -278,7 +299,7 @@ export class CalendarViewComponent implements OnInit {
               this.events[i].origin = this.event.origin;
               this.events[i].destination = this.event.destination;
               this.events[i].travelMode = this.eventPayload.travelMode;
-              console.log(this.events[i]);
+
             }
           }
           this.refresh.next();
@@ -287,9 +308,11 @@ export class CalendarViewComponent implements OnInit {
           this.eventPayload.id = data;
           this.displaySuccessMessage('Event has been added successfully');
         }
+
         $('#eventModal').modal('hide');
         this.initEvent();
         this.activeDayIsOpen = false;
+         this.fetchEvents();
       }
     });
 
@@ -313,13 +336,16 @@ export class CalendarViewComponent implements OnInit {
     }, 3000);
   }
 
-  openRepeatEventModal(element: HTMLInputElement) : void{
+  openRepeatBlock(element: HTMLInputElement) : void{
     this.repeatCheckbox=element;
       if(element.checked){
         this.repeatEvents = true;
       }
       else{
         this.repeatEvents = false;
+        this.ifSelected = false;
+        this.event.repeatPreference = undefined;
+        this.event.repeatMax = undefined;
       }
   }
 
@@ -336,7 +362,6 @@ export class CalendarViewComponent implements OnInit {
       this.calendarService.fetchTransitDetails(this.event.origin, this.event.destination).subscribe((data) => {
         this.travelModeArray = data;
         this.displayTravelModes = true;
-        this.repeatEvents=true;
         this.ref.tick();
       });
     }
@@ -402,6 +427,10 @@ export class CalendarViewComponent implements OnInit {
     if (isPast(eventEndTime)) {
       return [];
     } else { return this.eventActions; }
+  }
+
+  enableMaxDateSelection(): void{
+    this.ifSelected = true;
   }
 
   eventTimesChanged({
