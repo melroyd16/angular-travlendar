@@ -55,6 +55,7 @@ export class LogoutComponent implements LoggedInCallback {
 export class HomeLandingComponent {
   email: string;
   fp1Email: string;
+  rcEmail: string;
   password: string;
   fp2Password: string;
   errorMessage: string;
@@ -111,8 +112,7 @@ export class HomeLandingComponent {
         this.errorMessage = message;
       } else {
         this.registeredEmail = result.user.username;
-        $('#registerModal').modal('toggle');
-        $('#confirmRegisterModal').modal('toggle');
+        this.toggleModals('registerModal', 'confirmRegisterModal');
       }
     } else if (this.modalDisplay === 'confirmRegisterModal' || this.modalDisplay === 'newPasswordModal') {
       if (message != null) {
@@ -132,6 +132,13 @@ export class HomeLandingComponent {
         this.errorMessage = message;
       } else { // success
         this.toggleModals('fp2Modal', 'loginModal');
+      }
+    } else if (this.modalDisplay === 'resendCodeModal') {
+      if (message != null) {
+        this.errorMessage = 'Something went wrong...please try again';
+      } else {
+        this.registeredEmail = this.rcEmail;
+        this.toggleModals('resendCodeModal', 'confirmRegisterModal');
       }
     }
   }
@@ -171,6 +178,10 @@ export class HomeLandingComponent {
   confirmFp2Password() {
     this.errorMessage = null;
     this.userService.confirmNewPassword(this.fp1Email, this.verificationCode, this.fp2Password, this);
+  }
+
+  resendCode() {
+    this.userRegistration.resendCode(this.rcEmail, this);
   }
 
 }

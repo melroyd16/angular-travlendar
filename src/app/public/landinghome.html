@@ -64,7 +64,7 @@
           <hr>
           <p><a (click)="toggleModals('loginModal','registerModal')"> <i class="fa fa-fw fa-group"></i> Register</a>
             <a (click)="toggleModals('loginModal','fp1Modal')"> <i class="fa fa-fw fa-group"></i> Forgot Password?</a><br/>
-            <a (click)="toggleModals('loginModal','resendConfirmationModal')"> <i class="fa fa-fw fa-group"></i> Resend Confirmation Code</a>
+            <a (click)="toggleModals('loginModal','resendCodeModal')"> <i class="fa fa-fw fa-group"></i> Resend Confirmation Code</a>
           </p>
         </form>
       </div>
@@ -284,10 +284,44 @@
           </div>
 
           <hr>
-          <p><a [routerLink]="['/home/resendCode']"> <i class="fa fa-fw fa-group"></i> Go back</a>
+          <p><a (click)="toggleModals('fp2Modal','resendCodeModal')"> <i class="fa fa-fw fa-group"></i> Go back</a>
           </p>
         </form>
 
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="resendCodeModal" tabindex="-1" role="dialog" aria-labelledby="resendCodeModal" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+
+      <div class="modal-body">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <form class="form-signin" method="POST" action="#" role="form">
+          <div class="form-group">
+            <h2>Resend Code</h2>
+          </div>
+          <div *ngIf="errorMessage!=null" class="alert alert-danger">
+            {{ errorMessage }}
+          </div>
+          <div class="form-group">
+            <label class="control-label" for="signupEmail">Email</label>
+            <input id="signupEmail" type="email" maxlength="50" class="form-control" [(ngModel)]="rcEmail" [ngModelOptions]="{standalone: true}">
+          </div>
+          <div class="form-group">
+            <button (click)="resendCode()" id="signupSubmit" type="submit" class="btn btn-info btn-block">
+                    Resend Code
+                </button>
+          </div>
+
+          <hr>
+          <p><a (click)="toggleModals('resendCodeModal','registerModal')"> <i class="fa fa-fw fa-group"></i> Register</a> <a (click)="toggleModals('resendCodeModal','loginModal')"> <i class="fa fa-fw fa-user"></i> Login</a>
+          </p>
+        </form>
       </div>
     </div>
   </div>
