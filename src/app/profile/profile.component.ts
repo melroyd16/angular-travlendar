@@ -1,9 +1,9 @@
-import {Component, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
-import {Router} from '@angular/router';
-import {UserLoginService} from '../services/user-login.service';
-import {ProfileService} from './shared/profile.service';
-import {IonRangeSliderComponent} from 'ng2-ion-range-slider';
-import {Location} from '../classes/location';
+import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Router } from '@angular/router';
+import { UserLoginService } from '../services/user-login.service';
+import { ProfileService } from './shared/profile.service';
+import { IonRangeSliderComponent } from 'ng2-ion-range-slider';
+import { Location } from '../classes/location';
 
 
 @Component({
@@ -44,7 +44,7 @@ export class ProfileComponent implements OnInit {
       ['03:00pm', 16]
     ]
   );
-  lunchStart : number;
+  lunchStart: number;
   lunchEnd: number;
   lunchStartTime: string;
   lunchEndTime: string;
@@ -79,14 +79,14 @@ export class ProfileComponent implements OnInit {
   walking = 0;
   cycling = 0;
 
-  advancedSlider1 = {name: 'Lunch Slider', onUpdate: undefined, onFinish: undefined};
-  advancedSlider = {name: 'Dinner Slider', onUpdate: undefined, onFinish: undefined};
+  advancedSlider1 = { name: 'Lunch Slider', onUpdate: undefined, onFinish: undefined };
+  advancedSlider = { name: 'Dinner Slider', onUpdate: undefined, onFinish: undefined };
 
   // User preferred mode checkboxes
-  walk:boolean = true;
-  drive:boolean = true;
-  cycle:boolean = true;
-  trans:boolean = true
+  walk = true;
+  drive = true;
+  cycle = true;
+  trans = true;
   travelMode = ['walking', 'driving', 'cycling', 'transit'];
 
   constructor(public router: Router, public userService: UserLoginService, public profileService: ProfileService) {
@@ -105,10 +105,10 @@ export class ProfileComponent implements OnInit {
         case 'driving':
           this.drive = true;
           break;
-        case 'cycling' :
+        case 'cycling':
           this.cycle = true;
           break;
-        case 'transit' :
+        case 'transit':
           this.trans = true;
           break;
         default:
@@ -126,10 +126,10 @@ export class ProfileComponent implements OnInit {
         case 'driving':
           this.drive = false;
           break;
-        case 'cycling' :
+        case 'cycling':
           this.cycle = false;
           break;
-        case 'transit' :
+        case 'transit':
           this.trans = false;
           break;
         default:
@@ -140,7 +140,7 @@ export class ProfileComponent implements OnInit {
 
   isLoggedIn(message: string, isLoggedIn: boolean) {
     if (!isLoggedIn) {
-      this.router.navigate(['/home/login']);
+      this.router.navigate(['/home']);
     }
   }
 
@@ -209,8 +209,8 @@ export class ProfileComponent implements OnInit {
     this.profileService.saveUserProfile(this.homeLocation, this.workLocation, this.walking,
       this.cycling, this.travelMode, this.lunchStartTime, this.lunchEndTime, this.dinnerStartTime,
       this.dinnerEndTime).subscribe((data) => {
-      this.profileService.setUserDetails(this.walking, this.cycling, this.travelMode);
-    });
+        this.profileService.setUserDetails(this.walking, this.cycling, this.travelMode);
+      });
   }
 
   update(slider, event) {

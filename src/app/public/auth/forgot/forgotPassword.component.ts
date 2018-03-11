@@ -56,7 +56,7 @@ export class ForgotPassword2Component implements CognitoCallback, OnInit, OnDest
   }
 
   ngOnDestroy() {
-    this.sub.unsubscribe();
+    //this.sub.unsubscribe();
   }
 
   onNext() {

@@ -1,10 +1,10 @@
 import { RouterModule, Routes } from '@angular/router';
 import { ModuleWithProviders } from '@angular/core';
-import { AboutComponent, HomeComponent, HomeLandingComponent } from './public/home.component';
+import { AboutComponent, HomeComponent, HomeLandingComponent, LogoutComponent } from './public/home.component';
 import { LoginComponent } from './public/auth/login/login.component';
 import { RegisterComponent } from './public/auth/register/registration.component';
 import { ForgotPassword2Component, ForgotPasswordStep1Component } from './public/auth/forgot/forgotPassword.component';
-import { LogoutComponent, RegistrationConfirmationComponent } from './public/auth/confirm/confirmRegistration.component';
+import { RegistrationConfirmationComponent } from './public/auth/confirm/confirmRegistration.component';
 import { ResendCodeComponent } from './public/auth/resend/resendCode.component';
 import { NewPasswordComponent } from './public/auth/newpassword/newpassword.component';
 
@@ -14,7 +14,7 @@ import { CalendarViewComponent } from './calendar-view/calendar-view.component';
 const homeRoutes: Routes = [
   {
     path: '',
-    redirectTo: '/home/login',
+    redirectTo: '/home',
     pathMatch: 'full'
   },
   {
@@ -26,7 +26,6 @@ const homeRoutes: Routes = [
       { path: 'register', component: RegisterComponent },
       { path: 'confirmRegistration/:username', component: RegistrationConfirmationComponent },
       { path: 'resendCode', component: ResendCodeComponent },
-      { path: 'forgotPassword/:email', component: ForgotPassword2Component },
       { path: 'forgotPassword', component: ForgotPasswordStep1Component },
       { path: 'newPassword', component: NewPasswordComponent },
       { path: '', component: HomeLandingComponent }

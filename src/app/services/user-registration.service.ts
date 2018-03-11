@@ -8,7 +8,7 @@ import * as AWS from 'aws-sdk/global';
 @Injectable()
 export class UserRegistrationService {
 
-  constructor( @Inject(CognitoUtil) public cognitoUtil: CognitoUtil) {
+  constructor(@Inject(CognitoUtil) public cognitoUtil: CognitoUtil) {
 
   }
 
@@ -43,6 +43,9 @@ export class UserRegistrationService {
       Username: username,
       Pool: this.cognitoUtil.getUserPool()
     };
+
+    console.log(userData);
+    console.log(confirmationCode);
 
     const cognitoUser = new CognitoUser(userData);
 
