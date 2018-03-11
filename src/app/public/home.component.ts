@@ -20,6 +20,33 @@ export class RegistrationUser {
   email: string;
   password: string;
 }
+export class NewPasswordUser {
+  username: string;
+  existingPassword: string;
+  password: string;
+}
+
+@Component({
+  selector: 'awscognito-angular2-app',
+  template: ''
+})
+export class LogoutComponent implements LoggedInCallback {
+
+  constructor(public router: Router,
+    public userService: UserLoginService) {
+    this.userService.isAuthenticated(this);
+  }
+
+  isLoggedIn(message: string, isLoggedIn: boolean) {
+    if (isLoggedIn) {
+      this.userService.logout();
+      this.router.navigate(['/home']);
+    }
+
+    this.router.navigate(['/home']);
+  }
+}
+
 
 @Component({
   selector: 'awscognito-angular2-app',
@@ -27,26 +54,33 @@ export class RegistrationUser {
 })
 export class HomeLandingComponent {
   email: string;
+  fp1Email: string;
   password: string;
+  fp2Password: string;
   errorMessage: string;
   modalDisplay: string;
   registrationUser: RegistrationUser;
-  router: Router;
-  errorMessage: string;
+  newPasswordUser: NewPasswordUser;
+  registeredEmail: string;
+  confirmationCode: string;
+  verificationCode: string;
+  private sub: any;
 
   constructor(public router: Router,
-    public userService: UserLoginService) {
+    public userService: UserLoginService,
+    public userRegistration: UserRegistrationService) {
     this.onInit();
   }
 
   onInit() {
     this.registrationUser = new RegistrationUser();
+    this.newPasswordUser = new NewPasswordUser();
     this.errorMessage = null;
   }
 
   ngOnInit() {
     this.errorMessage = null;
-    this.modalDisplay = 'login';
+    this.modalDisplay = 'loginModal';
     this.userService.isAuthenticated(this);
   }
 
@@ -60,7 +94,7 @@ export class HomeLandingComponent {
   }
 
   cognitoCallback(message: string, result: any) {
-    if (this.modalDisplay === 'login') {
+    if (this.modalDisplay === 'loginModal') {
       if (message != null) { // error
         this.errorMessage = message;
         if (this.errorMessage === 'User is not confirmed.') {
@@ -72,12 +106,32 @@ export class HomeLandingComponent {
         $('#loginModal').modal('toggle');
         this.router.navigate(['/calendar']);
       }
-    } else if (this.modalDisplay === 'register') {
+    } else if (this.modalDisplay === 'registerModal') {
+      if (message != null) {
+        this.errorMessage = message;
+      } else {
+        this.registeredEmail = result.user.username;
+        $('#registerModal').modal('toggle');
+        $('#confirmRegisterModal').modal('toggle');
+      }
+    } else if (this.modalDisplay === 'confirmRegisterModal' || this.modalDisplay === 'newPasswordModal') {
+      if (message != null) {
+        this.errorMessage = message;
+      } else {
+        $('#' + this.modalDisplay).modal('toggle');
+        this.router.navigate(['/calendar']);
+      }
+    } else if (this.modalDisplay === 'fp1Modal') {
+      if (message == null && result == null) { // error
+        this.toggleModals('fp1Modal', 'fp2Modal');
+      } else { // success
+        this.errorMessage = message;
+      }
+    } else if (this.modalDisplay === 'fp2Modal') {
       if (message != null) { // error
         this.errorMessage = message;
       } else { // success
-        // move to the next step
-        this.router.navigate(['/home/confirmRegistration', result.user.username]);
+        this.toggleModals('fp2Modal', 'loginModal');
       }
     }
   }
@@ -91,11 +145,32 @@ export class HomeLandingComponent {
   toggleModals(modal1: string, modal2: string) {
     $('#' + modal1).modal('toggle');
     $('#' + modal2).modal('toggle');
+    this.modalDisplay = modal2;
   }
 
   onRegister() {
     this.errorMessage = null;
     this.userRegistration.register(this.registrationUser, this);
+  }
+
+  onConfirmRegistration() {
+    this.errorMessage = null;
+    this.userRegistration.confirmRegistration(this.email, this.confirmationCode, this);
+  }
+
+  onNewPassword() {
+    this.errorMessage = null;
+    this.userRegistration.newPassword(this.newPasswordUser, this);
+  }
+
+  forgotPasswordCheckEmail() {
+    this.errorMessage = null;
+    this.userService.forgotPassword(this.fp1Email, this);
+  }
+
+  confirmFp2Password() {
+    this.errorMessage = null;
+    this.userService.confirmNewPassword(this.fp1Email, this.verificationCode, this.fp2Password, this);
   }
 
 }

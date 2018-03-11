@@ -63,14 +63,10 @@
           </div>
           <hr>
           <p><a (click)="toggleModals('loginModal','registerModal')"> <i class="fa fa-fw fa-group"></i> Register</a>
-            <a (click)="toggleModals('loginModal','forgotPasswordModal')"> <i class="fa fa-fw fa-group"></i> Forgot Password?</a><br/>
+            <a (click)="toggleModals('loginModal','fp1Modal')"> <i class="fa fa-fw fa-group"></i> Forgot Password?</a><br/>
             <a (click)="toggleModals('loginModal','resendConfirmationModal')"> <i class="fa fa-fw fa-group"></i> Resend Confirmation Code</a>
           </p>
         </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
       </div>
     </div>
   </div>
@@ -138,13 +134,160 @@
             </button>
             </div>
             <hr>
-            <p>Already have an account? <a [routerLink]="['/home/login']"> <i class="fa fa-fw fa-lock"></i>Login</a></p>
+            <p>Already have an account? <a (click)="toggleModals('registerModal','loginModal')"> <i class="fa fa-fw fa-lock"></i>Login</a></p>
           </form>
         </div>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="confirmRegisterModal" tabindex="-1" role="dialog" aria-labelledby="confirmRegisterModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+
+      <div class="modal-body">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <form class="form-signin" method="POST" action="#" role="form">
+          <div class="form-group">
+            <h2>Confirm Registration</h2>
+          </div>
+          <div *ngIf="errorMessage!=null" class="alert alert-danger">
+            {{ errorMessage }}
+          </div>
+          <div class="form-group" *ngIf="email===null">
+            <label class="control-label" for="confirmationCode">Email</label>
+            <input id="email" type="email" maxlength="50" class="form-control" [(ngModel)]="email" [ngModelOptions]="{standalone: true}">
+          </div>
+          <div class="form-group">
+            <label class="control-label" for="confirmationCode">Confirmation Code</label>
+            <input id="confirmationCode" type="text" maxlength="50" class="form-control" [(ngModel)]="confirmationCode" [ngModelOptions]="{standalone: true}">
+          </div>
+          <div class="form-group">
+            <button (click)="onConfirmRegistration()" id="confirmRegistration" type="submit" class="btn btn-info btn-block">Confirm
+                </button>
+          </div>
+          <hr>
+          <p>Can't find your code? <a [routerLink]="['/home/resendCode']"> <i class="fa fa-fw fa-group"></i> Resend
+                Code</a>
+            <a [routerLink]="['/home/register']"> <i class="fa fa-fw fa-group"></i> Register</a> <a [routerLink]="['/home/login']"> <i class="fa fa-fw fa-user"></i> Login</a>
+          </p>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="newPasswordModal" tabindex="-1" role="dialog" aria-labelledby="newPasswordModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+
+      <div class="modal-body">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <form class="form-signin" method="POST" action="#" role="form">
+          <div class="form-group">
+            <h2>Set new password</h2>
+          </div>
+          <div *ngIf="errorMessage!=null" class="alert alert-danger">
+            {{ errorMessage }}
+          </div>
+          <div class="form-group">
+            <label class="control-label" for="signupEmail">Username / Email</label>
+            <input id="signupEmail" type="email" maxlength="50" class="form-control" [(ngModel)]="newPasswordUser.username" [ngModelOptions]="{standalone: true}">
+          </div>
+          <div class="form-group">
+            <label class="control-label" for="existingPassword">Temporary Password</label>
+            <input id="existingPassword" type="password" maxlength="25" class="form-control" placeholder="at least 8 characters" length="40" [(ngModel)]="newPasswordUser.existingPassword" [ngModelOptions]="{standalone: true}">
+          </div>
+          <div class="form-group">
+            <label class="control-label" for="signupPassword">New Password</label>
+            <input id="signupPassword" type="password" maxlength="25" class="form-control" placeholder="at least 8 characters" length="40" [(ngModel)]="newPasswordUser.password" [ngModelOptions]="{standalone: true}">
+          </div>
+          <div class="form-group">
+            <button (click)="onNewPassword()" id="signupSubmit" type="submit" class="btn btn-info btn-block">
+                    Set your password
+                </button>
+          </div>
+          <hr>
+          <p>Already have an account? <a (click)="toggleModals('newPasswordModal','loginModal')"> <i class="fa fa-fw fa-lock"></i>Login</a></p>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="fp1Modal" tabindex="-1" role="dialog" aria-labelledby="fp1ModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+
+      <div class="modal-body">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <form class="form-signin" method="POST" action="#" role="form">
+          <div class="form-group">
+            <h2>Forgot Password</h2>
+          </div>
+          <div *ngIf="errorMessage!=null" class="alert alert-danger">
+            {{ errorMessage }}
+          </div>
+          <div class="form-group">
+            <label class="control-label" for="signupEmail">Email</label>
+            <input id="signupEmail" type="email" maxlength="50" class="form-control" [(ngModel)]="fp1Email" [ngModelOptions]="{standalone: true}">
+          </div>
+          <div class="form-group">
+            <button (click)="forgotPasswordCheckEmail()" id="nextPage" type="submit" class="btn btn-info btn-block">Next
+                </button>
+          </div>
+
+          <hr>
+          <p><a (click)="toggleModals('fp1Modal','registerModal')"> <i class="fa fa-fw fa-group"></i> Register</a> <a (click)="toggleModals('fp1Modal','loginModal')"> <i class="fa fa-fw fa-user"></i> Login</a>
+          </p>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="fp2Modal" tabindex="-1" role="dialog" aria-labelledby="fp2ModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+
+      <div class="modal-body">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <form class="form-signin" method="POST" action="#" role="form">
+          <div class="form-group">
+            <h2>Forgot Password</h2>
+          </div>
+          <div *ngIf="errorMessage!=null" class="alert alert-danger">
+            {{ errorMessage }}
+          </div>
+          <div class="form-group">
+            <label class="control-label" for="verificationCode">Verification Code</label>
+            <input id="verificationCode" type="verificationCode" maxlength="50" class="form-control" [(ngModel)]="verificationCode" [ngModelOptions]="{standalone: true}">
+          </div>
+          <div class="form-group">
+            <label class="control-label" for="newPassword">New Password</label>
+            <input id="newPassword" type="password" maxlength="25" class="form-control" length="40" [(ngModel)]="fp2Password" [ngModelOptions]="{standalone: true}">
+          </div>
+          <div class="form-group">
+            <button (click)="confirmFp2Password()" id="signupSubmit" type="submit" class="btn btn-info btn-block">
+                    Reset Password
+                </button>
+          </div>
+
+          <hr>
+          <p><a [routerLink]="['/home/resendCode']"> <i class="fa fa-fw fa-group"></i> Go back</a>
+          </p>
+        </form>
+
       </div>
     </div>
   </div>
