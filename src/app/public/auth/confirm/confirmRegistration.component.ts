@@ -48,7 +48,7 @@ export class RegistrationConfirmationComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.sub.unsubscribe();
+    //this.sub.unsubscribe();
   }
 
   onConfirmRegistration() {

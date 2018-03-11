@@ -53,10 +53,10 @@ export class LogoutComponent implements LoggedInCallback {
   templateUrl: './landinghome.html'
 })
 export class HomeLandingComponent {
-  email: string;
+  loginEmail: string;
   fp1Email: string;
   rcEmail: string;
-  password: string;
+  loginPassword: string;
   fp2Password: string;
   errorMessage: string;
   modalDisplay: string;
@@ -86,12 +86,12 @@ export class HomeLandingComponent {
   }
 
   onLogin() {
-    if (this.email == null || this.password == null) {
+    if (this.loginEmail == null || this.loginPassword == null) {
       this.errorMessage = 'All fields are required';
       return;
     }
     this.errorMessage = null;
-    this.userService.authenticate(this.email, this.password, this);
+    this.userService.authenticate(this.loginEmail, this.loginPassword, this);
   }
 
   cognitoCallback(message: string, result: any) {
@@ -99,9 +99,10 @@ export class HomeLandingComponent {
       if (message != null) { // error
         this.errorMessage = message;
         if (this.errorMessage === 'User is not confirmed.') {
-          this.router.navigate(['/home/confirmRegistration', this.email]);
+          this.registeredEmail = this.loginEmail;
+          this.toggleModals('loginModal', 'confirmRegisterModal');
         } else if (this.errorMessage === 'User needs to set password.') {
-          this.router.navigate(['/home/newPassword']);
+          this.toggleModals('loginModal', 'newPasswordModal');
         }
       } else {
         $('#loginModal').modal('toggle');
@@ -118,8 +119,7 @@ export class HomeLandingComponent {
       if (message != null) {
         this.errorMessage = message;
       } else {
-        $('#' + this.modalDisplay).modal('toggle');
-        this.router.navigate(['/calendar']);
+        this.toggleModals(this.modalDisplay, 'loginModal');
       }
     } else if (this.modalDisplay === 'fp1Modal') {
       if (message == null && result == null) { // error
@@ -162,7 +162,7 @@ export class HomeLandingComponent {
 
   onConfirmRegistration() {
     this.errorMessage = null;
-    this.userRegistration.confirmRegistration(this.email, this.confirmationCode, this);
+    this.userRegistration.confirmRegistration(this.registeredEmail, this.confirmationCode, this);
   }
 
   onNewPassword() {
@@ -182,6 +182,10 @@ export class HomeLandingComponent {
 
   resendCode() {
     this.userRegistration.resendCode(this.rcEmail, this);
+  }
+  resetModal() {
+    this.modalDisplay = 'loginModal';
+    this.errorMessage = null;
   }
 
 }
