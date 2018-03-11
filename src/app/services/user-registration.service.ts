@@ -1,8 +1,8 @@
 import { Inject, Injectable } from '@angular/core';
 import { CognitoCallback, CognitoUtil } from './cognito.service';
 import { AuthenticationDetails, CognitoUser, CognitoUserAttribute } from 'amazon-cognito-identity-js';
-import { RegistrationUser } from '../public/auth/register/registration.component';
-import { NewPasswordUser } from '../public/auth/newpassword/newpassword.component';
+import { RegistrationUser } from '../home/home.component';
+import { NewPasswordUser } from '../home/home.component';
 import * as AWS from 'aws-sdk/global';
 
 @Injectable()
