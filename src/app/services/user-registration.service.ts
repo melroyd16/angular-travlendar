@@ -1,14 +1,14 @@
 import { Inject, Injectable } from '@angular/core';
 import { CognitoCallback, CognitoUtil } from './cognito.service';
 import { AuthenticationDetails, CognitoUser, CognitoUserAttribute } from 'amazon-cognito-identity-js';
-import { RegistrationUser } from '../public/auth/register/registration.component';
-import { NewPasswordUser } from '../public/auth/newpassword/newpassword.component';
+import { RegistrationUser } from '../home/home.component';
+import { NewPasswordUser } from '../home/home.component';
 import * as AWS from 'aws-sdk/global';
 
 @Injectable()
 export class UserRegistrationService {
 
-  constructor( @Inject(CognitoUtil) public cognitoUtil: CognitoUtil) {
+  constructor(@Inject(CognitoUtil) public cognitoUtil: CognitoUtil) {
 
   }
 
@@ -43,6 +43,9 @@ export class UserRegistrationService {
       Username: username,
       Pool: this.cognitoUtil.getUserPool()
     };
+
+    console.log(userData);
+    console.log(confirmationCode);
 
     const cognitoUser = new CognitoUser(userData);
 
