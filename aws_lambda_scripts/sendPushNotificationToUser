@@ -1,224 +1,53 @@
-package com.amazonaws.samples;
+# First we need to add boto3 library in the Amazon Lambda folder
 
-import java.util.HashMap;
-import java.util.Map;
+import boto3
 
-import com.amazonaws.regions.Regions;
-import com.amazonaws.services.codedeploy.model.DeleteApplicationRequest;
-import com.amazonaws.services.pinpoint.AmazonPinpoint;
-import com.amazonaws.services.pinpoint.AmazonPinpointClientBuilder;
-import com.amazonaws.services.pinpoint.model.CreateAppRequest;
-import com.amazonaws.services.pinpoint.model.CreateAppResult;
-import com.amazonaws.services.pinpoint.model.CreateApplicationRequest;
-import com.amazonaws.services.pinpoint.model.DefaultPushNotificationMessage;
-import com.amazonaws.services.pinpoint.model.DeleteAppRequest;
-import com.amazonaws.services.pinpoint.model.DirectMessageConfiguration;
-import com.amazonaws.services.pinpoint.model.EndpointSendConfiguration;
-import com.amazonaws.services.pinpoint.model.GCMMessage;
-import com.amazonaws.services.pinpoint.model.SendUsersMessageRequest;
-import com.amazonaws.services.pinpoint.model.SendUsersMessagesRequest;
-import com.amazonaws.services.pinpoint.model.SendUsersMessagesResult;
-import com.amazonaws.services.sns.model.CreatePlatformEndpointRequest;
-import com.amazonaws.services.sqs.model.SendMessageRequest;
-import com.amazonaws.services.pinpoint.AmazonPinpoint;
-import com.amazonaws.services.pinpoint.AmazonPinpointClientBuilder;
+client = boto3.client('pinpoint',region_name="us-east-1")
 
-public class AWSPinpointExample {
-	static AmazonPinpoint pinpoint = AmazonPinpointClientBuilder.standard().withRegion(Regions.US_EAST_1).build();
+print(client)
 
-	public static void createApplicationInPinPoint(String appName){
-		CreateApplicationRequest appRequest = new CreateApplicationRequest()
-				.withName(appName);
-
-		CreateAppRequest request = new CreateAppRequest();
-		request.withCreateApplicationRequest(appRequest);
-		CreateAppResult result = pinpoint.createApp(request);
-
-		if(result != null){
-		System.out.println(result.getApplicationResponse());
-		System.out.println(result.getApplicationResponse().getId());
-		System.out.println(result.getApplicationResponse().getName());
-		}else{
-			System.out.println("No Application was added to the PinPoint Application");
-		}
-	}
-
-	public static void deletePinPoint(String appId){
-		DeleteAppRequest deleteRequest = new DeleteAppRequest()
-				.withApplicationId(appId);
-
-		pinpoint.deleteApp(deleteRequest);
-	}
+response_apps = client.get_apps()
+print("List of applications")
+print(response_apps)
 
 
-	public static void sendMessageToEndPoint(){
-
-		DirectMessageConfiguration directMessageConfiguration = new DirectMessageConfiguration();
-
-		DefaultPushNotificationMessage pushNotificationMessage = new DefaultPushNotificationMessage();
-		pushNotificationMessage.setTitle("Default Push Notification Message");
-		pushNotificationMessage.setBody("Body of the Push Notification Message");
-
-
-		GCMMessage gcmMessage = new GCMMessage();
-		gcmMessage.setTitle("GCM Message Title");
-		gcmMessage.setBody("GCM Message Body");
-
-		directMessageConfiguration.setDefaultPushNotificationMessage(pushNotificationMessage);
-		directMessageConfiguration.setGCMMessage(gcmMessage);
+# AndroidPushNotification_MobileHub
+name = "androidpushnotification_MobileHub"
+Id = "30187d92e3a84f9bb5313f23b07038d4"
 
 
 
-		SendUsersMessageRequest singleRequest = new SendUsersMessageRequest();
-		singleRequest.setMessageConfiguration(directMessageConfiguration);
+response_app_information = client.get_app(ApplicationId='30187d92e3a84f9bb5313f23b07038d4')
+print("App Information")
+print(response_app_information)
 
-		EndpointSendConfiguration endPoint = new EndpointSendConfiguration();
-		endPoint.setTitleOverride("Title Override");
-//
-		String endPointToken = "arn:aws:sns:us-west-2:016911789346:endpoint/GCM/PushNotificationSample/2b58b46b-b951-396e-bb38-738957bb5174";
-		//singleRequest.addUsersEntry(endPointToken, endPoint);
+response = client.get_application_settings(
+    ApplicationId='30187d92e3a84f9bb5313f23b07038d4'
+)
 
-
-		singleRequest.addUsersEntry(endPointToken,endPoint);
-
-		SendUsersMessagesRequest request = new SendUsersMessagesRequest();
-		request.setApplicationId("arn:aws:sns:us-west-2:016911789346:app/GCM/PushNotificationSample");
-		request.setSendUsersMessageRequest(singleRequest);
-
-		SendUsersMessagesResult  result = pinpoint.sendUsersMessages(request);
-		System.out.println(result);
-
-	}
+print("Application Settings")
+print(response)
 
 
-	public static void main(String args[]){
-		//AWSPinpointExample.createApplicationInPinPoint("Eclipse App creation");
-//		{Id: e07f970d3eb641758aa1c9bb3fa7bb9f,Name: Eclipse App creation}
-//		e07f970d3eb641758aa1c9bb3fa7bb9f
-//		Eclipse App creation
+print("Send Messages")
+# Sending Messages to the single endPoint
+endPoint = "eTUnwUGiaUA:APA91bGlLmRreuC4Ij97fN1_PWGS_arIqpt8EhVRs6VRBHHXuE0ruIRg3AKadKL-j3WkInVjwnDoN0n_n6jUQQ8QbsvTZrsl4OXyLcfQAhpAXOMhQR3v6f46zr3VPZHVR-9dJCxyImBl"
 
-		//AWSPinpointExample.deletePinPoint("e07f970d3eb641758aa1c9bb3fa7bb9f");
+response = client.send_messages(
+    ApplicationId='30187d92e3a84f9bb5313f23b07038d4',
+    MessageRequest= {
+      "Addresses":{
+            endPoint:{"ChannelType" : "GCM"}
+                },
+      "MessageConfiguration": {
+          "DefaultPushNotificationMessage" : {
+            "Action" : "OPEN_APP",
+            "Body" : "Message Body",
+            "Title" : " Body Title"
+          }
+      }
+  }
+)
+print(response)
+print("Completed sending messages")
 
-		sendMessageToEndPoint();
-
-
-	}
-
-
-
-}
-
-
-
-//class RegistrationExample {
-//
-//	  AmazonSNSClient client = new AmazonSNSClient(); //provide credentials here
-//
-//	  private void registerWithSNS() {
-//
-//	    String endpointArn = retrieveEndpointArn();
-//	    String token = "Retrieved from the mobile operating system";
-//
-//	    boolean updateNeeded = false;
-//	    boolean createNeeded = (null == endpointArn);
-//
-//	    if (createNeeded) {
-//	      // No platform endpoint ARN is stored; need to call createEndpoint.
-//	      endpointArn = createEndpoint();
-//	      createNeeded = false;
-//	    }
-//
-//	    System.out.println("Retrieving platform endpoint data...");
-//	    // Look up the platform endpoint and make sure the data in it is current, even if
-//	    // it was just created.
-//	    try {
-//	      GetEndpointAttributesRequest geaReq =
-//	          new GetEndpointAttributesRequest()
-//	        .withEndpointArn(endpointArn);
-//	      GetEndpointAttributesResult geaRes =
-//	        client.getEndpointAttributes(geaReq);
-//
-//	      updateNeeded = !geaRes.getAttributes().get("Token").equals(token)
-//	        || !geaRes.getAttributes().get("Enabled").equalsIgnoreCase("true");
-//
-//	    } catch (NotFoundException nfe) {
-//	      // We had a stored ARN, but the platform endpoint associated with it
-//	      // disappeared. Recreate it.
-//	        createNeeded = true;
-//	    }
-//
-//	    if (createNeeded) {
-//	      createEndpoint();
-//	    }
-//
-//	    System.out.println("updateNeeded = " + updateNeeded
-//
-//	    if (updateNeeded) {
-//	      // The platform endpoint is out of sync with the current data;
-//	      // update the token and enable it.
-//	      System.out.println("Updating platform endpoint " + endpointArn);
-//	      Map attribs = new HashMap();
-//	      attribs.put("Token", token);
-//	      attribs.put("Enabled", "true");
-//	      SetEndpointAttributesRequest saeReq =
-//	          new SetEndpointAttributesRequest()
-//	        .withEndpointArn(endpointArn)
-//	        .withAttributes(attribs);
-//	      client.setEndpointAttributes(saeReq);
-//	    }
-//	  }
-//
-//	  /**
-//	  * @return never null
-//	  * */
-//	  private String createEndpoint(String token) {
-//
-//	    String endpointArn = null;
-//	    try {
-//	      System.out.println("Creating platform endpoint with token " + token);
-//	      CreatePlatformEndpointRequest cpeReq =
-//	          new CreatePlatformEndpointRequest()
-//	        .withPlatformApplicationArn(applicationArn)
-//	        .withToken(token);
-//	      CreatePlatformEndpointResult cpeRes = client
-//	        .createPlatformEndpoint(cpeReq);
-//	      endpointArn = cpeRes.getEndpointArn();
-//	    } catch (InvalidParameterException ipe) {
-//	      String message = ipe.getErrorMessage();
-//	      System.out.println("Exception message: " + message);
-//	      Pattern p = Pattern.compile(".*Endpoint (arn:aws:sns[^ ]+) already exists " +
-//	                 "with the same token.*");
-//	      Matcher m = p.matcher(message);
-//	      if (m.matches()) {
-//	        // The platform endpoint already exists for this token, but with
-//	        // additional custom data that
-//	        // createEndpoint doesn't want to overwrite. Just use the
-//	        // existing platform endpoint.
-//	        endpointArn = m.group(1);
-//	      } else {
-//	        // Rethrow the exception, the input is actually bad.
-//	        throw ipe;
-//	      }
-//	    }
-//	    storeEndpointArn(endpointArn);
-//	    return endpointArn;
-//	  }
-//
-//	  /**
-//	  * @return the ARN the app was registered under previously, or null if no
-//	  *         platform endpoint ARN is stored.
-//	  */
-//	  private String retrieveEndpointArn() {
-//	    // Retrieve the platform endpoint ARN from permanent storage,
-//	    // or return null if null is stored.
-//	    return arnStorage;
-//	  }
-//
-//	  /**
-//	  * Stores the platform endpoint ARN in permanent storage for lookup next time.
-//	  * */
-//	  private void storeEndpointArn(String endpointArn) {
-//	    // Write the platform endpoint ARN to permanent storage.
-//	    arnStorage = endpointArn;
-//	  }
-//	}
