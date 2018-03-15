@@ -227,6 +227,7 @@ export class CalendarViewComponent implements OnInit {
       destination: event.destination,
       travelMode: event.travelMode,
       repeatMax : event.repeatMax,
+      isRepeat : event.isRepeat,
       repeatPreference : event.repeatPreference,
       draggable: true,
       resizable: {
@@ -359,6 +360,7 @@ export class CalendarViewComponent implements OnInit {
 
   handleEvent(action: string, event: any): void {
 
+
     this.modalData = { event, action };
     this.modal.open(this.modalContent, { size: 'lg' });
   }
@@ -376,6 +378,7 @@ export class CalendarViewComponent implements OnInit {
   }
 
   openRepeatBlock(element: HTMLInputElement) : void{
+    console.log(this.event.isRepeat)
     this.repeatCheckbox=element;
       if(element.checked){
         this.repeatEvents = true;
