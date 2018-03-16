@@ -1,4 +1,5 @@
 import boto3
+import json
 
 client = boto3.client('pinpoint',region_name="us-east-1")
 
@@ -48,7 +49,6 @@ response = client.send_messages(
 )
 print(response)
 print("Completed sending messages")
-
 
 # Adding Method to pull data from the dynamoDB Database
 
@@ -107,6 +107,8 @@ print(response)
 #   //             ":end": cal_eventEnd
 #   //         }
 
+
+
 response = dynamoDbClient.scan(
     TableName='user_events',
     ExpressionAttributeNames={
@@ -114,12 +116,57 @@ response = dynamoDbClient.scan(
 
     },
     ExpressionAttributeValues={
-        ':eventStart': {
-            'N': 1519592400000,
-        }
+        ':eventStartStartWindowTime': {
+            'N': '1519592400000'
+        },
+        ':eventStartEndWindowTime':{
+            'N':  '1519599600000'
+        },
+
     },
-    FilterExpression='#eventStart = :eventStart',
+    FilterExpression='#eventStart >= :eventStartStartWindowTime and #eventStart <= :eventStartEndWindowTime',
 )
 
 print("Added Filter to get the table")
 print(response)
+
+# Parsing the responseJson
+
+# You have meeting at 5
+listOfItems = response['Items']
+
+for items in listOfItems:
+    print(items['eventEnd']['N'])
+    print(items['username']['S'])
+    print(items['eventTitle']['S'])
+    print(items['destination']['M']['formatted_address']['S'])
+
+
+
+
+# Need to get the token from the user Interface
+
+print("Send Messages")
+# Sending Messages to the single endPoint
+endPoint = "eTUnwUGiaUA:APA91bGlLmRreuC4Ij97fN1_PWGS_arIqpt8EhVRs6VRBHHXuE0ruIRg3AKadKL-j3WkInVjwnDoN0n_n6jUQQ8QbsvTZrsl4OXyLcfQAhpAXOMhQR3v6f46zr3VPZHVR-9dJCxyImBl"
+
+response = client.send_messages(
+    ApplicationId='30187d92e3a84f9bb5313f23b07038d4',
+    MessageRequest= {
+      "Addresses":{
+            endPoint:{"ChannelType" : "GCM",
+                      "BodyOverride":"New XXXX messages"
+                      }
+                }
+        ,
+      "MessageConfiguration": {
+          "DefaultPushNotificationMessage" : {
+            "Action" : "OPEN_APP",
+            "Body" : "Message Body",
+            "Title" : " Body Title"
+          }
+      }
+  }
+)
+print(response)
+print("Completed sending messages")
