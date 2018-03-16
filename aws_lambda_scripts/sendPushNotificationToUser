@@ -155,10 +155,36 @@ response = client.send_messages(
     MessageRequest= {
       "Addresses":{
             endPoint:{"ChannelType" : "GCM",
-                      "BodyOverride":"New XXXX messages"
-                      }
-                }
-        ,
+                      "BodyOverride":"New XXXX messages",
+                      "Context":{
+                            'eventEnd':"1519599600000",
+                            'eventStart':"1519592400000",
+                            'origin_place_id':"ChIJa8f1cO8IK4cRhFzAxK2hLPc",
+                            'origin_formatted_address':"1137 E Orange St, Tempe, AZ 85281, USA",
+                            'destination_place_id' : "ChIJffoao2cJK4cRpDZy6Da-T8E",
+                            "destination_formatted_address":"1312 N Scottsdale Rd, Scottsdale, AZ 85257, USA",
+                            "travelMode":"walking",
+                            'timeNeeded':"669", # In Seconds
+                            'username':"addy3429@live.com",
+                            'eventTitle':"lunch Test 2 - 4",
+                            }
+                        },
+          endPoint: {"ChannelType": "GCM",
+                     "BodyOverride": "New XXXX messages",
+                     "Context": {
+                         'eventEnd': "1519599600000",
+                         'eventStart': "1519592400000",
+                         'origin_place_id': "ChIJa8f1cO8IK4cRhFzAxK2hLPc",
+                         'origin_formatted_address': "1137 E Orange St, Tempe, AZ 85281, USA",
+                         'destination_place_id': "ChIJffoao2cJK4cRpDZy6Da-T8E",
+                         "destination_formatted_address": "1312 N Scottsdale Rd, Scottsdale, AZ 85257, USA",
+                         "travelMode": "walking",
+                         'timeNeeded': "669",  # In Seconds
+                         'username': "addy3429@live.com",
+                         'eventTitle': "lunch Test 2 - 4",
+                     }
+                     }
+      },
       "MessageConfiguration": {
           "DefaultPushNotificationMessage" : {
             "Action" : "OPEN_APP",
@@ -166,7 +192,13 @@ response = client.send_messages(
             "Title" : " Body Title"
           }
       }
-  }
+      }
 )
+
 print(response)
 print("Completed sending messages")
+
+
+
+
+
