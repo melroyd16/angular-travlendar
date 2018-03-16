@@ -1,5 +1,3 @@
-# First we need to add boto3 library in the Amazon Lambda folder
-
 import boto3
 
 client = boto3.client('pinpoint',region_name="us-east-1")
@@ -51,3 +49,77 @@ response = client.send_messages(
 print(response)
 print("Completed sending messages")
 
+
+# Adding Method to pull data from the dynamoDB Database
+
+
+dynamoDbClient = boto3.client('dynamodb')
+
+# List of tables to validate if the access to dynamo db is given or not
+
+
+response = dynamoDbClient.list_tables()
+
+print("Response for List of Tables")
+print(response)
+
+# {'TableNames': ['awstesting-mobilehub-1322918507-pets', 'starter-mobilehub-520218620-pets', 'user_events', 'user_preferences']
+
+
+# Query
+
+# response = dynamoDbClient.scan(
+#     TableName="user_events",
+#     Select="ALL_ATTRIBUTES",
+# )
+
+
+response = dynamoDbClient.scan(
+    # ExpressionAttributeNames={
+    #     'AT': 'AlbumTitle',
+    #     'ST': 'SongTitle',
+    # },
+    # ExpressionAttributeValues={
+    #     ':a': {
+    #         'S': 'No One You Know',
+    #     },
+    # },
+    # FilterExpression='Artist = :a',
+    # ProjectionExpression='#ST, #AT',
+    TableName='user_events'
+)
+
+print("Response of getting table values")
+print(response)
+
+
+# Adding filter in table
+
+# KeyConditionExpression: "#username = :u",
+#   //         ProjectionExpression: "id, eventStart, eventEnd",
+#   //         FilterExpression: "eventStart >= :start and eventStart <= :end",
+#   //         ExpressionAttributeNames: {
+#   //             "#username": "username"
+#   //         },
+#   //         ExpressionAttributeValues: {
+#   //             ":u": username,
+#   //             ":start": cal_eventStart,
+#   //             ":end": cal_eventEnd
+#   //         }
+
+response = dynamoDbClient.scan(
+    TableName='user_events',
+    ExpressionAttributeNames={
+        '#eventStart': 'eventStart'
+
+    },
+    ExpressionAttributeValues={
+        ':eventStart': {
+            'N': 1519592400000,
+        }
+    },
+    FilterExpression='#eventStart = :eventStart',
+)
+
+print("Added Filter to get the table")
+print(response)
