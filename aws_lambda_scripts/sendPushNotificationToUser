@@ -1,0 +1,53 @@
+# First we need to add boto3 library in the Amazon Lambda folder
+
+import boto3
+
+client = boto3.client('pinpoint',region_name="us-east-1")
+
+print(client)
+
+response_apps = client.get_apps()
+print("List of applications")
+print(response_apps)
+
+
+# AndroidPushNotification_MobileHub
+name = "androidpushnotification_MobileHub"
+Id = "30187d92e3a84f9bb5313f23b07038d4"
+
+
+
+response_app_information = client.get_app(ApplicationId='30187d92e3a84f9bb5313f23b07038d4')
+print("App Information")
+print(response_app_information)
+
+response = client.get_application_settings(
+    ApplicationId='30187d92e3a84f9bb5313f23b07038d4'
+)
+
+print("Application Settings")
+print(response)
+
+
+print("Send Messages")
+# Sending Messages to the single endPoint
+endPoint = "eTUnwUGiaUA:APA91bGlLmRreuC4Ij97fN1_PWGS_arIqpt8EhVRs6VRBHHXuE0ruIRg3AKadKL-j3WkInVjwnDoN0n_n6jUQQ8QbsvTZrsl4OXyLcfQAhpAXOMhQR3v6f46zr3VPZHVR-9dJCxyImBl"
+
+response = client.send_messages(
+    ApplicationId='30187d92e3a84f9bb5313f23b07038d4',
+    MessageRequest= {
+      "Addresses":{
+            endPoint:{"ChannelType" : "GCM"}
+                },
+      "MessageConfiguration": {
+          "DefaultPushNotificationMessage" : {
+            "Action" : "OPEN_APP",
+            "Body" : "Message Body",
+            "Title" : " Body Title"
+          }
+      }
+  }
+)
+print(response)
+print("Completed sending messages")
+

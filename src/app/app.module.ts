@@ -35,15 +35,9 @@ import * as moment from 'moment';
 
 
 
-import { AboutComponent, HomeComponent, HomeLandingComponent } from './public/home.component';
-import { LoginComponent } from './public/auth/login/login.component';
-import { RegisterComponent } from './public/auth/register/registration.component';
-import { ForgotPassword2Component, ForgotPasswordStep1Component } from './public/auth/forgot/forgotPassword.component';
-import { LogoutComponent, RegistrationConfirmationComponent } from './public/auth/confirm/confirmRegistration.component';
-import { ResendCodeComponent } from './public/auth/resend/resendCode.component';
-import { NewPasswordComponent } from './public/auth/newpassword/newpassword.component';
+import { HomeComponent, LogoutComponent } from './home/home.component';
 import { AuthInterceptor } from './apiinterceptor';
-import {IonRangeSliderModule} from 'ng2-ion-range-slider';
+import { IonRangeSliderModule } from 'ng2-ion-range-slider';
 
 @NgModule({
   declarations: [
@@ -52,16 +46,7 @@ import {IonRangeSliderModule} from 'ng2-ion-range-slider';
     HeaderComponent,
     ProfileComponent,
     GpCompleteDirective,
-    NewPasswordComponent,
-    LoginComponent,
     LogoutComponent,
-    RegistrationConfirmationComponent,
-    ResendCodeComponent,
-    ForgotPasswordStep1Component,
-    ForgotPassword2Component,
-    RegisterComponent,
-    AboutComponent,
-    HomeLandingComponent,
     HomeComponent
   ],
   imports: [

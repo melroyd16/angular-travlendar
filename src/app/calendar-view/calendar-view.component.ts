@@ -321,6 +321,7 @@ export class CalendarViewComponent implements OnInit {
         $('#eventModal').modal('hide');
         this.initEvent();
         this.activeDayIsOpen = false;
+        this.fetchEvents();
       }
     });
 
