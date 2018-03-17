@@ -12,38 +12,42 @@ exports.handler = (event, context, callback) => {
 
   function saveEvent() {
     var id = new Date().getTime() + "_" + username
-    var payload = {
-      TableName: "user_events",
-      Item: {
-        "id": id,
-        "username": username,
-        "eventStart": event.body.eventDetails.eventStart,
-        "eventEnd": event.body.eventDetails.eventEnd,
-        "eventTitle": event.body.eventDetails.eventTitle,
-        "origin": event.body.eventDetails.origin,
-        "destination": event.body.eventDetails.destination,
-        "travelMode": event.body.eventDetails.travelMode
+    if(event.body.eventDetails.isRepeat){
+      var payload = {
+        TableName: "user_events",
+        Item: {
+          "id": id,
+          "username": username,
+          "eventStart": event.body.eventDetails.eventStart,
+          "eventEnd": event.body.eventDetails.eventEnd,
+          "eventTitle": event.body.eventDetails.eventTitle,
+          "origin": event.body.eventDetails.origin,
+          "destination": event.body.eventDetails.destination,
+          "travelMode": event.body.eventDetails.travelMode,
+          "repeatMax" : event.body.eventDetails.repeatMax,
+          "isRepeat" : event.body.eventDetails.isRepeat,
+          "repeatPreference" : event.body.eventDetails.repeatPreference
+        }
       }
     }
-
-    dynamo.putItem(payload, function (err, data) {
-      if (err) {
-        context.fail(err);
-      } else {
-        context.succeed(id);
+    
+    else {
+        var payload = {
+        TableName: "user_events",
+        Item: {
+          "id": id,
+          "username": username,
+          "eventStart": event.body.eventDetails.eventStart,
+          "eventEnd": event.body.eventDetails.eventEnd,
+          "eventTitle": event.body.eventDetails.eventTitle,
+          "origin": event.body.eventDetails.origin,
+          "destination": event.body.eventDetails.destination,
+          "travelMode": event.body.eventDetails.travelMode,
+          "isRepeat" : false
+        }
       }
-    });
-  }
-
-  function fetchEvents() {
-    var payload = {
-      TableName: "user_events",
-      IndexName: "username-index",
-      KeyConditionExpression: "username = :u",
-      ExpressionAttributeValues: {
-        ":u": username
-      }
-    };
+    }
+    
     dynamo.query(payload, function (err, data) {
       if (err) {
         context.fail(err);
@@ -665,7 +669,27 @@ exports.handler = (event, context, callback) => {
 
 
   function saveModifiedEvent() {
-    var new_event_payload = {
+     if(event.body.eventDetails.isRepeat){
+        var new_event_payload = {
+        TableName: "user_events",
+        Item: {
+          "id":  event.body.eventID,
+          "username": username,
+          "eventStart": event.body.eventDetails.eventStart,
+          "eventEnd": event.body.eventDetails.eventEnd,
+          "eventTitle": event.body.eventDetails.eventTitle,
+          "origin": event.body.eventDetails.origin,
+          "destination": event.body.eventDetails.destination,
+          "travelMode": event.body.eventDetails.travelMode,
+          "repeatMax" : event.body.eventDetails.repeatMax,
+          "isRepeat" : event.body.eventDetails.isRepeat,
+          "repeatPreference" : event.body.eventDetails.repeatPreference
+        }
+      }
+    }
+    
+    else{
+       var new_event_payload = {
       TableName: "user_events",
       Item: {
         "id": event.body.eventID,
@@ -678,6 +702,7 @@ exports.handler = (event, context, callback) => {
         "travelMode": event.body.eventDetails.travelMode
       }
     };
+    }
 
     dynamo.putItem(new_event_payload, function (err, data) {
       if (err) {

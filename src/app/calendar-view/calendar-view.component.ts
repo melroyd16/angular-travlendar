@@ -77,7 +77,7 @@ export class CalendarViewComponent implements OnInit {
   displayEventModal = false;
   displayRepeatEventModal = false;
   displayTravelModes = false;
-  repeatEvents=false;
+  repeatEvents = false;
   displayModalError = false;
   forceSaveEvent = false;
   displaySuccess = false;
@@ -95,7 +95,6 @@ export class CalendarViewComponent implements OnInit {
     action: string;
     event: any;
   };
-
   currentEventId = '';
   eventType = 'save';
   events: any[] = [];
@@ -117,6 +116,9 @@ export class CalendarViewComponent implements OnInit {
             this.event.destination = event.destination;
             this.event.eventLocation = event.destination.formatted_address;
             this.eventType = 'edit';
+            this.event.isRepeat = event.isRepeat;
+            this.event.repeatMax= event.repeatMax;
+            this.event.repeatPreference= event.repeatPreference;
             this.changeLocation();
             this.event.travelMode = event.travelMode.mode;
             this.selectedPriorLocation = 'other';
@@ -152,7 +154,7 @@ export class CalendarViewComponent implements OnInit {
 
   isLoggedIn(message: string, isLoggedIn: boolean) {
     if (!isLoggedIn) {
-      this.router.navigate(['/home/login']);
+      this.router.navigate(['/home']);
     }
   }
 
@@ -176,7 +178,7 @@ export class CalendarViewComponent implements OnInit {
       this.homeLocation = this.profileService.userProfile.homeLocation;
       this.workLocation = this.profileService.userProfile.workLocation;
     }
-    this.fetchEvents();
+
     this.initEvent();
   }
 
@@ -197,7 +199,7 @@ export class CalendarViewComponent implements OnInit {
     this.displayEventModal = false;
     this.displayRepeatEventModal = false;
     this.displayTravelModes = false;
-    this.repeatEvents=false;
+    this.repeatEvents = false;
     this.displayModalError = false;
     this.ifSelected = false;
     this.forceSaveEvent = false;
@@ -209,7 +211,7 @@ export class CalendarViewComponent implements OnInit {
     this.otherLocationDetails = new Location();
     this.eventsService.fetchEvents().subscribe((eventList) => {
       this.eventsLoaded = true;
-      this.events=[];
+      this.events = [];
       for (let i = 0; i < eventList.Items.length; i++) {
         this.addEvent(eventList.Items[i]);
       }
@@ -226,7 +228,7 @@ export class CalendarViewComponent implements OnInit {
       origin: event.origin,
       destination: event.destination,
       travelMode: event.travelMode,
-      repeatMax : event.repeatMax,
+      repeatMax : new Date(event.repeatMax),
       isRepeat : event.isRepeat,
       repeatPreference : event.repeatPreference,
       draggable: true,
@@ -272,6 +274,12 @@ export class CalendarViewComponent implements OnInit {
 
   saveEvent(): void {
 
+    if(!this.event.isRepeat){
+      this.event.isRepeat=false;
+    }
+    else{
+      this.event.repeatMax = new Date(this.event.repeatMax).getTime();
+    }
     this.eventPayload = Object.assign({}, this.event);
     this.eventPayload.eventStart = new Date(this.eventPayload.eventStart).getTime();
     this.eventPayload.eventEnd = new Date(this.eventPayload.eventEnd).getTime();
@@ -300,10 +308,10 @@ export class CalendarViewComponent implements OnInit {
               this.events[i].origin = this.event.origin;
               this.events[i].destination = this.event.destination;
               this.events[i].travelMode = this.eventPayload.travelMode;
-
+              this.events[i].isRepeat = this.eventPayload.isRepeat;
             }
           }
-          this.refresh.next();
+          //this.refresh.next();
           this.displaySuccessMessage('Event has been edited successfully');
         } else {
           this.eventPayload.id = data;
@@ -313,11 +321,11 @@ export class CalendarViewComponent implements OnInit {
         $('#eventModal').modal('hide');
         this.initEvent();
         this.activeDayIsOpen = false;
-         this.fetchEvents();
       }
     });
 
     if(this.event.repeatPreference){
+      console.log("inside repeat");
       $('#eventModal').modal('hide');
       switch(this.event.repeatPreference){
         case 'Daily':
@@ -327,11 +335,11 @@ export class CalendarViewComponent implements OnInit {
           }
           break;
         case 'Weekly':
-        let i = this.event.eventStart;
-        i.setDate(i.getDate()+7);
-        while(i < this.event.repeatMax){
-          this.datesArray.push(new Date(i));
-          i.setDate(i.getDate()+7);
+        let j = this.event.eventStart;
+        j.setDate(j.getDate()+7);
+        while(j < this.event.repeatMax){
+          this.datesArray.push(new Date(j));
+          j.setDate(j.getDate()+7);
         }
         break;
       }
@@ -341,7 +349,7 @@ export class CalendarViewComponent implements OnInit {
       for (let i =0 ; i < this.datesArray.length; i++){
         this.eventPayload.eventStart = new Date(this.datesArray[i]).getTime();
         this.eventPayload.eventEnd = this.eventPayload.eventStart + this.difference;
-        this.eventsService.saveEvent(this.eventPayload, this.forceSaveEvent, this.eventType, this.event.id).subscribe((data) => {
+        this.eventsService.saveEvent(this.eventPayload, this.forceSaveEvent, 'save', this.event.id).subscribe((data) => {
           if (data.errorMessage && data.errorMessage === 'Conflict') {
             this.displayModalError = true;
             this.forceSaveEvent = true;
@@ -359,8 +367,6 @@ export class CalendarViewComponent implements OnInit {
   }
 
   handleEvent(action: string, event: any): void {
-
-
     this.modalData = { event, action };
     this.modal.open(this.modalContent, { size: 'lg' });
   }
@@ -480,8 +486,17 @@ export class CalendarViewComponent implements OnInit {
     newStart,
     newEnd
   }: CalendarEventTimesChangedEvent): void {
-    event.start = newStart;
-    event.end = newEnd;
-    this.refresh.next();
+    const eventCopy: any = Object.assign({}, event);
+    this.event.id = eventCopy.id;
+    this.event.eventTitle = eventCopy.title;
+    this.event.eventStart = new Date(newStart).getTime();
+    this.event.eventEnd = new Date(newEnd).getTime();
+    this.event.origin = eventCopy.origin;
+    this.event.otherLocation = eventCopy.origin.formatted_address;
+    this.event.destination = eventCopy.destination;
+    this.event.eventLocation = eventCopy.destination.formatted_address;
+    this.eventType = 'edit';
+    this.event.travelMode = eventCopy.travelMode;
+    this.saveEvent();
   }
 }
