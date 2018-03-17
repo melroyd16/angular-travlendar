@@ -12,19 +12,42 @@ exports.handler = (event, context, callback) => {
 
   function saveEvent() {
     var id = new Date().getTime() + "_" + username
-    var payload = {
-      TableName: "user_events",
-      Item: {
-        "id": id,
-        "username": username,
-        "eventStart": event.body.eventDetails.eventStart,
-        "eventEnd": event.body.eventDetails.eventEnd,
-        "eventTitle": event.body.eventDetails.eventTitle,
-        "origin": event.body.eventDetails.origin,
-        "destination": event.body.eventDetails.destination,
-        "travelMode": event.body.eventDetails.travelMode
+    if(event.body.eventDetails.isRepeat){
+      var payload = {
+        TableName: "user_events",
+        Item: {
+          "id": id,
+          "username": username,
+          "eventStart": event.body.eventDetails.eventStart,
+          "eventEnd": event.body.eventDetails.eventEnd,
+          "eventTitle": event.body.eventDetails.eventTitle,
+          "origin": event.body.eventDetails.origin,
+          "destination": event.body.eventDetails.destination,
+          "travelMode": event.body.eventDetails.travelMode,
+          "repeatMax" : event.body.eventDetails.repeatMax,
+          "isRepeat" : event.body.eventDetails.isRepeat,
+          "repeatPreference" : event.body.eventDetails.repeatPreference
+        }
       }
     }
+
+    else {
+      var payload = {
+        TableName: "user_events",
+        Item: {
+          "id": id,
+          "username": username,
+          "eventStart": event.body.eventDetails.eventStart,
+          "eventEnd": event.body.eventDetails.eventEnd,
+          "eventTitle": event.body.eventDetails.eventTitle,
+          "origin": event.body.eventDetails.origin,
+          "destination": event.body.eventDetails.destination,
+          "travelMode": event.body.eventDetails.travelMode,
+          "isRepeat" : false
+        }
+      }
+    }
+
 
     dynamo.putItem(payload, function (err, data) {
       if (err) {
@@ -379,8 +402,10 @@ exports.handler = (event, context, callback) => {
     console.log("EEEE");
     console.log(endMeetinfDetails);
 
+    // If there is no previous and next meeting then directly save the meeting
     if(startmeetingDetails == null && endMeetinfDetails == null){
-      return false
+      saveOrModifyEvents(status)
+      return;
     }
 
 
@@ -454,58 +479,129 @@ exports.handler = (event, context, callback) => {
       "nextMeetingStartTime":nextMeetingStartTime,
       "nextMeetingEndTime":nextMeetingEndTime
     };
+    console.log('AABB')
+    console.log(params)
 
+    // var AWS = require("aws-sdk");
+    // AWS.config.update({
+    //   region: "us-west-2"
+    // });
+    // var aws = require('aws-sdk');
 
-    var AWS = require("aws-sdk");
-    AWS.config.update({
-      region: "us-west-2"
-    });
-    var aws = require('aws-sdk');
+    // var lambda = new aws.Lambda({
+    //   region: 'us-west-2'
+    // });
 
+    // lambda.invoke({
+    //   FunctionName: 'getLocationInformation',
+    //   Payload: JSON.stringify(params, null, null) // pass params
+    // }, function(error, data) {
+    // if(status == "new") {
+    //     console.log("Saved SSSS")
+    //     saveEvent();
+    //   } else {
+    //     saveModifiedEvent();
+    //   }
+    //   context.succeed(error_message);
+    //   return;
 
-    var lambda = new aws.Lambda({
-      region: 'us-west-2'
-    });
+    // if (error) {
+    //   console.log("Error SSSS" + error);
 
-    lambda.invoke({
-      FunctionName: 'getLocationInformation',
-      Payload: JSON.stringify(params, null, null) // pass params
-    }, function(error, data) {
-      if (error) {
-        console.log("Error" + error);
+    //   // If the error occurs in fetching the service Still saving the data
 
-        // If the error occurs in fetching the service Still saving the data
-        if(status == "new") {
-          saveEvent();
-        } else {
-          saveModifiedEvent();
-        }
-      }else{
-        console.log("Location data ");
-        console.log(data)
-        // save the meeting
-        if (data['Payload'] == 'true'){
-          console.log("Conflict Found while comparing the location distance ")
-          var error_message = {
-            "errorMessage": {
-              "code": 4,
-              "value": "MEHUL EVENT"
-            }
-          };
-          context.succeed(error_message);
+    // }else{
 
-        }else{
-          if(status == "new") {
-            saveEvent();
-          } else {
-            saveModifiedEvent();
-          }
-        }
-      }
-    });
-
+    //   console.log("Location data SSSS");
+    //   console.log(data)
+    //   // save the meeting
+    //   if (data['Payload'] == 'true'){
+    //       console.log("Conflict Found while comparing the location distance ")
+    //     var error_message = {
+    //       "errorMessage": {
+    //         "code": 4,
+    //         "value": "MEHUL EVENT"
+    //       }
+    //     };
+    //   }
+    // }
+    //   });
+    promiseCallFunction(params, status)
   }
 
+  function saveOrModifyEvents(status){
+    if(status == 'new'){
+      saveEvent();
+    }else{
+      saveModifiedEvent();
+    }
+  }
+
+  function promiseCallFunction(params, status){
+    console.log("Inside Promise call function ")
+    console.log(params)
+
+    var callOtherLambdaFunction = new Promise(
+      function (resolve, reject) {
+
+        var aws = require('aws-sdk');
+        var lambda = new aws.Lambda({
+          region: 'us-west-2'
+        });
+
+        lambda.invoke({
+          FunctionName: 'getLocationInformation',
+          Payload: JSON.stringify(params, null, null) // pass params
+        }, function(error, data) {
+
+          if (error) {
+            console.log("Error SSSS" + error);
+            // If the error occurs in fetching the service Still saving the data
+            saveOrModifyEvents(status)
+            reject(error)
+          }else{
+            console.log("Location data ");
+            console.log(data)
+            // save the meeting
+            if (data['Payload'] == 'true'){
+              console.log("Conflict Found while comparing the location distance ")
+              var error_message = {
+                "errorMessage": {
+                  "code": 4,
+                  "value": "MEHUL EVENT"
+                }
+              };
+              context.succeed(error_message);
+            }else{
+              // No Conflict
+              saveOrModifyEvents(status)
+            }
+            resolve(data); // fulfilled
+          }
+
+        });
+
+      });
+
+
+    var promiseConsumeFunction = function () {
+      callOtherLambdaFunction
+        .then(function (data) {
+          // yay, you got a new phone
+          //console.log(data);
+          //console.log("DDDD")
+          // output: { brand: 'Samsung', color: 'black' }
+        })
+        .catch(function (error) {
+          // oops, mom don't buy it
+          //console.log(error.message);
+          // output: 'mom is not happy'
+        });
+
+
+    };
+    promiseConsumeFunction();
+  }
 
 
   function queryForFetchingNearMeetings(status) {
@@ -565,6 +661,8 @@ exports.handler = (event, context, callback) => {
         }
 
         dynamo.query(payload, function(err, dist) {
+
+
           // console.log(dist.Items[0]);
           if (err) {
             console.log("ERRRRRRRRR");
@@ -642,16 +740,17 @@ exports.handler = (event, context, callback) => {
               }
               context.succeed(error_message);
 
+            }else{
+              checkConflictOnLocationBasis(data, eventID, eventStart, eventEnd, origin, destination, travelMode, status)
             }
 
-            else {
-              // checkConflictOnLocationBasis(data, eventID, eventStart, eventEnd, origin, destination, travelMode, status);
-              if(status == "new") {
-                saveEvent();
-              } else {
-                saveModifiedEvent();
-              }
-            }
+            // else {
+            //   if(status == "new") {
+            //     saveEvent();
+            //   } else {
+            //     saveModifiedEvent();
+            //   }
+            // }
           }
         });
       }
@@ -677,19 +776,41 @@ exports.handler = (event, context, callback) => {
 
 
   function saveModifiedEvent() {
-    var new_event_payload = {
-      TableName: "user_events",
-      Item: {
-        "id": event.body.eventID,
-        "username": username,
-        "eventStart": event.body.eventDetails.eventStart,
-        "eventEnd": event.body.eventDetails.eventEnd,
-        "eventTitle": event.body.eventDetails.eventTitle,
-        "origin": event.body.eventDetails.origin,
-        "destination": event.body.eventDetails.destination,
-        "travelMode": event.body.eventDetails.travelMode
+
+    if(event.body.eventDetails.isRepeat){
+      var new_event_payload = {
+        TableName: "user_events",
+        Item: {
+          "id":  event.body.eventID,
+          "username": username,
+          "eventStart": event.body.eventDetails.eventStart,
+          "eventEnd": event.body.eventDetails.eventEnd,
+          "eventTitle": event.body.eventDetails.eventTitle,
+          "origin": event.body.eventDetails.origin,
+          "destination": event.body.eventDetails.destination,
+          "travelMode": event.body.eventDetails.travelMode,
+          "repeatMax" : event.body.eventDetails.repeatMax,
+          "isRepeat" : event.body.eventDetails.isRepeat,
+          "repeatPreference" : event.body.eventDetails.repeatPreference
+        }
       }
-    };
+    }
+
+    else{
+      var new_event_payload = {
+        TableName: "user_events",
+        Item: {
+          "id": event.body.eventID,
+          "username": username,
+          "eventStart": event.body.eventDetails.eventStart,
+          "eventEnd": event.body.eventDetails.eventEnd,
+          "eventTitle": event.body.eventDetails.eventTitle,
+          "origin": event.body.eventDetails.origin,
+          "destination": event.body.eventDetails.destination,
+          "travelMode": event.body.eventDetails.travelMode
+        }
+      };
+    }
 
     dynamo.putItem(new_event_payload, function (err, data) {
       if (err) {
@@ -699,6 +820,8 @@ exports.handler = (event, context, callback) => {
       }
     });
   }
+
+
 
   // function queryForFetchingEventForModifiedEvent() {
   //     var tableName = "user_events";
