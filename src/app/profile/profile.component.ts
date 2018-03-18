@@ -149,7 +149,7 @@ export class ProfileComponent implements OnInit {
       this.profileService.fetchUserProfile().subscribe((data) => {
         if (data.Item) {
           console.log(data);
-          this.profileService.setLocationDetails(data.Item.homeLocation, data.Item.workLocation);
+          // this.profileService.setLocationDetails(data.Item.homeLocation, data.Item.workLocation);
           this.homeLocation = this.profileService.userProfile.homeLocation;
           this.workLocation = this.profileService.userProfile.workLocation;
           this.homeLocationText = this.profileService.userProfile.homeLocation.formatted_address;
@@ -209,7 +209,8 @@ export class ProfileComponent implements OnInit {
     this.profileService.saveUserProfile(this.homeLocation, this.workLocation, this.walking,
       this.cycling, this.travelMode, this.lunchStartTime, this.lunchEndTime, this.dinnerStartTime,
       this.dinnerEndTime).subscribe((data) => {
-        this.profileService.setUserDetails(this.walking, this.cycling, this.travelMode);
+        this.profileService.setUserDetails(this.walking, this.cycling,
+          this.travelMode);
       });
   }
 

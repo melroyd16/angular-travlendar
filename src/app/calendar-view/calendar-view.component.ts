@@ -188,6 +188,7 @@ export class CalendarViewComponent implements OnInit {
   }
 
   initEvent(): void {
+    console.log(this.profileService);
     this.dates = [{ value: null }];
     this.event = {};
     this.event.eventStart = new Date();
