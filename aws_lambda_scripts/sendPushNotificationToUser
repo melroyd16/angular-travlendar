@@ -1,14 +1,17 @@
-# First we need to add boto3 library in the Amazon Lambda folder
-
 import boto3
 
 client = boto3.client('pinpoint',region_name="us-east-1")
-
 print(client)
 
-response_apps = client.get_apps()
-print("List of applications")
-print(response_apps)
+# Dynamo Db Client
+dynamoDbClient = boto3.client('dynamodb')
+
+
+# Getting List of Apps API
+
+# response_apps = client.get_apps()
+# print("List of applications")
+# print(response_apps)
 
 
 # AndroidPushNotification_MobileHub
@@ -16,38 +19,302 @@ name = "androidpushnotification_MobileHub"
 Id = "30187d92e3a84f9bb5313f23b07038d4"
 
 
+# Getting Application Information
 
-response_app_information = client.get_app(ApplicationId='30187d92e3a84f9bb5313f23b07038d4')
-print("App Information")
-print(response_app_information)
+# response_app_information = client.get_app(ApplicationId='30187d92e3a84f9bb5313f23b07038d4')
+# print("App Information")
+# print(response_app_information)
+#
+# response = client.get_application_settings(
+#     ApplicationId='30187d92e3a84f9bb5313f23b07038d4'
+# )
+#
+# print("Application Settings")
+# print(response)
 
-response = client.get_application_settings(
-    ApplicationId='30187d92e3a84f9bb5313f23b07038d4'
-)
 
-print("Application Settings")
-print(response)
-
-
-print("Send Messages")
-# Sending Messages to the single endPoint
-endPoint = "eTUnwUGiaUA:APA91bGlLmRreuC4Ij97fN1_PWGS_arIqpt8EhVRs6VRBHHXuE0ruIRg3AKadKL-j3WkInVjwnDoN0n_n6jUQQ8QbsvTZrsl4OXyLcfQAhpAXOMhQR3v6f46zr3VPZHVR-9dJCxyImBl"
-
-response = client.send_messages(
-    ApplicationId='30187d92e3a84f9bb5313f23b07038d4',
-    MessageRequest= {
-      "Addresses":{
-            endPoint:{"ChannelType" : "GCM"}
-                },
-      "MessageConfiguration": {
-          "DefaultPushNotificationMessage" : {
-            "Action" : "OPEN_APP",
-            "Body" : "Message Body",
-            "Title" : " Body Title"
-          }
-      }
-  }
-)
-print(response)
+# print("Send Messages")
+# #Sending Messages to the single endPoint
+# endPoint = "eTUnwUGiaUA:APA91bGlLmRreuC4Ij97fN1_PWGS_arIqpt8EhVRs6VRBHHXuE0ruIRg3AKadKL-j3WkInVjwnDoN0n_n6jUQQ8QbsvTZrsl4OXyLcfQAhpAXOMhQR3v6f46zr3VPZHVR-9dJCxyImBl"
+#
+# response = client.send_messages(
+#     ApplicationId='30187d92e3a84f9bb5313f23b07038d4',
+#     MessageRequest= {
+#       "Addresses":{
+#             endPoint:{"ChannelType" : "GCM"}
+#                 },
+#       "MessageConfiguration": {
+#           "DefaultPushNotificationMessage" : {
+#             "Action" : "OPEN_APP",
+#             "Body" : "Message Body",
+#             "Title" : " Body Title"
+#           }
+#       }
+#   }
+# )
+# print(response)
 print("Completed sending messages")
 
+# Adding Method to pull data from the dynamoDB Database
+
+
+
+# List of tables to validate if the access to dynamo db is given or not
+
+# response = dynamoDbClient.list_tables()
+#
+# print("Response for List of Tables")
+# print(response)
+#
+
+
+# Query
+
+# response = dynamoDbClient.scan(
+#     TableName="user_events",
+#     Select="ALL_ATTRIBUTES",
+# )
+
+
+
+# Adding filter in table
+
+# KeyConditionExpression: "#username = :u",
+#   //         ProjectionExpression: "id, eventStart, eventEnd",
+#   //         FilterExpression: "eventStart >= :start and eventStart <= :end",
+#   //         ExpressionAttributeNames: {
+#   //             "#username": "username"
+#   //         },
+#   //         ExpressionAttributeValues: {
+#   //             ":u": username,
+#   //             ":start": cal_eventStart,
+#   //             ":end": cal_eventEnd
+#   //         }
+
+
+
+response = dynamoDbClient.scan(
+    TableName='user_events',
+    ExpressionAttributeNames={
+        '#eventStart': 'eventStart'
+
+    },
+    ExpressionAttributeValues={
+        ':eventStartStartWindowTime': {
+            'N': '1519592400000'
+        },
+        ':eventStartEndWindowTime':{
+            'N':  '1519599600000'
+        },
+
+    },
+    FilterExpression='#eventStart >= :eventStartStartWindowTime and #eventStart <= :eventStartEndWindowTime',
+)
+
+print("Added Filter to get the table")
+print(response)
+
+# Parsing the responseJson
+
+# You have meeting at 5
+listOfItems = response['Items']
+
+for items in listOfItems:
+    print(items['eventEnd']['N'])
+    print(items['username']['S'])
+    print(items['eventTitle']['S'])
+    print(items['destination']['M']['formatted_address']['S'])
+
+
+
+# Need to get the token from the user Interface
+
+
+# Sending Messages to the single pinendPoint
+# endPoint = "eTUnwUGiaUA:APA91bGlLmRreuC4Ij97fN1_PWGS_arIqpt8EhVRs6VRBHHXuE0ruIRg3AKadKL-j3WkInVjwnDoN0n_n6jUQQ8QbsvTZrsl4OXyLcfQAhpAXOMhQR3v6f46zr3VPZHVR-9dJCxyImBl"
+#
+# endPoint_alfred = "dCavzv5sLgo:APA91bFaUpuqJhbYTUC5a155UJWEYmIind2oMNqEgnbCbfvLAKv_KP0MY7d027myCgmH24-FJalZoKj9q0wVm40S4jB87zcgDcKtkzGU0RdHUsJuj6U0h-Mby5TumUM1fL0sIw8u0vU8"
+# endPoint_mehul = "eCPF7mCEuis:APA91bGUR-GFOKTCclBq2QQiUSYh1LDdfo-eKI3alYuEU5y-HVyBI5BASrcSQrg1UUBHQ3CllupnHVSTEfhMAF5w6sPgoma2TGe2oaLpUDXa8qDuMftmGoGvKbZFwK9FXNHLwIXqms1V"
+# endPoint_aditya = "f7_PwxiDCCc:APA91bF_mcyIIsCWpjetiW180xU5Y8LbVx1bgEPmXFOpZKQu3PcxeLngavqdH1HN5mqTO_nBK4spHaknLCJipNNZBZ9qPTzRYo1btNHQediiBKjyFlnkt_2SeGTDavG_FGEOjG3D_uBt"
+#
+#
+# response = client.send_messages(
+#     ApplicationId='30187d92e3a84f9bb5313f23b07038d4',
+#     MessageRequest= {
+#       "Addresses":{
+#             endPoint:{"ChannelType" : "GCM",
+#                       "BodyOverride":"New XXXX messages",
+#                       "Context":{
+#                             'eventEnd':"1519599600000",
+#                             'eventStart':"1519592400000",
+#                             'origin_place_id':"ChIJa8f1cO8IK4cRhFzAxK2hLPc",
+#                             'origin_formatted_address':"1137 E Orange St, Tempe, AZ 85281, USA",
+#                             'destination_place_id' : "ChIJffoao2cJK4cRpDZy6Da-T8E",
+#                             "destination_formatted_address":"1312 N Scottsdale Rd, Scottsdale, AZ 85257, USA",
+#                             "travelMode":"walking",
+#                             'timeNeeded':"669", # In Seconds
+#                             'username':"addy3429@live.com",
+#                             'eventTitle':"lunch Test 2 - 4",
+#                             }
+#                         },
+#           endPoint_alfred: {"ChannelType": "GCM",
+#                      "BodyOverride": "New XXXX messages",
+#                      "Context": {
+#                          'eventEnd': "1519599600000",
+#                          'eventStart': "1519592400000",
+#                          'origin_place_id': "ChIJa8f1cO8IK4cRhFzAxK2hLPc",
+#                          'origin_formatted_address': "1137 E Orange St, Tempe, AZ 85281, USA",
+#                          'destination_place_id': "ChIJffoao2cJK4cRpDZy6Da-T8E",
+#                          "destination_formatted_address": "1312 N Scottsdale Rd, Scottsdale, AZ 85257, USA",
+#                          "travelMode": "walking",
+#                          'timeNeeded': "669",  # In Seconds
+#                          'username': "addy3429@live.com",
+#                          'eventTitle': "lunch Test 2 - 4",
+#                      }
+#                     },
+#             endPoint_mehul: {"ChannelType": "GCM",
+#                      "BodyOverride": "New XXXX messages",
+#                      "Context": {
+#                          'eventEnd': "1519599600000",
+#                          'eventStart': "1519592400000",
+#                          'origin_place_id': "ChIJa8f1cO8IK4cRhFzAxK2hLPc",
+#                          'origin_formatted_address': "1137 E Orange St, Tempe, AZ 85281, USA",
+#                          'destination_place_id': "ChIJffoao2cJK4cRpDZy6Da-T8E",
+#                          "destination_formatted_address": "1312 N Scottsdale Rd, Scottsdale, AZ 85257, USA",
+#                          "travelMode": "walking",
+#                          'timeNeeded': "669",  # In Seconds
+#                          'username': "addy3429@live.com",
+#                          'eventTitle': "lunch Test 2 - 4",
+#                      }
+#                     },
+#             endPoint_aditya: {"ChannelType": "GCM",
+#                      "BodyOverride": "New XXXX messages",
+#                      "Context": {
+#                          'eventEnd': "1519599600000",
+#                          'eventStart': "1519592400000",
+#                          'origin_place_id': "ChIJa8f1cO8IK4cRhFzAxK2hLPc",
+#                          'origin_formatted_address': "1137 E Orange St, Tempe, AZ 85281, USA",
+#                          'destination_place_id': "ChIJffoao2cJK4cRpDZy6Da-T8E",
+#                          "destination_formatted_address": "1312 N Scottsdale Rd, Scottsdale, AZ 85257, USA",
+#                          "travelMode": "walking",
+#                          'timeNeeded': "669",  # In Seconds
+#                          'username': "addy3429@live.com",
+#                          'eventTitle': "lunch Test 2 - 4",
+#                      }
+#                     }
+#
+#       },
+#       "MessageConfiguration": {
+#           "DefaultPushNotificationMessage" : {
+#             "Action" : "OPEN_APP",
+#             "Body" : "Message Body",
+#             "Title" : " Body Title"
+#           }
+#       }
+#     }
+# )
+#
+# print(response)
+# print("Completed sending messages")
+
+
+
+from datetime import datetime
+import time
+import boto3
+
+def lambda_handler(event, context):
+    print(event)
+    print(type(event))
+    client = boto3.client('pinpoint', region_name="us-east-1")
+    dynamoDbClient = boto3.client('dynamodb')
+    print(client)
+
+    # Get the time from the Cloudwatch Event
+    time1 = event['time']
+
+
+    # Time coming from cloudWatch
+    time1 = "2018-03-13T19:12:17Z"
+
+    d = datetime.strptime(time1, "%Y-%m-%dT%H:%M:%SZ")
+    print(d.microsecond)
+    currentTime = int(time.mktime(d.timetuple())) * 1000
+
+    mins_15_constant = 15 * 60 * 1000
+
+    # if the current time is 3 : 45
+    startTime = str(currentTime + mins_15_constant)  # start Time will be current Time + 15 mins
+    endTime = str(currentTime + 2 * mins_15_constant)  # end Time will be current Time + 30 mins
+    # hence the window for searching is 4 :00 to 4 : 15
+
+
+    # Event start will be replaced with the Leave start time
+    response = dynamoDbClient.scan(
+        TableName='user_events',
+        ExpressionAttributeNames={
+            '#eventStart': 'eventStart'
+
+        },
+        ExpressionAttributeValues={
+            ':eventStartStartWindowTime': {
+                'N': startTime
+            },
+            ':eventStartEndWindowTime': {
+                'N': endTime
+            },
+
+        },
+        FilterExpression='#eventStart >= :eventStartStartWindowTime and #eventStart <= :eventStartEndWindowTime',
+    )
+
+
+    listOfItems = response['Items']
+    listOfUserNames = []
+    if listOfItems is not None and len(listOfItems) > 0:
+
+        for items in listOfItems:
+            # print(items['eventEnd']['N'])
+            print(items['username']['S'])
+            # print(items['eventTitle']['S'])
+            # print(items['destination']['M']['formatted_address']['S'])
+            listOfUserNames.append(items['username']['S'])
+
+    # Searching the endPoint with the curresponding userName # Now searching the endPoint
+
+
+    deviceToken_alfred = "dCavzv5sLgo:APA91bFaUpuqJhbYTUC5a155UJWEYmIind2oMNqEgnbCbfvLAKv_KP0MY7d027myCgmH24-FJalZoKj9q0wVm40S4jB87zcgDcKtkzGU0RdHUsJuj6U0h-Mby5TumUM1fL0sIw8u0vU8"
+    deviceToken_mehul = "eCPF7mCEuis:APA91bGUR-GFOKTCclBq2QQiUSYh1LDdfo-eKI3alYuEU5y-HVyBI5BASrcSQrg1UUBHQ3CllupnHVSTEfhMAF5w6sPgoma2TGe2oaLpUDXa8qDuMftmGoGvKbZFwK9FXNHLwIXqms1V"
+    deviceToken_aditya = "f7_PwxiDCCc:APA91bF_mcyIIsCWpjetiW180xU5Y8LbVx1bgEPmXFOpZKQu3PcxeLngavqdH1HN5mqTO_nBK4spHaknLCJipNNZBZ9qPTzRYo1btNHQediiBKjyFlnkt_2SeGTDavG_FGEOjG3D_uBt"
+    endPoint = "eTUnwUGiaUA:APA91bGlLmRreuC4Ij97fN1_PWGS_arIqpt8EhVRs6VRBHHXuE0ruIRg3AKadKL-j3WkInVjwnDoN0n_n6jUQQ8QbsvTZrsl4OXyLcfQAhpAXOMhQR3v6f46zr3VPZHVR-9dJCxyImBl"
+
+    response = client.send_messages(
+        ApplicationId='30187d92e3a84f9bb5313f23b07038d4',
+        MessageRequest={
+            "Addresses": {
+                endPoint: {"ChannelType": "GCM",
+                           "BodyOverride": "AAAAAAA MESSAGE BBBBBB ",
+                           "Context": {
+                               'eventEnd': "1519599600000",
+                               'eventStart': "1519592400000",
+                               'origin_place_id': "ChIJa8f1cO8IK4cRhFzAxK2hLPc",
+                               'origin_formatted_address': "1137 E Orange St, Tempe, AZ 85281, USA",
+                               'destination_place_id': "ChIJffoao2cJK4cRpDZy6Da-T8E",
+                               "destination_formatted_address": "1312 N Scottsdale Rd, Scottsdale, AZ 85257, USA",
+                               "travelMode": "walking",
+                               'timeNeeded': "669",  # In Seconds
+                               'username': "addy3429@live.com",
+                               'eventTitle': "lunch Test 2 - 4",
+                           }
+                           }
+            },
+
+            "MessageConfiguration": {
+                "DefaultPushNotificationMessage": {
+                    "Action": "OPEN_APP",
+                    "Body": "Message Body",
+                    "Title": " Body Title"
+                }
+            }
+        }
+    )

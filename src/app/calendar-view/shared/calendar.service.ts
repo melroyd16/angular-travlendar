@@ -4,11 +4,13 @@ import { Observable } from 'rxjs/Observable';
 import { of } from 'rxjs/observable/of';
 
 import { Location } from '../../classes/location';
+import { ProfileService } from '../../profile/shared/profile.service';
 
 @Injectable()
 export class CalendarService {
 
-  constructor(public centralAPIService: CentralApiService) { }
+  constructor(public centralAPIService: CentralApiService,
+    public profileService: ProfileService) { }
 
   origin: Location;
   destination: Location;
@@ -37,6 +39,7 @@ export class CalendarService {
   }
 
   fetchTransitDetails(origin: Location, destination: Location): Observable<any> {
+    const vm = this;
     const deferredObject = $.Deferred();
     this.origin = origin;
     this.destination = destination;
@@ -65,7 +68,20 @@ export class CalendarService {
             icon: 'bus',
             value: val4.rows[0].elements[0]
           });
-          observer.next(travelModeArray);
+          const result = [];
+          if (vm.profileService.userProfile.preferredMode) {
+            for (let i = 0; i < vm.profileService.userProfile.preferredMode.length; i++) {
+              for (let j = 0; j < travelModeArray.length; j++) {
+                if (vm.profileService.userProfile.preferredMode[i] === travelModeArray[j].mode) {
+                  result.push(travelModeArray[j]);
+                  break;
+                }
+              }
+            }
+            observer.next(result);
+          } else {
+            observer.next(travelModeArray);
+          }
           observer.complete();
         })
         .fail(function() { });

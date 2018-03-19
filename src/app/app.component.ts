@@ -39,11 +39,7 @@ export class AppComponent implements OnInit, LoggedInCallback {
     const mythis = this;
     this.cognito.getIdToken({
       callback() {
-        mythis.profileService.fetchUserProfile().subscribe((data) => {
-          if (data.Item) {
-            mythis.profileService.setLocationDetails(data.Item.homeLocation, data.Item.workLocation);
-          }
-        });
+        mythis.profileService.fetchUserProfile();
       },
       callbackWithParam(token: any) {
         // Include the passed-in callback here as well so that it's executed downstream
