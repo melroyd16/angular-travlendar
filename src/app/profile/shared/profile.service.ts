@@ -14,11 +14,9 @@ export class ProfileService {
   fetchUserProfile(): Observable<any> {
     const simpleObservable = new Observable((observer) => {
       this.centralAPIService.callAPI('profile', {}, 'get').subscribe((data) => {
-        console.log(data);
-        this.setProfile(data.Item);
-        // this.setLocationDetails(data.Item.homeLocation, data.Item.workLocation);
-        // this.setUserDetails(data.Item.walkingDistance, data.Item.cyclingDistance,
-        //   data.Item.preferredModes, lunchTime.start_time, lunchTime.end_time, dinnerTime.start_time, dinnerTime.end_time);
+        if (data.Item) {
+          this.setProfile(data.Item);
+        }
         observer.next(data);
         observer.complete();
       });
@@ -30,12 +28,12 @@ export class ProfileService {
     this.userProfile.homeLocation = item.homeLocation;
     this.userProfile.workLocation = item.workLocation;
     this.userProfile.walkingDistance = item.walkingDistance;
-    this.userProfile.cyclingDistance = item.cyclingDistance;
+    this.userProfile.bicyclingDistance = item.bicyclingDistance;
     this.userProfile.preferredMode = item.preferredMode;
-    this.userProfile.lunchStartTime = item.lunchTime.start_time;
-    this.userProfile.lunchEndTime = item.lunchTime.end_time;
-    this.userProfile.dinnerStartTime = item.dinnerTime.start_time;
-    this.userProfile.dinnerEndTime = item.dinnerTime.end_time;
+    this.userProfile.lunchStartTime = item.lunchTime ? item.lunchTime.start_time : 'Not Set';
+    this.userProfile.lunchEndTime = item.lunchTime ? item.lunchTime.end_time : 'Not Set';
+    this.userProfile.dinnerStartTime = item.dinnerTime ? item.dinnerTime.start_time : 'Not Set';
+    this.userProfile.dinnerEndTime = item.dinnerTime ? item.dinnerTime.end_time : 'Not Set';
   }
 
   setLocationDetails(homeLocation: Location, workLocation: Location): void {
@@ -54,14 +52,14 @@ export class ProfileService {
   }
 
   saveUserProfile(homeLocation: Location, workLocation: Location, walkingDistance: number,
-    cyclingDistance: number, preferredModes: any[], lunchStartTime, lunchEndTime,
+    bicyclingDistance: number, preferredModes: any[], lunchStartTime, lunchEndTime,
     dinnerStartTime, dinnerEndTime): Observable<any> {
     const payload = {
       operation: 'saveProfile',
       homeLocation: homeLocation,
       workLocation: workLocation,
       walkingDistance: walkingDistance,
-      cyclingDistance: cyclingDistance,
+      bicyclingDistance: bicyclingDistance,
       preferredModes: preferredModes,
       lunchTime: {
         'end_time': lunchEndTime,
@@ -76,15 +74,15 @@ export class ProfileService {
     return this.centralAPIService.callAPI('profile', payload, 'post');
   }
 
-  setUserDetails(walkingDistance: number, cyclingDistance: number,
+  setUserDetails(walkingDistance: number, bicyclingDistance: number,
     preferredModes: any[]): void {
     this.userProfile.walkingDistance = walkingDistance;
-    this.userProfile.cyclingDistance = cyclingDistance;
+    this.userProfile.bicyclingDistance = bicyclingDistance;
     this.userProfile.preferredMode = preferredModes;
   }
 
-  getUserProfile(): UserProfile {
-    console.log(this.userProfile);
-    return this.userProfile;
-  }
+  // getUserProfile(): UserProfile {
+  //   console.log(this.userProfile);
+  //   return this.userProfile;
+  // }
 }

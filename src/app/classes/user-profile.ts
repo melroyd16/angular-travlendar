@@ -5,7 +5,7 @@ export class UserProfile {
   homeLocation?: Location;
   workLocation?: Location;
   walkingDistance?: number;
-  cyclingDistance?: number;
+  bicyclingDistance?: number;
   preferredMode?: any[];
   lunchStartTime?: string;
   lunchEndTime?: string;
@@ -17,7 +17,7 @@ export class UserProfile {
     this.homeLocation = home;
     this.workLocation = work;
     this.walkingDistance = walk;
-    this.cyclingDistance = cycle;
+    this.bicyclingDistance = cycle;
     this.preferredMode = mode;
     this.lunchStartTime = lunchStart;
     this.lunchEndTime = lunchEnd;
