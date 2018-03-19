@@ -162,8 +162,7 @@ export class CalendarViewComponent implements OnInit {
 
     this.displayDeleteModal = false;
     this.maxRepeatDate.setMonth(this.maxRepeatDate.getMonth() + 2);
-
-    const userProfile = this.profileService.getUserProfile();
+    // const userProfile = this.profileService.getUserProfile();
     if (!this.profileService.userProfile || !this.profileService.userProfile.homeLocation) {
       this.profileService.fetchUserProfile().subscribe((locationDetails) => {
         console.log(locationDetails);
@@ -297,20 +296,20 @@ export class CalendarViewComponent implements OnInit {
       if (data.errorMessage) {
         switch (data.errorMessage.code) {
           case 1:
-            this.scheduleModalError = 'Maximum Daily walking distance of '
-              + data.errorMessage.value + ' miles will be exceeded. Click Continue to proceed anyways.';
+            this.scheduleModalError = 'Maximum daily walking distance of '
+              + data.errorMessage.value + ' miles will be exceeded. Click Save to proceed anyways.';
             break;
           case 2:
-            this.scheduleModalError = 'Maximum Daily bicycling distance of '
-              + data.errorMessage.value + ' miles will be exceeded. Click Continue to proceed anyways.';
+            this.scheduleModalError = 'Maximum daily bicycling distance of '
+              + data.errorMessage.value + ' miles will be exceeded. Click Save to proceed anyways.';
             break;
           case 3:
             this.scheduleModalError = 'This event directly conflicts with event: '
-              + data.errorMessage.value + '. Click Continue to proceed anyways.';
+              + data.errorMessage.value + '. Click Save to proceed anyways.';
             break;
           case 4:
             this.scheduleModalError = 'The travel time for this event conflicts with event: '
-              + data.errorMessage.value + '. Click Continue to proceed anyways.';
+              + data.errorMessage.value + '. Click Save to proceed anyways.';
             break;
         }
         this.displayModalError = true;
@@ -334,7 +333,6 @@ export class CalendarViewComponent implements OnInit {
           this.eventPayload.id = data;
           this.displaySuccessMessage('Event has been added successfully');
         }
-
         $('#eventModal').modal('hide');
         this.initEvent();
         this.activeDayIsOpen = false;
@@ -343,8 +341,6 @@ export class CalendarViewComponent implements OnInit {
     });
 
     if(this.event.repeatPreference){
-      console.log("inside repeat");
-      $('#eventModal').modal('hide');
       switch(this.event.repeatPreference){
         case 'Daily':
           let i = this.event.eventStart;
@@ -362,16 +358,35 @@ export class CalendarViewComponent implements OnInit {
         break;
       }
     }
+    // else{
+    //
+    // }
 
     if(this.datesArray.length > 1){
       for (let i =0 ; i < this.datesArray.length; i++){
         this.eventPayload.eventStart = new Date(this.datesArray[i]).getTime();
         this.eventPayload.eventEnd = this.eventPayload.eventStart + this.difference;
         this.eventsService.saveEvent(this.eventPayload, this.forceSaveEvent, 'save', this.event.id).subscribe((data) => {
-          if (data.errorMessage && data.errorMessage === 'Conflict') {
+          if (data.errorMessage) {
+            switch (data.errorMessage.code) {
+              case 1:
+                this.scheduleModalError = 'Maximum daily walking distance of '
+                  + data.errorMessage.value + ' miles will be exceeded. Click Save to proceed anyways.';
+                break;
+              case 2:
+                this.scheduleModalError = 'Maximum daily bicycling distance of '
+                  + data.errorMessage.value + ' miles will be exceeded. Click Save to proceed anyways.';
+                break;
+              case 3:
+                this.scheduleModalError = 'The event  starting at ' + new Date(data.errorMessage.startTime) + 'conflicts with another meeting. Click Save to proceed anyways.';
+                break;
+              case 4:
+                this.scheduleModalError = 'The travel time for this event conflicts with event: '
+                  + data.errorMessage.value + '. Click Save to proceed anyways.';
+                break;
+            }
             this.displayModalError = true;
             this.forceSaveEvent = true;
-            this.scheduleModalError = 'This event conflicts with another scheduled event. Click Continue to proceed anyways.';
           }
           else {
             this.eventPayload.id = data;
