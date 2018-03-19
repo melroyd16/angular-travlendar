@@ -30,7 +30,6 @@ exports.handler = (event, context, callback) => {
         }
       }
     }
-
     else {
         var payload = {
         TableName: "user_events",
@@ -66,7 +65,8 @@ exports.handler = (event, context, callback) => {
       ExpressionAttributeValues: {
         ":u": username
       }
-    };
+    }
+    
     dynamo.query(payload, function (err, data) {
       if (err) {
         context.fail(err);
@@ -782,8 +782,7 @@ promiseConsumeFunction();
 
 
   function saveModifiedEvent() {
-
-       if(event.body.eventDetails.isRepeat){
+     if(event.body.eventDetails.isRepeat){
         var new_event_payload = {
         TableName: "user_events",
         Item: {
@@ -801,7 +800,6 @@ promiseConsumeFunction();
         }
       }
     }
-
     else{
        var new_event_payload = {
       TableName: "user_events",

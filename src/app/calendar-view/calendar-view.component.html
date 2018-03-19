@@ -140,16 +140,26 @@
               </tr>
             </table>
           </div>
-          <div class="form-group" *ngIf="repeatEvents">
+          <div class="form-group">
             <label>
-              <input #repeat type="checkbox" data-toggle="modal" value="repeat" (change)="openRepeatEventModal(repeat)"> Repeat Event
+              <input #repeat type="checkbox" name="isRepeat" data-toggle="modal" [(ngModel)]="event.isRepeat" (change)="openRepeatBlock(repeat)"> Repeat Event
             </label>
+          </div>
+          <div  class="col-xs-12 col-md-6" *ngIf="event.isRepeat">
+            <label for="repeatSelect">Options</label>
+            <select class="form-control" id="repeatSelect" name="repeatSelect" required [(ngModel)]="event.repeatPreference">
+                <option>Daily</option>
+                <option>Weekly</option>
+            </select>
+            <label for="repeatUntil">Repeat Until</label>
+            <input required name="Until" class="form-control" [owlDateTimeTrigger]="dt4" [owlDateTime]="dt4" [min]="eventStartMinDate" [max]="maxRepeatDate"  [(ngModel)]="event.repeatMax">
+            <owl-date-time [pickerType]="'calendar'" #dt4></owl-date-time>
           </div>
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="initEvent()">Close</button>
-        <button type="button" class="btn btn-primary" [disabled]="!eventForm.form.valid" (click)="saveEvent()">Save</button>
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="initEvent()">Close  </button>
+        <button type="button" class="btn btn-primary"  (click)="saveEvent()">Save</button>
       </div>
     </div>
   </div>
@@ -200,36 +210,6 @@
         <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="closeDeleteModal()">Close</button>
         <button type="button" class="btn btn-primary" (click)="deleteEvent()">Yes</button>
       </div>
-    </div>
-  </div>
-</div>
-
-
-<!-- REPEAT EVENTS MODAL -->
-
-<div class="modal fade" id="repeatEventsModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h4 class="modal-title">Repeat Events</h4>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-           <span aria-hidden="true">&times;</span>
-         </button>
-      </div>
-      <div class="modal-body">
-        <p>Select the dates you want to repeat this event</p>
-        <fieldset *ngFor="let date of dates ;let last = last">
-          <input required id="date" required [owlDateTimeTrigger]="dt3" [owlDateTime]="dt3" [min]="event.eventEnd" [selectMode]="'single'" [(ngModel)]="date.value">
-          <owl-date-time #dt3></owl-date-time>
-          <button class="remove" (click)="removeChoice(date.value)">-</button>
-          <button class="add" *ngIf=last (click)="addNewChoice(date.value)">+</button>
-        </fieldset>
-      </div>
-      <div class="modal-footer">
-        <button class="addMore" type="button" class="btn btn-secondary" title="Hit me" data-dismiss="modal" (click)="closeRepeatModal()">Cancel</button>
-        <button type="button" class="btn btn-primary" (click)="repeatEvent()">Confirm</button>
-      </div>
-
     </div>
   </div>
 </div>

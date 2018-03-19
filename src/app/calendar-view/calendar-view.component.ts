@@ -69,6 +69,8 @@ export class CalendarViewComponent implements OnInit {
   event: any;
   otherLocationDetails: Location;
   eventStartMinDate: Date = new Date();
+  maxRepeatDate: Date = new Date();
+  repeatMax : Date = new Date();
   viewDate: Date = new Date();
   activeDayIsOpen = false;
   displayDeleteModal: boolean;
@@ -84,17 +86,15 @@ export class CalendarViewComponent implements OnInit {
   locationTypes = ['home', 'work', 'prior event location', 'other'];
   selectedPriorLocation = 'home';
   travelModeArray = [];
+  datesArray=[];
   deleteEventId = '';
-  date = [];
-  difference: any;
+  ifSelected = false;
+  difference : any;
   repeatCheckbox: any;
-  dates = [{ value: null }];
-
   modalData: {
     action: string;
     event: any;
   };
-
   currentEventId = '';
   eventType = 'save';
   events: any[] = [];
@@ -116,6 +116,9 @@ export class CalendarViewComponent implements OnInit {
             this.event.destination = event.destination;
             this.event.eventLocation = event.destination.formatted_address;
             this.eventType = 'edit';
+            this.event.isRepeat = event.isRepeat;
+            this.event.repeatMax= event.repeatMax;
+            this.event.repeatPreference= event.repeatPreference;
             this.changeLocation();
             this.event.travelMode = event.travelMode.mode;
             this.selectedPriorLocation = 'other';
@@ -158,6 +161,9 @@ export class CalendarViewComponent implements OnInit {
   ngOnInit() {
 
     this.displayDeleteModal = false;
+    this.maxRepeatDate.setMonth(this.maxRepeatDate.getMonth() + 2);
+
+    const userProfile = this.profileService.getUserProfile();
     if (!this.profileService.userProfile || !this.profileService.userProfile.homeLocation) {
       this.profileService.fetchUserProfile().subscribe((locationDetails) => {
         console.log(locationDetails);
@@ -172,7 +178,7 @@ export class CalendarViewComponent implements OnInit {
       this.homeLocation = this.profileService.userProfile.homeLocation;
       this.workLocation = this.profileService.userProfile.workLocation;
     }
-    this.fetchEvents();
+
     this.initEvent();
   }
 
@@ -187,8 +193,6 @@ export class CalendarViewComponent implements OnInit {
   }
 
   initEvent(): void {
-    console.log(this.profileService);
-    this.dates = [{ value: null }];
     this.event = {};
     this.event.eventStart = new Date();
     this.event.eventEnd = moment().add(1, 'hours');
@@ -197,11 +201,13 @@ export class CalendarViewComponent implements OnInit {
     this.displayTravelModes = false;
     this.repeatEvents = false;
     this.displayModalError = false;
+    this.ifSelected = false;
     this.forceSaveEvent = false;
     this.scheduleModalError = '';
     this.selectedPriorLocation = 'home';
     this.eventType = 'save';
     this.travelModeArray = [];
+    this.datesArray = [];
     this.otherLocationDetails = new Location();
     this.eventsService.fetchEvents().subscribe((eventList) => {
       this.eventsLoaded = true;
@@ -222,6 +228,9 @@ export class CalendarViewComponent implements OnInit {
       origin: event.origin,
       destination: event.destination,
       travelMode: event.travelMode,
+      repeatMax : new Date(event.repeatMax),
+      isRepeat : event.isRepeat,
+      repeatPreference : event.repeatPreference,
       draggable: true,
       resizable: {
         beforeStart: true,
@@ -264,6 +273,13 @@ export class CalendarViewComponent implements OnInit {
   }
 
   saveEvent(): void {
+
+    if(!this.event.isRepeat){
+      this.event.isRepeat=false;
+    }
+    else{
+      this.event.repeatMax = new Date(this.event.repeatMax).getTime();
+    }
     this.eventPayload = Object.assign({}, this.event);
     this.eventPayload.eventStart = new Date(this.eventPayload.eventStart).getTime();
     this.eventPayload.eventEnd = new Date(this.eventPayload.eventEnd).getTime();
@@ -309,14 +325,16 @@ export class CalendarViewComponent implements OnInit {
               this.events[i].origin = this.event.origin;
               this.events[i].destination = this.event.destination;
               this.events[i].travelMode = this.eventPayload.travelMode;
+              this.events[i].isRepeat = this.eventPayload.isRepeat;
             }
           }
-          this.refresh.next();
+          //this.refresh.next();
           this.displaySuccessMessage('Event has been edited successfully');
         } else {
           this.eventPayload.id = data;
           this.displaySuccessMessage('Event has been added successfully');
         }
+
         $('#eventModal').modal('hide');
         this.initEvent();
         this.activeDayIsOpen = false;
@@ -324,16 +342,38 @@ export class CalendarViewComponent implements OnInit {
       }
     });
 
-    if (this.dates.length > 1) {
-      for (let i = 0; i < this.dates.length; i++) {
-        this.eventPayload.eventStart = new Date(this.dates[i].value).getTime();
+    if(this.event.repeatPreference){
+      console.log("inside repeat");
+      $('#eventModal').modal('hide');
+      switch(this.event.repeatPreference){
+        case 'Daily':
+          let i = this.event.eventStart;
+          while(i < this.event.repeatMax){
+            this.datesArray.push(new Date(i.setDate(i.getDate()+1)));
+          }
+          break;
+        case 'Weekly':
+        let j = this.event.eventStart;
+        j.setDate(j.getDate()+7);
+        while(j < this.event.repeatMax){
+          this.datesArray.push(new Date(j));
+          j.setDate(j.getDate()+7);
+        }
+        break;
+      }
+    }
+
+    if(this.datesArray.length > 1){
+      for (let i =0 ; i < this.datesArray.length; i++){
+        this.eventPayload.eventStart = new Date(this.datesArray[i]).getTime();
         this.eventPayload.eventEnd = this.eventPayload.eventStart + this.difference;
-        this.eventsService.saveEvent(this.eventPayload, this.forceSaveEvent, this.eventType, this.event.id).subscribe((data) => {
+        this.eventsService.saveEvent(this.eventPayload, this.forceSaveEvent, 'save', this.event.id).subscribe((data) => {
           if (data.errorMessage && data.errorMessage === 'Conflict') {
             this.displayModalError = true;
             this.forceSaveEvent = true;
             this.scheduleModalError = 'This event conflicts with another scheduled event. Click Continue to proceed anyways.';
-          } else {
+          }
+          else {
             this.eventPayload.id = data;
             this.refresh.next();
             this.displaySuccessMessage('Event has been added successfully');
@@ -345,7 +385,6 @@ export class CalendarViewComponent implements OnInit {
   }
 
   handleEvent(action: string, event: any): void {
-
     this.modalData = { event, action };
     this.modal.open(this.modalContent, { size: 'lg' });
   }
@@ -362,46 +401,20 @@ export class CalendarViewComponent implements OnInit {
     }, 3000);
   }
 
-  openRepeatEventModal(element: HTMLInputElement): void {
-    this.repeatCheckbox = element;
-    if (element.checked) {
-      $('#repeatEventsModal').modal('toggle');
-    }
-    else {
-      this.dates = [{ value: null }];
-    }
-  }
-
-  closeRepeatModal(): void {
-    this.repeatCheckbox.checked = false;
-    $('#repeatEventsModal').modal('hide');
-  }
-
-  repeatEvent(): void {
-    console.log(this.dates);
-    $('#repeatEventsModal').modal('hide');
-  }
-
-  triggerRepeat(): void {
-    this.repeatEvents = true;
-  }
-
-  addNewChoice(temp: Date): void {
-    this.dates.push({ value: null });
-  }
-
-  removeChoice(temp: Date): void {
-    if (this.dates.length > 1) {
-      for (let i = 0; i < this.dates.length; i++) {
-        if (this.dates[i].value === temp) {
-          this.dates.splice(i, 1);
-          break;
-        }
+  openRepeatBlock(element: HTMLInputElement) : void{
+    console.log(this.event.isRepeat)
+    this.repeatCheckbox=element;
+      if(element.checked){
+        this.repeatEvents = true;
       }
-    } else {
-      this.dates = [{ value: null }];
-    }
+      else{
+        this.repeatEvents = false;
+        this.ifSelected = false;
+        this.event.repeatPreference = undefined;
+        this.event.repeatMax = undefined;
+      }
   }
+
 
 
   changeLocation(): void {
@@ -415,7 +428,6 @@ export class CalendarViewComponent implements OnInit {
       this.calendarService.fetchTransitDetails(this.event.origin, this.event.destination).subscribe((data) => {
         this.travelModeArray = data;
         this.displayTravelModes = true;
-        this.repeatEvents = true;
         this.ref.tick();
       });
     }
@@ -481,6 +493,10 @@ export class CalendarViewComponent implements OnInit {
     if (isPast(eventEndTime)) {
       return [];
     } else { return this.eventActions; }
+  }
+
+  enableMaxDateSelection(): void{
+    this.ifSelected = true;
   }
 
   eventTimesChanged({
