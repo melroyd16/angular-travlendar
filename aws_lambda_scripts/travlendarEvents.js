@@ -109,14 +109,12 @@ exports.handler = (event, context, callback) => {
     // if not return false
     // check if eventStart-LunchStart >= 30 ==> return true
     // if not modify lunchStart to eventEnd
-    console.log("ALFRED: "+lunchStart + " to " + lunchEnd);
+    console.log("Lunch Time: "+lunchStart + " to " + lunchEnd);
     console.log(lunchTimeMeetings)
     if (lunchTimeMeetings == null || lunchTimeMeetings.length == 0) {
-      console.log("HERE 1");
       return true;
     }
     var LUNCH_TIME = 30*60*1000 ;    //30 minute lunch time
-    // var itemList = lunchTimeMeetings.Items;
     var itemList = lunchTimeMeetings;
     console.log(itemList[0])
     for (var i = 0; i < itemList.length; i++) {
@@ -234,7 +232,7 @@ exports.handler = (event, context, callback) => {
 
 
   function isUnderPreferredTransportation(currentEvent, travelMode, user_distance, allEvents) {
-    console.log("Checking Walking/Biking Criteria");
+    console.log("Checking Walking/Bicycling Criteria");
     var eventID = currentEvent.body.eventID;
     var eventStart = currentEvent.body.eventDetails.eventStart;
     var eventEnd = currentEvent.body.eventDetails.eventEnd;
@@ -249,8 +247,7 @@ exports.handler = (event, context, callback) => {
       distance = user_distance.walkingDistance;
     }
     else if (currentTravelMode == 'bicycling') {
-      // distance = user_distance.bikingDistance;
-      distance = user_distance.cyclingDistance;
+      distance = user_distance.bicyclingDistance;
     }
     console.log(distance);
     console.log("Preferred distance", distance);
@@ -658,7 +655,7 @@ promiseConsumeFunction();
         var payload = {
           TableName: "user_preferences",
           KeyConditionExpression: "username = :u",
-          ProjectionExpression: "walkingDistance, cyclingDistance, lunchTime, dinnerTime",
+          ProjectionExpression: "walkingDistance, bicyclingDistance, lunchTime, dinnerTime",
           ExpressionAttributeValues: {
             ":u": username
           }
@@ -704,8 +701,7 @@ promiseConsumeFunction();
               }
             }
             if(travelMode == "bicycling") {
-              // if("bikingDistance" in user_distance) {
-              if("cyclingDistance" in user_distance) {
+              if("bicyclingDistance" in user_distance) {
                 max_dist_status = true;
               }
             }
@@ -720,8 +716,7 @@ promiseConsumeFunction();
                     error_code = 1;
                   }
                   else if(travelMode == "bicycling") {
-                    // user_miles = user_distance.bikingDistance;
-                    user_miles = user_distance.cyclingDistance;
+                    user_miles = user_distance.bicyclingDistance;
                     error_code = 2;
                   }
                   error_message = {
