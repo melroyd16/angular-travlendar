@@ -1,75 +1,39 @@
 <form>
   <div class="form-group">
     <label for="homeAddress">Home Address</label>
-    <input id="homeAddress" class="form-control" [(ngModel)]="homeLocationText"
-           (onSelect)="selectAddress($event, 'home')" appGpComplete name="home-location"/>
+    <input id="homeAddress" class="form-control" [(ngModel)]="homeLocationText" (onSelect)="selectAddress($event, 'home')" appGpComplete name="home-location" />
 
   </div>
   <div class="form-group">
     <label for="workAddress">Work Address</label>
-    <input id="workAddress" class="form-control" [(ngModel)]="workLocationText"
-           (onSelect)="selectAddress($event, 'work')" appGpComplete name="work-location"/>
+    <input id="workAddress" class="form-control" [(ngModel)]="workLocationText" (onSelect)="selectAddress($event, 'work')" appGpComplete name="work-location" />
   </div>
   <div class="form-group">
     <label>Lunch Time</label>
 
-    <ion-range-slider #lunchSliderElement
-                      type="double"
-                      [from]="lunchStart"
-                      from_shadow="true"
-                      [to]="lunchEnd"
-                      [values]="['11:00am','11:15am', '11:30am', '11:45am', '12:00pm', '12:15pm', '12:30pm', '12:45pm',
-                      '01:00pm', '01:15pm', '01:30pm','01:45pm', '02:00pm', '02:15pm', '02:30pm', '02:45pm', '03:00pm']"
-                      to_shadow="true"
-                      grid="true"
-                      grid_num="17"
-                      prefix="Time: "
-                      [min_interval]="13"
-                      [max_interval]="13"
-                      drag_interval="true"
-                      decorate_both="true"
-                      [prettify_enabled]="true"
-                      (onUpdate)="update(advancedSlider1,$event)"
-                      (onChange)="update(advancedSlider1, $event)"
-                      (onFinish)="finishStart(advancedSlider1, $event)"></ion-range-slider>
+    <ion-range-slider #lunchSliderElement type="double" [from]="lunchStart" from_shadow="true" [to]="lunchEnd" [values]="['11:00am','11:15am', '11:30am', '11:45am', '12:00pm', '12:15pm', '12:30pm', '12:45pm',
+                      '01:00pm', '01:15pm', '01:30pm','01:45pm', '02:00pm', '02:15pm', '02:30pm', '02:45pm', '03:00pm']" to_shadow="true" grid="true" grid_num="17" prefix="Time: " [min_interval]="13" [max_interval]="13" drag_interval="true" decorate_both="true"
+      [prettify_enabled]="true" (onUpdate)="update(advancedSlider1,$event)" (onChange)="update(advancedSlider1, $event)" (onFinish)="finishStart(advancedSlider1, $event)"></ion-range-slider>
   </div>
   <div class="form-group">
 
     <label>Dinner Time</label>
 
-    <ion-range-slider #DinnerSliderElement
-                      type="double"
-                      [from]="dinnerStart"
-                      from_shadow="true"
-                      [to]="dinnerEnd"
-                      grid="true"
-                      [values]="['06:00pm','06:15pm', '06:30pm', '06:45pm', '07:00pm', '07:15pm', '07:30pm', '07:45pm',
-                      '08:00pm', '08:15pm', '08:30pm','08:45pm', '09:00pm', '09:15pm', '09:30pm', '09:45pm', '10:00pm']"
-                      to_shadow="true"
-                      grid_num="17"
-                      prefix="Time: "
-                      [min_interval]="13"
-                      [max_interval]="13"
-                      drag_interval="true"
-                      decorate_both="true"
-                      [prettify_enabled]="true"
-                      (onUpdate)="update(advancedSlider,$event)"
-                      (onChange)="update(advancedSlider, $event)"
-                      (onFinish)="finishDinner(advancedSlider, $event)"></ion-range-slider>
+    <ion-range-slider #DinnerSliderElement type="double" [from]="dinnerStart" from_shadow="true" [to]="dinnerEnd" grid="true" [values]="['06:00pm','06:15pm', '06:30pm', '06:45pm', '07:00pm', '07:15pm', '07:30pm', '07:45pm',
+                      '08:00pm', '08:15pm', '08:30pm','08:45pm', '09:00pm', '09:15pm', '09:30pm', '09:45pm', '10:00pm']" to_shadow="true" grid_num="17" prefix="Time: " [min_interval]="13" [max_interval]="13" drag_interval="true" decorate_both="true"
+      [prettify_enabled]="true" (onUpdate)="update(advancedSlider,$event)" (onChange)="update(advancedSlider, $event)" (onFinish)="finishDinner(advancedSlider, $event)"></ion-range-slider>
   </div>
   <br>
 
   <div class="form-group" novalidate class="col-xs-12 col-md-4">
     <p>
       <label for="walkingDistance">Maximum Walking Distance (in miles)</label>
-      <input id="walkingDistance" type="number" min="0" max="10" class="form-control" [(ngModel)]="walking"
-             [ngModelOptions]="{standalone: true}"/>
+      <input id="walkingDistance" type="number" min="0" max="10" class="form-control" [(ngModel)]="walking" [ngModelOptions]="{standalone: true}" />
     </p>
     <br/>
     <p>
-      <label for="cyclingDistance">Maximum Cycling Distance (in miles)</label>
-      <input id="cyclingDistance" type="number" min="0" max="10" class="form-control" [(ngModel)]="cycling"
-             [ngModelOptions]="{standalone: true}"/>
+      <label for="bicyclingDistance">Maximum Bicycling Distance (in miles)</label>
+      <input id="bicyclingDistance" type="number" min="0" max="10" class="form-control" [(ngModel)]="bicycling" [ngModelOptions]="{standalone: true}" />
     </p>
   </div>
 
@@ -83,7 +47,7 @@
       </label>
       <br>
       <label>
-        <input #cb2 type="checkbox" value="cycling" (change)="logCheckbox(cb2)" [checked]="cycle"> Cycling
+        <input #cb2 type="checkbox" value="bicycling" (change)="logCheckbox(cb2)" [checked]="cycle"> Bicycling
       </label>
       <br>
       <label>

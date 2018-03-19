@@ -77,7 +77,7 @@ export class ProfileComponent implements OnInit {
 
   index: number;
   walking = 0;
-  cycling = 0;
+  bicycling = 0;
 
   advancedSlider1 = { name: 'Lunch Slider', onUpdate: undefined, onFinish: undefined };
   advancedSlider = { name: 'Dinner Slider', onUpdate: undefined, onFinish: undefined };
@@ -87,7 +87,7 @@ export class ProfileComponent implements OnInit {
   drive = true;
   cycle = true;
   trans = true;
-  travelMode = ['walking', 'driving', 'cycling', 'transit'];
+  travelMode = ['walking', 'driving', 'bicycling', 'transit'];
 
   constructor(public router: Router, public userService: UserLoginService, public profileService: ProfileService) {
     this.userService.isAuthenticated(this);
@@ -105,7 +105,7 @@ export class ProfileComponent implements OnInit {
         case 'driving':
           this.drive = true;
           break;
-        case 'cycling':
+        case 'bicycling':
           this.cycle = true;
           break;
         case 'transit':
@@ -126,7 +126,7 @@ export class ProfileComponent implements OnInit {
         case 'driving':
           this.drive = false;
           break;
-        case 'cycling':
+        case 'bicycling':
           this.cycle = false;
           break;
         case 'transit':
@@ -148,8 +148,6 @@ export class ProfileComponent implements OnInit {
     if (!this.profileService.userProfile.homeLocation || !this.profileService.userProfile.preferredMode) {
       this.profileService.fetchUserProfile().subscribe((data) => {
         if (data.Item) {
-          console.log(data);
-          // this.profileService.setLocationDetails(data.Item.homeLocation, data.Item.workLocation);
           this.homeLocation = this.profileService.userProfile.homeLocation;
           this.workLocation = this.profileService.userProfile.workLocation;
           this.homeLocationText = this.profileService.userProfile.homeLocation.formatted_address;
@@ -168,13 +166,13 @@ export class ProfileComponent implements OnInit {
           console.log(this.dinnerEnd);
           if (data.Item.walkingDistance) {
             this.profileService.setUserDetails(data.Item.walkingDistance,
-              data.Item.cyclingDistance, data.Item.preferredMode);
+              data.Item.bicyclingDistance, data.Item.preferredMode);
             this.walking = this.profileService.userProfile.walkingDistance;
-            this.cycling = this.profileService.userProfile.cyclingDistance;
+            this.bicycling = this.profileService.userProfile.bicyclingDistance;
             this.travelMode = this.profileService.userProfile.preferredMode;
             this.walk = this.travelMode.indexOf('walking') > -1;
             this.drive = this.travelMode.indexOf('driving') > -1;
-            this.cycle = this.travelMode.indexOf('cycling') > -1;
+            this.cycle = this.travelMode.indexOf('bicycling') > -1;
             this.trans = this.travelMode.indexOf('transit') > -1;
           }
         }
@@ -185,12 +183,12 @@ export class ProfileComponent implements OnInit {
       this.homeLocationText = this.profileService.userProfile.homeLocation.formatted_address;
       this.workLocationText = this.profileService.userProfile.workLocation.formatted_address;
       this.walking = this.profileService.userProfile.walkingDistance;
-      this.cycling = this.profileService.userProfile.cyclingDistance;
+      this.bicycling = this.profileService.userProfile.bicyclingDistance;
       this.travelMode = this.profileService.userProfile.preferredMode;
       console.log(this.profileService.userProfile);
       this.walk = this.travelMode.indexOf('walking') > -1;
       this.drive = this.travelMode.indexOf('driving') > -1;
-      this.cycle = this.travelMode.indexOf('cycling') > -1;
+      this.cycle = this.travelMode.indexOf('bicycling') > -1;
       this.trans = this.travelMode.indexOf('transit') > -1;
     }
   }
@@ -207,9 +205,9 @@ export class ProfileComponent implements OnInit {
 
   saveUserProfile(): void {
     this.profileService.saveUserProfile(this.homeLocation, this.workLocation, this.walking,
-      this.cycling, this.travelMode, this.lunchStartTime, this.lunchEndTime, this.dinnerStartTime,
+      this.bicycling, this.travelMode, this.lunchStartTime, this.lunchEndTime, this.dinnerStartTime,
       this.dinnerEndTime).subscribe((data) => {
-        this.profileService.setUserDetails(this.walking, this.cycling,
+        this.profileService.setUserDetails(this.walking, this.bicycling,
           this.travelMode);
       });
   }

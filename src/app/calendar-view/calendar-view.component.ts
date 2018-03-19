@@ -158,10 +158,9 @@ export class CalendarViewComponent implements OnInit {
   ngOnInit() {
 
     this.displayDeleteModal = false;
-
-    const userProfile = this.profileService.getUserProfile();
     if (!this.profileService.userProfile || !this.profileService.userProfile.homeLocation) {
       this.profileService.fetchUserProfile().subscribe((locationDetails) => {
+        console.log(locationDetails);
         if (!locationDetails.Item || !locationDetails.Item.homeLocation) {
           $('#locationModal').modal('toggle');
         } else {
