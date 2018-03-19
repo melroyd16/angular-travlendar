@@ -278,10 +278,27 @@ export class CalendarViewComponent implements OnInit {
       }
     }
     this.eventsService.saveEvent(this.eventPayload, this.forceSaveEvent, this.eventType, this.event.id).subscribe((data) => {
-      if (data.errorMessage && data.errorMessage === 'Conflict') {
+      if (data.errorMessage) {
+        switch (data.errorMessage.code) {
+          case 1:
+            this.scheduleModalError = 'Maximum Daily walking distance of '
+              + data.errorMessage.value + ' miles will be exceeded. Click Continue to proceed anyways.';
+            break;
+          case 2:
+            this.scheduleModalError = 'Maximum Daily bicycling distance of '
+              + data.errorMessage.value + ' miles will be exceeded. Click Continue to proceed anyways.';
+            break;
+          case 3:
+            this.scheduleModalError = 'This event directly conflicts with event: '
+              + data.errorMessage.value + '. Click Continue to proceed anyways.';
+            break;
+          case 4:
+            this.scheduleModalError = 'The travel time for this event conflicts with event: '
+              + data.errorMessage.value + '. Click Continue to proceed anyways.';
+            break;
+        }
         this.displayModalError = true;
         this.forceSaveEvent = true;
-        this.scheduleModalError = 'This event conflicts with another scheduled event. Click Save to proceed anyways.';
       } else {
         if (this.eventType === 'edit') {
           for (let i = 0; i < this.events.length; i++) {
