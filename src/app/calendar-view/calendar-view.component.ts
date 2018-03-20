@@ -333,10 +333,13 @@ export class CalendarViewComponent implements OnInit {
           this.eventPayload.id = data;
           this.displaySuccessMessage('Event has been added successfully');
         }
-        $('#eventModal').modal('hide');
-        this.initEvent();
-        this.activeDayIsOpen = false;
-        this.fetchEvents();
+        if(!this.event.repeatPreference){
+          console.log("hide");
+          $('#eventModal').modal('hide');
+          this.initEvent();
+          this.activeDayIsOpen = false;
+          this.fetchEvents();
+        }
       }
     });
 
@@ -385,17 +388,21 @@ export class CalendarViewComponent implements OnInit {
                   + data.errorMessage.value + '. Click Save to proceed anyways.';
                 break;
             }
+              $('#eventModal').modal('show');
             this.displayModalError = true;
             this.forceSaveEvent = true;
           }
           else {
             this.eventPayload.id = data;
             this.refresh.next();
-            this.displaySuccessMessage('Event has been added successfully');
-            this.initEvent();
+            //this.initEvent();
           }
         });
       }
+      this.displaySuccessMessage('All the Events have been added successfully');
+      $('#eventModal').modal('hide');
+      //this.initEvent();
+
     }
   }
 
