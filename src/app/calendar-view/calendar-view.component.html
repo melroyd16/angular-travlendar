@@ -155,11 +155,19 @@
             <input required name="Until" class="form-control" [owlDateTimeTrigger]="dt4" [owlDateTime]="dt4" [min]="eventStartMinDate" [max]="maxRepeatDate"  [(ngModel)]="event.repeatMax">
             <owl-date-time [pickerType]="'calendar'" #dt4></owl-date-time>
           </div>
+          <div  class="col-xs-12 col-md-6" *ngIf="repeatEdit">
+            <label for="repeatSelect">Choose the Event(s) to be edited</label>
+            <select class="form-control" id="redit" name="repeatEdit" required [disabled]="!event.isRepeat" [(ngModel)]="event.repeatEditChoice">
+              <option>Current Event</option>
+              <option>Future Repeated Events(Including this event)</option>
+              <option>All Repeated Events</option>
+            </select>
+          </div>
         </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="initEvent()">Close  </button>
-        <button type="button" class="btn btn-primary"  (click)="saveEvent()">Save</button>
+        <button type="button" class="btn btn-primary" [disabled]="!eventForm.form.valid"  (click)="saveEvent()">Save</button>
       </div>
     </div>
   </div>
