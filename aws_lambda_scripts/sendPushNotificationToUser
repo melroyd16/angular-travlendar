@@ -1,134 +1,131 @@
 import boto3
 
-client = boto3.client('pinpoint',region_name="us-east-1")
-print(client)
-
-# Dynamo Db Client
-dynamoDbClient = boto3.client('dynamodb')
-
-
-# Getting List of Apps API
-
-# response_apps = client.get_apps()
-# print("List of applications")
-# print(response_apps)
-
-
-# AndroidPushNotification_MobileHub
-name = "androidpushnotification_MobileHub"
-Id = "30187d92e3a84f9bb5313f23b07038d4"
-
-
-# Getting Application Information
-
-# response_app_information = client.get_app(ApplicationId='30187d92e3a84f9bb5313f23b07038d4')
-# print("App Information")
-# print(response_app_information)
+# client = boto3.client('pinpoint',region_name="us-east-1")
+# print(client)
 #
-# response = client.get_application_settings(
-#     ApplicationId='30187d92e3a84f9bb5313f23b07038d4'
-# )
+# # Dynamo Db Client
+# dynamoDbClient = boto3.client('dynamodb')
 #
-# print("Application Settings")
-# print(response)
-
-
-# print("Send Messages")
-# #Sending Messages to the single endPoint
-# endPoint = "eTUnwUGiaUA:APA91bGlLmRreuC4Ij97fN1_PWGS_arIqpt8EhVRs6VRBHHXuE0ruIRg3AKadKL-j3WkInVjwnDoN0n_n6jUQQ8QbsvTZrsl4OXyLcfQAhpAXOMhQR3v6f46zr3VPZHVR-9dJCxyImBl"
 #
-# response = client.send_messages(
-#     ApplicationId='30187d92e3a84f9bb5313f23b07038d4',
-#     MessageRequest= {
-#       "Addresses":{
-#             endPoint:{"ChannelType" : "GCM"}
-#                 },
-#       "MessageConfiguration": {
-#           "DefaultPushNotificationMessage" : {
-#             "Action" : "OPEN_APP",
-#             "Body" : "Message Body",
-#             "Title" : " Body Title"
-#           }
-#       }
-#   }
-# )
-# print(response)
-print("Completed sending messages")
-
-# Adding Method to pull data from the dynamoDB Database
-
-
-
-# List of tables to validate if the access to dynamo db is given or not
-
-# response = dynamoDbClient.list_tables()
+# # Getting List of Apps API
 #
-# print("Response for List of Tables")
-# print(response)
+# # response_apps = client.get_apps()
+# # print("List of applications")
+# # print(response_apps)
 #
-
-
-# Query
-
+#
+# # AndroidPushNotification_MobileHub
+# name = "androidpushnotification_MobileHub"
+# Id = "30187d92e3a84f9bb5313f23b07038d4"
+#
+#
+# # Getting Application Information
+#
+# # response_app_information = client.get_app(ApplicationId='30187d92e3a84f9bb5313f23b07038d4')
+# # print("App Information")
+# # print(response_app_information)
+# #
+# # response = client.get_application_settings(
+# #     ApplicationId='30187d92e3a84f9bb5313f23b07038d4'
+# # )
+# #
+# # print("Application Settings")
+# # print(response)
+#
+#
+# # print("Send Messages")
+# # #Sending Messages to the single endPoint
+# # endPoint = "eTUnwUGiaUA:APA91bGlLmRreuC4Ij97fN1_PWGS_arIqpt8EhVRs6VRBHHXuE0ruIRg3AKadKL-j3WkInVjwnDoN0n_n6jUQQ8QbsvTZrsl4OXyLcfQAhpAXOMhQR3v6f46zr3VPZHVR-9dJCxyImBl"
+# #
+# # response = client.send_messages(
+# #     ApplicationId='30187d92e3a84f9bb5313f23b07038d4',
+# #     MessageRequest= {
+# #       "Addresses":{
+# #             endPoint:{"ChannelType" : "GCM"}
+# #                 },
+# #       "MessageConfiguration": {
+# #           "DefaultPushNotificationMessage" : {
+# #             "Action" : "OPEN_APP",
+# #             "Body" : "Message Body",
+# #             "Title" : " Body Title"
+# #           }
+# #       }
+# #   }
+# # )
+# # print(response)
+# print("Completed sending messages")
+#
+# # Adding Method to pull data from the dynamoDB Database
+#
+#
+#
+# # List of tables to validate if the access to dynamo db is given or not
+#
+# # response = dynamoDbClient.list_tables()
+# #
+# # print("Response for List of Tables")
+# # print(response)
+# #
+#
+#
+# # Query
+#
+# # response = dynamoDbClient.scan(
+# #     TableName="user_events",
+# #     Select="ALL_ATTRIBUTES",
+# # )
+#
+#
+#
+# # Adding filter in table
+#
+# # KeyConditionExpression: "#username = :u",
+# #   //         ProjectionExpression: "id, eventStart, eventEnd",
+# #   //         FilterExpression: "eventStart >= :start and eventStart <= :end",
+# #   //         ExpressionAttributeNames: {
+# #   //             "#username": "username"
+# #   //         },
+# #   //         ExpressionAttributeValues: {
+# #   //             ":u": username,
+# #   //             ":start": cal_eventStart,
+# #   //             ":end": cal_eventEnd
+# #   //         }
+#
 # response = dynamoDbClient.scan(
-#     TableName="user_events",
-#     Select="ALL_ATTRIBUTES",
+#     TableName='user_events',
+#     ExpressionAttributeNames={
+#         '#eventStart': 'eventStart'
+#
+#     },
+#     ExpressionAttributeValues={
+#         ':eventStartStartWindowTime': {
+#             'N': '1519592400000'
+#         },
+#         ':eventStartEndWindowTime':{
+#             'N':  '1519599600000'
+#         },
+#
+#     },
+#     FilterExpression='#eventStart >= :eventStartStartWindowTime and #eventStart <= :eventStartEndWindowTime',
 # )
-
-
-
-# Adding filter in table
-
-# KeyConditionExpression: "#username = :u",
-#   //         ProjectionExpression: "id, eventStart, eventEnd",
-#   //         FilterExpression: "eventStart >= :start and eventStart <= :end",
-#   //         ExpressionAttributeNames: {
-#   //             "#username": "username"
-#   //         },
-#   //         ExpressionAttributeValues: {
-#   //             ":u": username,
-#   //             ":start": cal_eventStart,
-#   //             ":end": cal_eventEnd
-#   //         }
-
-
-
-response = dynamoDbClient.scan(
-    TableName='user_events',
-    ExpressionAttributeNames={
-        '#eventStart': 'eventStart'
-
-    },
-    ExpressionAttributeValues={
-        ':eventStartStartWindowTime': {
-            'N': '1519592400000'
-        },
-        ':eventStartEndWindowTime':{
-            'N':  '1519599600000'
-        },
-
-    },
-    FilterExpression='#eventStart >= :eventStartStartWindowTime and #eventStart <= :eventStartEndWindowTime',
-)
-
-print("Added Filter to get the table")
-print(response)
-
-# Parsing the responseJson
-
-# You have meeting at 5
-listOfItems = response['Items']
-
-for items in listOfItems:
-    print(items['eventEnd']['N'])
-    print(items['username']['S'])
-    print(items['eventTitle']['S'])
-    print(items['destination']['M']['formatted_address']['S'])
+#
+# print("Added Filter to get the table")
+# print(response)
+#
+# # Parsing the responseJson
+#
+# # You have meeting at 5
+# listOfItems = response['Items']
+#
+# for items in listOfItems:
+#     print(items['eventEnd']['N'])
+#     print(items['username']['S'])
+#     print(items['eventTitle']['S'])
+#     print(items['destination']['M']['formatted_address']['S'])
 
 
 
 # Need to get the token from the user Interface
-
 
 # Sending Messages to the single pinendPoint
 # endPoint = "eTUnwUGiaUA:APA91bGlLmRreuC4Ij97fN1_PWGS_arIqpt8EhVRs6VRBHHXuE0ruIRg3AKadKL-j3WkInVjwnDoN0n_n6jUQQ8QbsvTZrsl4OXyLcfQAhpAXOMhQR3v6f46zr3VPZHVR-9dJCxyImBl"
@@ -224,14 +221,15 @@ import time
 import boto3
 
 def lambda_handler(event, context):
-    print(event)
-    print(type(event))
-    client = boto3.client('pinpoint', region_name="us-east-1")
+    # print(event)
+    # print(type(event))
+    #time1 = event['time']
+    client = boto3.client('pinpoint', region_name="us-west-2")
     dynamoDbClient = boto3.client('dynamodb')
-    print(client)
+    snsClient = boto3.client('sns')
 
+    print(client)
     # Get the time from the Cloudwatch Event
-    time1 = event['time']
 
 
     # Time coming from cloudWatch
@@ -288,6 +286,37 @@ def lambda_handler(event, context):
     deviceToken_aditya = "f7_PwxiDCCc:APA91bF_mcyIIsCWpjetiW180xU5Y8LbVx1bgEPmXFOpZKQu3PcxeLngavqdH1HN5mqTO_nBK4spHaknLCJipNNZBZ9qPTzRYo1btNHQediiBKjyFlnkt_2SeGTDavG_FGEOjG3D_uBt"
     endPoint = "eTUnwUGiaUA:APA91bGlLmRreuC4Ij97fN1_PWGS_arIqpt8EhVRs6VRBHHXuE0ruIRg3AKadKL-j3WkInVjwnDoN0n_n6jUQQ8QbsvTZrsl4OXyLcfQAhpAXOMhQR3v6f46zr3VPZHVR-9dJCxyImBl"
 
+
+    # Get list of endpoints for the users
+    # Currently getting all the endpoints
+
+    applicationName = "arn:aws:sns:us-west-2:016911789346:app/GCM/Travlendar"
+
+    response = snsClient.list_endpoints_by_platform_application(
+        PlatformApplicationArn=applicationName
+    )
+
+    # No Endpoints so no execution
+    if (response == None or response['Endpoints'] == None or len(response['Endpoints']) == 0):
+        return
+
+    # Map between userName and number of deviceTokens
+    endPointMap = {}
+
+    for username in listOfUserNames:
+        endPointMap[username] = []
+
+    print("List of Endpoints")
+    print(response)
+
+    for eP in response['Endpoints']:
+        if eP['Attributes']['CustomUserData'] in endPointMap:
+            endPointMap[eP['Attributes']['CustomUserData']].append(eP['EndpointArn'])
+
+
+
+
+
     response = client.send_messages(
         ApplicationId='30187d92e3a84f9bb5313f23b07038d4',
         MessageRequest={
@@ -318,3 +347,7 @@ def lambda_handler(event, context):
             }
         }
     )
+
+
+
+lambda_handler(None, None)
