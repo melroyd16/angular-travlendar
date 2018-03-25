@@ -321,15 +321,19 @@ export class CalendarViewComponent implements OnInit {
         this.forceSaveEvent = true;
       } else {
         if (this.eventType === 'edit') {
-          for (let i = 0; i < this.events.length; i++) {
-            if (this.events[i].id === this.event.id) {
-              this.events[i].title = this.event.eventTitle;
-              this.events[i].start = this.event.eventStart;
-              this.events[i].end = this.event.eventEnd;
-              this.events[i].origin = this.event.origin;
-              this.events[i].destination = this.event.destination;
-              this.events[i].travelMode = this.eventPayload.travelMode;
-              this.events[i].isRepeat = this.eventPayload.isRepeat;
+          console.log(this.event.repeatEditChoice);
+          if (this.event.repeatEditChoice == 'Current Event'){
+            console.log("Edit");
+            for (let i = 0; i < this.events.length; i++) {
+              if (this.events[i].id === this.event.id) {
+                this.events[i].title = this.event.eventTitle;
+                this.events[i].start = this.event.eventStart;
+                this.events[i].end = this.event.eventEnd;
+                this.events[i].origin = this.event.origin;
+                this.events[i].destination = this.event.destination;
+                this.events[i].travelMode = this.eventPayload.travelMode;
+                this.events[i].isRepeat = this.eventPayload.isRepeat;
+              }
             }
           }
           //this.refresh.next();
@@ -338,8 +342,8 @@ export class CalendarViewComponent implements OnInit {
           this.eventPayload.id = data;
           this.displaySuccessMessage('Event has been added successfully');
         }
+
         if(!this.event.repeatPreference){
-          console.log("hide");
           $('#eventModal').modal('hide');
           this.initEvent();
           this.activeDayIsOpen = false;
@@ -348,7 +352,7 @@ export class CalendarViewComponent implements OnInit {
       }
     });
 
-    if(this.event.repeatPreference){
+    if(this.event.repeatPreference && this.eventType=='save'){
       switch(this.event.repeatPreference){
         case 'Daily':
           let i = this.event.eventStart;
@@ -370,7 +374,7 @@ export class CalendarViewComponent implements OnInit {
     //
     // }
 
-    if(this.datesArray.length > 1){
+    if(this.datesArray.length > 1  && this.eventType=='save'){
       for (let i =0 ; i < this.datesArray.length; i++){
         this.eventPayload.eventStart = new Date(this.datesArray[i]).getTime();
         this.eventPayload.eventEnd = this.eventPayload.eventStart + this.difference;
