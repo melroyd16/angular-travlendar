@@ -79,6 +79,7 @@ export class CalendarViewComponent implements OnInit {
   displayTravelModes = false;
   repeatEvents = false;
   displayModalError = false;
+  displayModalSave = false;
   forceSaveEvent = false;
   repeatEdit = false;
   displaySuccess = false;
@@ -166,10 +167,6 @@ export class CalendarViewComponent implements OnInit {
 
     this.displayDeleteModal = false;
     this.maxRepeatDate.setMonth(this.maxRepeatDate.getMonth() + 2);
-<<<<<<< HEAD
-=======
-
->>>>>>> master
     // const userProfile = this.profileService.getUserProfile();
     if (!this.profileService.userProfile || !this.profileService.userProfile.homeLocation) {
       this.profileService.fetchUserProfile().subscribe((locationDetails) => {
@@ -208,6 +205,7 @@ export class CalendarViewComponent implements OnInit {
     this.displayTravelModes = false;
     this.repeatEvents = false;
     this.displayModalError = false;
+    this.displayModalSave = false;
     this.ifSelected = false;
     this.forceSaveEvent = false;
     this.repeatEdit = false;
@@ -281,16 +279,12 @@ export class CalendarViewComponent implements OnInit {
   }
 
   saveEvent(): void {
-
-    if (!this.event.isRepeat) {
-      this.event.isRepeat = false;
-    }
-    else {
-      this.event.repeatMax = new Date(this.event.repeatMax).getTime();
-    }
     this.eventPayload = Object.assign({}, this.event);
     this.eventPayload.eventStart = new Date(this.eventPayload.eventStart).getTime();
     this.eventPayload.eventEnd = new Date(this.eventPayload.eventEnd).getTime();
+    if (this.event.isRepeat){
+      this.eventPayload.repeatMax = new Date(this.eventPayload.repeatMax).getTime();
+    }
     this.difference = this.eventPayload.eventEnd - this.eventPayload.eventStart;
     for (let i = 0; i < this.travelModeArray.length; i++) {
       if (this.eventPayload.travelMode === this.travelModeArray[i].mode) {
@@ -341,8 +335,12 @@ export class CalendarViewComponent implements OnInit {
           }
         } else {
           this.eventPayload.id = data;
-          this.displaySuccessMessage('Event has been added successfully');
-          this.repeatCheck(this.event);
+            if (this.event.isRepeat){
+              this.repeatCheck(this.event);
+            }
+            else{
+              this.displaySuccessMessage('Event has been added successfully');
+            }
         }
       }
     });
@@ -369,16 +367,9 @@ export class CalendarViewComponent implements OnInit {
   }
 
 
-<<<<<<< HEAD
   repeatCheck(event: any): void{
     if(this.event.repeatPreference){
       switch(this.event.repeatPreference){
-=======
-    if (this.event.repeatPreference) {
-      console.log('inside repeat');
-      $('#eventModal').modal('hide');
-      switch (this.event.repeatPreference) {
->>>>>>> master
         case 'Daily':
           const i = this.event.eventStart;
           while (i < this.event.repeatMax) {
@@ -395,31 +386,9 @@ export class CalendarViewComponent implements OnInit {
           break;
       }
     }
-
-<<<<<<< HEAD
     else{
       $('#eventModal').modal('hide');
       this.initEvent();
-=======
-    if (this.datesArray.length > 1) {
-      for (let i = 0; i < this.datesArray.length; i++) {
-        this.eventPayload.eventStart = new Date(this.datesArray[i]).getTime();
-        this.eventPayload.eventEnd = this.eventPayload.eventStart + this.difference;
-        this.eventsService.saveEvent(this.eventPayload, this.forceSaveEvent, 'save', this.event.id).subscribe((data) => {
-          if (data.errorMessage && data.errorMessage === 'Conflict') {
-            this.displayModalError = true;
-            this.forceSaveEvent = true;
-            this.scheduleModalError = 'This event conflicts with another scheduled event. Click Continue to proceed anyways.';
-          }
-          else {
-            this.eventPayload.id = data;
-            this.refresh.next();
-            this.displaySuccessMessage('Event has been added successfully');
-            this.initEvent();
-          }
-        });
-      }
->>>>>>> master
     }
 
     if(this.datesArray.length > 0){
@@ -428,6 +397,7 @@ export class CalendarViewComponent implements OnInit {
           while (i < this.datesArray.length){
             this.eventPayload.eventStart = new Date(this.datesArray[i]).getTime();
             this.eventPayload.eventEnd = this.eventPayload.eventStart + this.difference;
+            this.displayModalSave = true;
             this.eventsService.saveEvent(this.eventPayload, this.forceSaveEvent, 'save', this.event.id).subscribe((data) => {
               count ++;
               if (data.errorMessage) {
@@ -453,6 +423,7 @@ export class CalendarViewComponent implements OnInit {
                 }
                 $('#eventModal').modal('show');
                 this.displayModalError = true;
+                this.displayModalSave = false;
                 this.forceSaveEvent = true;
               }
               else {
@@ -462,11 +433,11 @@ export class CalendarViewComponent implements OnInit {
               if(count == this.datesArray.length ){
                 $('#eventModal').modal('hide');
                 this.initEvent();
+                this.displaySuccessMessage('All the Events have been added successfully');
               }
             });
             i++;
           }
-          this.displaySuccessMessage('All the Events have been added successfully');
         }
   }
 

@@ -82,7 +82,6 @@
           {{scheduleModalError}}
         </div>
         <form #eventForm="ngForm">
-
           <div class="form-group">
             <label for="eventTitle">Event Title</label>
             <input type="text" name="eventTitle" [(ngModel)]="event.eventTitle" class="form-control" id="eventTitle" placeholder="Enter event title" required name="eventTitle" #eventTitle="ngModel">
@@ -152,7 +151,7 @@
                 <option>Weekly</option>
             </select>
             <label for="repeatUntil">Repeat Until</label>
-            <input required name="Until" class="form-control" [owlDateTimeTrigger]="dt4" [owlDateTime]="dt4" [min]="eventStartMinDate" [max]="maxRepeatDate"  [(ngModel)]="event.repeatMax">
+            <input required name="Until" class="form-control" [owlDateTimeTrigger]="dt4" [owlDateTime]="dt4" [min]="eventStartEndDate" [max]="maxRepeatDate"  [(ngModel)]="event.repeatMax">
             <owl-date-time [pickerType]="'calendar'" #dt4></owl-date-time>
           </div>
           <div  class="col-xs-12 col-md-6" *ngIf="repeatEdit">
@@ -164,6 +163,9 @@
             </select>
           </div>
         </form>
+        <div class="alert alert-success" role="alert" *ngIf="displayModalSave">
+          Your Events are being saved
+        </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="initEvent()">Close  </button>
