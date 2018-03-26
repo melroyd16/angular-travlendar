@@ -29,7 +29,7 @@ exports.handler = (event, context, callback) => {
 
 
     function createCronJob(scheduleItem) {
-        var scheduledDate = moment.unix(scheduleItem.eventStart);
+        var scheduledDate = moment.unix(scheduleItem.eventStart/1000);
         var cloudwatchevents = new AWS.CloudWatchEvents();
 
         var scheduleExpression = "cron("+
@@ -57,7 +57,7 @@ exports.handler = (event, context, callback) => {
                     FunctionName: "sendPushNotification",
                     Principal: "events.amazonaws.com",
                     SourceArn: data.RuleArn,
-                    StatementId: "NID" + scheduleItem.class_nbr
+                    StatementId: "NID" + scheduleItem.eventTitle.replace(/\s/g,'') + scheduleItem.eventStart
                 };
                 lambda.addPermission(params, function (err, data) {
                     if (err) console.log(err, err.stack); // an error occurred
@@ -65,12 +65,10 @@ exports.handler = (event, context, callback) => {
                         var input = {
                             "operation": "scheduleCron",
                             "eventDetails": scheduleItem,
-                            "rulesToDelete": [
-                                {
-                                    "ruleName": 'notification_for_' + scheduleItem.eventTitle.replace(/\s/g,'') + scheduleItem.eventStart,
-                                    "policyId": "NID" + scheduleItem.eventTitle.replace(/\s/g,'') + scheduleItem.eventStart
-                                }
-                            ]
+                            "ruleToDelete":{
+                                "ruleName": 'notification_for_' + scheduleItem.eventTitle.replace(/\s/g,'') + scheduleItem.eventStart,
+                                "policyId": "NID" + scheduleItem.eventTitle.replace(/\s/g,'') + scheduleItem.eventStart
+                            }
                         }
                         var params = {
                             Rule: 'notification_for_' + scheduleItem.eventTitle.replace(/\s/g,'') + scheduleItem.eventStart,
