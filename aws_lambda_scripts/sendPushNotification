@@ -1,0 +1,39 @@
+var AWS = require('aws-sdk');
+
+exports.handler = (event, context, callback) => {
+
+    sendNotification();
+
+    function sendNotification(){
+        // MEHUL ADD YOUR LOGIC TO SEND NOTIFICATION HERE, USER AND EVENT details present in event
+        console.log(event);
+        deleteRules(event.ruleToDelete.ruleName, event.ruleToDelete.policyId);
+    }
+
+    function deleteRules(ruleName, policyId) {
+        var cloudwatchevents = new AWS.CloudWatchEvents();
+        var lambda = new AWS.Lambda();
+        var params = {
+            Ids: ['sendPushNotification'],
+            Rule: ruleName
+        };
+        cloudwatchevents.removeTargets(params, function (err, data) {
+            if (err) console.log(err, err.stack);
+            else {
+                var params = {
+                    Name: ruleName
+                };
+                cloudwatchevents.deleteRule(params, function (err, data) {
+                    if (err) console.log(err, err.stack);
+                });
+            }
+        });
+        var params = {
+            FunctionName: 'sendPushNotification',
+            StatementId: policyId,
+        };
+        lambda.removePermission(params, function (err, data) {
+            if (err) console.log(err, err.stack);
+        });
+    }
+};
