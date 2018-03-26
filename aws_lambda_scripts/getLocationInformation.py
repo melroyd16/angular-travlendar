@@ -93,11 +93,9 @@ def getLocationInformation(event, context):
     print("Input Event")
     print(event)
 
-    isConflictPresent = False
     if event is None:
-        return isConflictPresent
+        return sendingResultValues(False, "")
         # return result
-
 
     '''
     { "currentLocationOrigin": "ChIJa8f1cO8IK4cRhFzAxK2hLPc",
@@ -126,6 +124,9 @@ def getLocationInformation(event, context):
     nextMeetingDestinationPlaceId = ""
     travelMode = ""
 
+    nextMeetingId = ""
+    previousMeetingId = ""
+
     previousMeetingEndTime = 0
     previousMeetingStartTime = 0
     currentMeetingStartTime = 0
@@ -136,10 +137,10 @@ def getLocationInformation(event, context):
     if 'travelMode' in event and len(event['travelMode'].strip()) != 0:
         travelMode = event['travelMode'].strip()
     else:
-        return isConflictPresent
+        return sendingResultValues(False, "")
 
     if 'currentLocationOrigin' in event and len(event['currentLocationOrigin'].strip()) != 0:
-        currentLocationOrigin = "place_id:" +event['currentLocationOrigin'].strip()
+        currentLocationOrigin = "place_id:" + event['currentLocationOrigin'].strip()
 
     if 'currentLocationDestination' in event and len(event['currentLocationDestination'].strip()) != 0:
         currentLocationDestination = "place_id:" + event['currentLocationDestination'].strip()
@@ -174,6 +175,11 @@ def getLocationInformation(event, context):
     if event['nextMeetingEndTime'] is not None:
         nextMeetingEndTime = event['nextMeetingEndTime']
 
+    if event['nextMeetingId'] is not None:
+        nextMeetingId = event['nextMeetingId']
+
+    if event['previousMeetingId'] is not None:
+        previousMeetingId = event['previousMeetingId']
 
     print("BBBB")
 
@@ -193,8 +199,7 @@ def getLocationInformation(event, context):
     print(nextMeetingEndTime)
     print(travelMode)
 
-
-    result = [0,0,0,0]
+    result = [0, 0, 0, 0]
     durationCurrent = getDurationbetweenTwoLocations(currentLocationOrigin, currentLocationDestination, travelMode)
     durationNext = getDurationbetweenTwoLocations(nextMeetingOriginPlaceId, nextMeetingDestinationPlaceId, travelMode)
 
@@ -211,8 +216,9 @@ def getLocationInformation(event, context):
     print(currentMeetingStartTime)
     print(result)
 
-    if (previousMeetingDestinationPlaceId != "" and previousMeetingEndTime + result[0] > (currentMeetingStartTime - durationCurrent) and previousMeetingEndTime + result[1] > currentMeetingStartTime):
-        return True
+    if (previousMeetingDestinationPlaceId != "" and previousMeetingEndTime + result[0] > (
+        currentMeetingStartTime - durationCurrent) and previousMeetingEndTime + result[1] > currentMeetingStartTime):
+        return sendingResultValues(True, previousMeetingId)
 
     result[2] = getDurationbetweenTwoLocations(currentLocationDestination, nextMeetingOriginPlaceId, travelMode)
     result[3] = getDurationbetweenTwoLocations(currentLocationDestination, nextMeetingDestinationPlaceId, travelMode)
@@ -221,12 +227,20 @@ def getLocationInformation(event, context):
     #                                     nextMeetingStartTime, nextMeetingEndTime): and isConflictPresentForTwoLocations(currentMeetingStartTime, currentMeetingEndTime + result[3],
     #                                     nextMeetingStartTime, nextMeetingEndTime):
     #     return True
-    if (nextMeetingOriginPlaceId != "" and currentMeetingEndTime + result[2] > (nextMeetingStartTime - durationNext) and currentMeetingEndTime + result[3] > nextMeetingStartTime):
-        return True
-
+    if (nextMeetingOriginPlaceId != "" and currentMeetingEndTime + result[2] > (
+        nextMeetingStartTime - durationNext) and currentMeetingEndTime + result[3] > nextMeetingStartTime):
+        return sendingResultValues(True, nextMeetingId)
 
     print(result)
-    return False
+    return sendingResultValues(False, "")
+
+
+# Adding the conflict Meeting result format
+def sendingResultValues(isConflictPresent, conflictMeetingId):
+    result = {"isConflictPresent" : isConflictPresent,
+              "conflictMeetingId" : conflictMeetingId
+    }
+    return result
 
 
 def isConflictPresentForTwoLocations(eventStart1, eventEnd1, eventStart2, eventEnd2):
