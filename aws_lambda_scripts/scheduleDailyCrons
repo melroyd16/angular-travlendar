@@ -1,0 +1,89 @@
+var moment = require('moment');
+const doc = require("dynamodb-doc");
+const dynamo = new doc.DynamoDB();
+var AWS = require('aws-sdk');
+
+exports.handler = (event, context, callback) => {
+    var startTime = moment().startOf('day').unix()*1000,
+        endTime = moment().endOf('day').unix()*1000,
+
+        payload = {
+            TableName : "user_events",
+            FilterExpression : "eventStart >= :e1 and eventStart <= :e2",
+            ExpressionAttributeValues : {
+                ":e1" : startTime,
+                ":e2" : endTime
+            }
+        }
+        console.log(startTime);
+    dynamo.scan(payload, function(err, data){
+        if(!err){
+            for(var i = 0; i < data.Items.length; i++){
+                createCronJob(data.Items[i]);
+            }
+        } else {
+            context.fail(err);
+        }
+    })
+
+
+
+    function createCronJob(scheduleItem) {
+        var scheduledDate = moment.unix(scheduleItem.eventStart/1000);
+        var cloudwatchevents = new AWS.CloudWatchEvents();
+
+        var scheduleExpression = "cron("+
+            scheduledDate.minute() + " " +
+            scheduledDate.hours() + " " +
+            scheduledDate.date() + " " +
+            (scheduledDate.month() + 1) + " " +
+            "? " +
+            scheduledDate.year() + ")";
+
+
+        var endCronParams = {
+            Name: 'notification_for_' + scheduleItem.eventTitle.replace(/\s/g,'') + scheduleItem.eventStart,
+            Description: 'scheduling notification for an individual event',
+            ScheduleExpression: scheduleExpression,
+            State: "ENABLED"
+        };
+
+        cloudwatchevents.putRule(endCronParams, function (err, data) {
+            if (err) console.log(err, err.stack); // an error occurred
+            else {
+                var lambda = new AWS.Lambda();
+                var params = {
+                    Action: "lambda:InvokeFunction",
+                    FunctionName: "sendPushNotification",
+                    Principal: "events.amazonaws.com",
+                    SourceArn: data.RuleArn,
+                    StatementId: "NID" + scheduleItem.eventTitle.replace(/\s/g,'') + scheduleItem.eventStart
+                };
+                lambda.addPermission(params, function (err, data) {
+                    if (err) console.log(err, err.stack); // an error occurred
+                    else {
+                        var input = {
+                            "operation": "scheduleCron",
+                            "eventDetails": scheduleItem,
+                            "ruleToDelete":{
+                                "ruleName": 'notification_for_' + scheduleItem.eventTitle.replace(/\s/g,'') + scheduleItem.eventStart,
+                                "policyId": "NID" + scheduleItem.eventTitle.replace(/\s/g,'') + scheduleItem.eventStart
+                            }
+                        }
+                        var params = {
+                            Rule: 'notification_for_' + scheduleItem.eventTitle.replace(/\s/g,'') + scheduleItem.eventStart,
+                            Targets: [{
+                                Arn: 'arn:aws:lambda:us-west-2:016911789346:function:sendPushNotification',
+                                Id: 'sendPushNotification',
+                                Input: JSON.stringify(input)
+                            }]
+                        };
+                        cloudwatchevents.putTargets(params, function (err, data) {
+                            if (err) console.log(err, err.stack);
+                        });
+                    }
+                });
+            }
+        });
+    }
+};

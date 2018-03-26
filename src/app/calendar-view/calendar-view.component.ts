@@ -70,7 +70,7 @@ export class CalendarViewComponent implements OnInit {
   otherLocationDetails: Location;
   eventStartMinDate: Date = new Date();
   maxRepeatDate: Date = new Date();
-  repeatMax : Date = new Date();
+  repeatMax: Date = new Date();
   viewDate: Date = new Date();
   activeDayIsOpen = false;
   displayDeleteModal: boolean;
@@ -87,10 +87,10 @@ export class CalendarViewComponent implements OnInit {
   locationTypes = ['home', 'work', 'prior event location', 'other'];
   selectedPriorLocation = 'home';
   travelModeArray = [];
-  datesArray=[];
+  datesArray = [];
   deleteEventId = '';
   ifSelected = false;
-  difference : any;
+  difference: any;
   repeatCheckbox: any;
   modalData: {
     action: string;
@@ -118,8 +118,8 @@ export class CalendarViewComponent implements OnInit {
             this.event.eventLocation = event.destination.formatted_address;
             this.eventType = 'edit';
             this.event.isRepeat = event.isRepeat;
-            this.event.repeatMax= event.repeatMax;
-            this.event.repeatPreference= event.repeatPreference;
+            this.event.repeatMax = event.repeatMax;
+            this.event.repeatPreference = event.repeatPreference;
             this.changeLocation();
             this.event.travelMode = event.travelMode.mode;
             this.selectedPriorLocation = 'other';
@@ -166,6 +166,10 @@ export class CalendarViewComponent implements OnInit {
 
     this.displayDeleteModal = false;
     this.maxRepeatDate.setMonth(this.maxRepeatDate.getMonth() + 2);
+<<<<<<< HEAD
+=======
+
+>>>>>>> master
     // const userProfile = this.profileService.getUserProfile();
     if (!this.profileService.userProfile || !this.profileService.userProfile.homeLocation) {
       this.profileService.fetchUserProfile().subscribe((locationDetails) => {
@@ -232,9 +236,9 @@ export class CalendarViewComponent implements OnInit {
       origin: event.origin,
       destination: event.destination,
       travelMode: event.travelMode,
-      repeatMax : new Date(event.repeatMax),
-      isRepeat : event.isRepeat,
-      repeatPreference : event.repeatPreference,
+      repeatMax: new Date(event.repeatMax),
+      isRepeat: event.isRepeat,
+      repeatPreference: event.repeatPreference,
       draggable: true,
       resizable: {
         beforeStart: true,
@@ -278,10 +282,10 @@ export class CalendarViewComponent implements OnInit {
 
   saveEvent(): void {
 
-    if(!this.event.isRepeat){
-      this.event.isRepeat=false;
+    if (!this.event.isRepeat) {
+      this.event.isRepeat = false;
     }
-    else{
+    else {
       this.event.repeatMax = new Date(this.event.repeatMax).getTime();
     }
     this.eventPayload = Object.assign({}, this.event);
@@ -365,29 +369,57 @@ export class CalendarViewComponent implements OnInit {
   }
 
 
+<<<<<<< HEAD
   repeatCheck(event: any): void{
     if(this.event.repeatPreference){
       switch(this.event.repeatPreference){
+=======
+    if (this.event.repeatPreference) {
+      console.log('inside repeat');
+      $('#eventModal').modal('hide');
+      switch (this.event.repeatPreference) {
+>>>>>>> master
         case 'Daily':
-          let i = this.event.eventStart;
-          while(i < this.event.repeatMax){
-            this.datesArray.push(new Date(i.setDate(i.getDate()+1)));
+          const i = this.event.eventStart;
+          while (i < this.event.repeatMax) {
+            this.datesArray.push(new Date(i.setDate(i.getDate() + 1)));
           }
           break;
         case 'Weekly':
-        let j = this.event.eventStart;
-        j.setDate(j.getDate()+7);
-        while(j < this.event.repeatMax){
-          this.datesArray.push(new Date(j));
-          j.setDate(j.getDate()+7);
-        }
-        break;
+          const j = this.event.eventStart;
+          j.setDate(j.getDate() + 7);
+          while (j < this.event.repeatMax) {
+            this.datesArray.push(new Date(j));
+            j.setDate(j.getDate() + 7);
+          }
+          break;
       }
     }
 
+<<<<<<< HEAD
     else{
       $('#eventModal').modal('hide');
       this.initEvent();
+=======
+    if (this.datesArray.length > 1) {
+      for (let i = 0; i < this.datesArray.length; i++) {
+        this.eventPayload.eventStart = new Date(this.datesArray[i]).getTime();
+        this.eventPayload.eventEnd = this.eventPayload.eventStart + this.difference;
+        this.eventsService.saveEvent(this.eventPayload, this.forceSaveEvent, 'save', this.event.id).subscribe((data) => {
+          if (data.errorMessage && data.errorMessage === 'Conflict') {
+            this.displayModalError = true;
+            this.forceSaveEvent = true;
+            this.scheduleModalError = 'This event conflicts with another scheduled event. Click Continue to proceed anyways.';
+          }
+          else {
+            this.eventPayload.id = data;
+            this.refresh.next();
+            this.displaySuccessMessage('Event has been added successfully');
+            this.initEvent();
+          }
+        });
+      }
+>>>>>>> master
     }
 
     if(this.datesArray.length > 0){
@@ -455,18 +487,18 @@ export class CalendarViewComponent implements OnInit {
     }, 3000);
   }
 
-  openRepeatBlock(element: HTMLInputElement) : void{
-    console.log(this.event.isRepeat)
-    this.repeatCheckbox=element;
-      if(element.checked){
-        this.repeatEvents = true;
-      }
-      else{
-        this.repeatEvents = false;
-        this.ifSelected = false;
-        this.event.repeatPreference = undefined;
-        this.event.repeatMax = undefined;
-      }
+  openRepeatBlock(element: HTMLInputElement): void {
+    console.log(this.event.isRepeat);
+    this.repeatCheckbox = element;
+    if (element.checked) {
+      this.repeatEvents = true;
+    }
+    else {
+      this.repeatEvents = false;
+      this.ifSelected = false;
+      this.event.repeatPreference = undefined;
+      this.event.repeatMax = undefined;
+    }
   }
 
 
@@ -550,7 +582,7 @@ export class CalendarViewComponent implements OnInit {
     } else { return this.eventActions; }
   }
 
-  enableMaxDateSelection(): void{
+  enableMaxDateSelection(): void {
     this.ifSelected = true;
   }
 
