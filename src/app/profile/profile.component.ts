@@ -152,14 +152,19 @@ export class ProfileComponent implements OnInit {
           this.workLocation = this.profileService.userProfile.workLocation;
           this.homeLocationText = this.profileService.userProfile.homeLocation.formatted_address;
           this.workLocationText = this.profileService.userProfile.workLocation.formatted_address;
-          this.lunchStart = this.mapLunchTime.get(data.Item.lunchTime.start_time);
-          this.lunchEnd = this.mapLunchTime.get(data.Item.lunchTime.end_time);
-          this.dinnerStart = this.mapDinnerTime.get(data.Item.dinnerTime.start_time);
-          this.dinnerEnd = this.mapDinnerTime.get(data.Item.dinnerTime.end_time);
-          this.lunchStartTime = data.Item.lunchTime.start_time;
-          this.lunchEndTime = data.Item.lunchTime.end_time;
-          this.dinnerStartTime = data.Item.dinnerTime.start_time;
-          this.dinnerEndTime = data.Item.dinnerTime.end_time;
+          if(data.Item.lunchTime){
+            this.lunchStart = this.mapLunchTime.get(data.Item.lunchTime.start_time);
+            this.lunchEnd = this.mapLunchTime.get(data.Item.lunchTime.end_time);
+            this.lunchStartTime = data.Item.lunchTime.start_time;
+            this.lunchEndTime = data.Item.lunchTime.end_time;
+          }
+          if(data.Item.dinnerTime){
+            this.dinnerStart = this.mapDinnerTime.get(data.Item.dinnerTime.start_time);
+            this.dinnerEnd = this.mapDinnerTime.get(data.Item.dinnerTime.end_time);
+            this.dinnerStartTime = data.Item.dinnerTime.start_time;
+            this.dinnerEndTime = data.Item.dinnerTime.end_time;
+          }
+
           if (data.Item.walkingDistance) {
             this.profileService.setUserDetails(data.Item.lunchTime.start_time, data.Item.lunchTime.end_time, data.Item.dinnerTime.start_time,
               data.Item.dinnerTime.end_time, data.Item.walkingDistance, data.Item.bicyclingDistance, data.Item.preferredMode);
@@ -229,8 +234,6 @@ export class ProfileComponent implements OnInit {
         this.lunchEndTime = key;
       }
     });
-    console.log(this.lunchStartTime);
-    console.log(this.lunchEndTime);
   }
 
   finishDinner(slider, event) {
@@ -243,7 +246,5 @@ export class ProfileComponent implements OnInit {
         this.dinnerEndTime = key;
       }
     });
-    console.log(this.dinnerStartTime);
-    console.log(this.dinnerEndTime);
   }
 }

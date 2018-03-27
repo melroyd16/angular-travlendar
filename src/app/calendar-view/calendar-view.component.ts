@@ -284,18 +284,23 @@ export class CalendarViewComponent implements OnInit {
 
   saveEvent(): void {
 
-    this.lunchStart=this.setDateObject(this.lunchStart, this.event.eventStart, this.profileService.userProfile.lunchStartTime);
-    this.lunchEnd=this.setDateObject(this.lunchEnd,this.event.eventStart, this.profileService.userProfile.lunchEndTime);
-    this.dinnerStart=this.setDateObject(this.dinnerStart, this.event.eventStart, this.profileService.userProfile.dinnerStartTime);
-    this.dinnerEnd=this.setDateObject(this.dinnerEnd, this.event.eventStart, this.profileService.userProfile.dinnerEndTime);
-
     this.eventPayload = Object.assign({}, this.event);
+    if(this.profileService.userProfile.lunchStartTime != "Not Set"){
+      console.log(this.profileService.userProfile.lunchStartTime);
+      this.lunchStart=this.setDateObject(this.lunchStart, this.event.eventStart, this.profileService.userProfile.lunchStartTime);
+      this.lunchEnd=this.setDateObject(this.lunchEnd,this.event.eventStart, this.profileService.userProfile.lunchEndTime);
+      this.eventPayload.lunchStart = new Date(this.lunchStart).getTime();
+      this.eventPayload.lunchEnd = new Date(this.lunchEnd).getTime();
+    }
+    if (this.profileService.userProfile.dinnerStartTime != "Not Set"){
+      this.dinnerStart=this.setDateObject(this.dinnerStart, this.event.eventStart, this.profileService.userProfile.dinnerStartTime);
+      this.dinnerEnd=this.setDateObject(this.dinnerEnd, this.event.eventStart, this.profileService.userProfile.dinnerEndTime);
+      this.eventPayload.dinnerStart = new Date(this.dinnerStart).getTime();
+      this.eventPayload.dinnerEnd = new Date(this.dinnerEnd).getTime();
+    }
+
     this.eventPayload.eventStart = new Date(this.eventPayload.eventStart).getTime();
-    this.eventPayload.eventEnd = new Date(this.eventPayload.eventEnd).getTime()
-    this.eventPayload.lunchStart = new Date(this.lunchStart).getTime();
-    this.eventPayload.lunchEnd = new Date(this.lunchEnd).getTime();
-    this.eventPayload.dinnerStart = new Date(this.dinnerStart).getTime();
-    this.eventPayload.dinnerEnd = new Date(this.dinnerEnd).getTime();
+    this.eventPayload.eventEnd = new Date(this.eventPayload.eventEnd).getTime();
 
     if (this.event.isRepeat){
       this.eventPayload.repeatMax = new Date(this.eventPayload.repeatMax).getTime();
@@ -437,10 +442,14 @@ export class CalendarViewComponent implements OnInit {
           while (i < this.datesArray.length){
             this.eventPayload.eventStart = new Date(this.datesArray[i]).getTime();
             this.eventPayload.eventEnd = this.eventPayload.eventStart + this.difference;
-            this.eventPayload.lunchStart = this.setDateObject(this.lunchStart, this.datesArray[i], this.profileService.userProfile.lunchStartTime).getTime();
-            this.eventPayload.lunchEnd = this.setDateObject(this.lunchEnd, this.datesArray[i], this.profileService.userProfile.lunchEndTime).getTime();
-            this.eventPayload.dinnerStart = this.setDateObject(this.dinnerStart, this.datesArray[i], this.profileService.userProfile.dinnerStartTime).getTime();
-            this.eventPayload.dinnerEnd = this.setDateObject(this.dinnerEnd, this.datesArray[i], this.profileService.userProfile.dinnerEndTime).getTime();
+            if(this.profileService.userProfile.lunchStartTime != "Not Set"){
+              this.eventPayload.lunchStart = this.setDateObject(this.lunchStart, this.datesArray[i], this.profileService.userProfile.lunchStartTime).getTime();
+              this.eventPayload.lunchEnd = this.setDateObject(this.lunchEnd, this.datesArray[i], this.profileService.userProfile.lunchEndTime).getTime();
+            }
+            if(this.profileService.userProfile.dinnerStartTime != "Not Set"){
+              this.eventPayload.dinnerStart = this.setDateObject(this.dinnerStart, this.datesArray[i], this.profileService.userProfile.dinnerStartTime).getTime();
+              this.eventPayload.dinnerEnd = this.setDateObject(this.dinnerEnd, this.datesArray[i], this.profileService.userProfile.dinnerEndTime).getTime();
+            }
             this.displayModalSave = true;
             this.eventsService.saveEvent(this.eventPayload, this.forceSaveEvent, 'save', this.event.id).subscribe((data) => {
               count ++;
