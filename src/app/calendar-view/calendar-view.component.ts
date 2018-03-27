@@ -72,6 +72,10 @@ export class CalendarViewComponent implements OnInit {
   maxRepeatDate: Date = new Date();
   repeatMax: Date = new Date();
   viewDate: Date = new Date();
+  lunchStart: Date = new Date();
+  lunchEnd: Date = new Date();
+  dinnerStart: Date = new Date();
+  dinnerEnd: Date = new Date();
   activeDayIsOpen = false;
   displayDeleteModal: boolean;
   displayEventModal = false;
@@ -108,6 +112,7 @@ export class CalendarViewComponent implements OnInit {
       label: '<i class="fas fa-edit"></i>',
       onClick: ({ event }: { event: any }): void => {
         for (let i = 0; i < this.events.length; i++) {
+          $('#eventModal').modal('toggle');
           if (event.id === this.events[i].id) {
             this.event.id = event.id;
             this.event.eventTitle = event.title;
@@ -127,7 +132,6 @@ export class CalendarViewComponent implements OnInit {
             if(this.event.isRepeat){
               this.repeatEdit=true;
             }
-            $('#eventModal').modal('toggle');
             if (this.event.origin.place_id && this.event.origin.place_id === this.homeLocation.place_id) {
               this.selectedPriorLocation = 'home';
             }
@@ -279,12 +283,24 @@ export class CalendarViewComponent implements OnInit {
   }
 
   saveEvent(): void {
+
+    this.lunchStart=this.setDateObject(this.lunchStart, this.event.eventStart, this.profileService.userProfile.lunchStartTime);
+    this.lunchEnd=this.setDateObject(this.lunchEnd,this.event.eventStart, this.profileService.userProfile.lunchEndTime);
+    this.dinnerStart=this.setDateObject(this.dinnerStart, this.event.eventStart, this.profileService.userProfile.dinnerStartTime);
+    this.dinnerEnd=this.setDateObject(this.dinnerEnd, this.event.eventStart, this.profileService.userProfile.dinnerEndTime);
+
     this.eventPayload = Object.assign({}, this.event);
     this.eventPayload.eventStart = new Date(this.eventPayload.eventStart).getTime();
-    this.eventPayload.eventEnd = new Date(this.eventPayload.eventEnd).getTime();
+    this.eventPayload.eventEnd = new Date(this.eventPayload.eventEnd).getTime()
+    this.eventPayload.lunchStart = new Date(this.lunchStart).getTime();
+    this.eventPayload.lunchEnd = new Date(this.lunchEnd).getTime();
+    this.eventPayload.dinnerStart = new Date(this.dinnerStart).getTime();
+    this.eventPayload.dinnerEnd = new Date(this.dinnerEnd).getTime();
+
     if (this.event.isRepeat){
       this.eventPayload.repeatMax = new Date(this.eventPayload.repeatMax).getTime();
     }
+
     this.difference = this.eventPayload.eventEnd - this.eventPayload.eventStart;
     for (let i = 0; i < this.travelModeArray.length; i++) {
       if (this.eventPayload.travelMode === this.travelModeArray[i].mode) {
@@ -315,6 +331,15 @@ export class CalendarViewComponent implements OnInit {
             this.scheduleModalError = 'The travel time for this event conflicts with event: '
               + data.errorMessage.value + '. Click Save to proceed anyways.';
             break;
+          case 5:
+              this.scheduleModalError = 'This event conflicts with the preferred Lunch Time Slot . Click Save to proceed anyways.';
+              break;
+          case 6:
+              this.scheduleModalError = 'This event conflicts with the preferred Dinner Time Slot . Click Save to proceed anyways.';
+              break;
+          default :
+                  this.scheduleModalError = 'This Event is Conflicting. Click Save to proceed anyways.';
+                  break;
         }
         this.displayModalError = true;
         this.forceSaveEvent = true;
@@ -339,11 +364,26 @@ export class CalendarViewComponent implements OnInit {
               this.repeatCheck(this.event);
             }
             else{
+              $('#eventModal').modal('toggle');
               this.displaySuccessMessage('Event has been added successfully');
+              this.initEvent();
             }
         }
       }
     });
+  }
+
+  setDateObject(target: Date, source:Date, time: string): Date{
+    target.setDate(source.getDate());
+    target.setMonth(source.getMonth());
+    target.setFullYear(source.getFullYear());
+    let split = time.split(":");
+    if(split[1].slice(2,4) == "pm"){
+      split[0]= (parseInt(split[0]) + 12).toString();
+    }
+    target.setHours(parseInt(split[0]));
+    target.setMinutes(parseInt(split[1].slice(0,2)));
+    return target;
   }
 
   editEvent(event: any): void{
@@ -397,6 +437,10 @@ export class CalendarViewComponent implements OnInit {
           while (i < this.datesArray.length){
             this.eventPayload.eventStart = new Date(this.datesArray[i]).getTime();
             this.eventPayload.eventEnd = this.eventPayload.eventStart + this.difference;
+            this.eventPayload.lunchStart = this.setDateObject(this.lunchStart, this.datesArray[i], this.profileService.userProfile.lunchStartTime).getTime();
+            this.eventPayload.lunchEnd = this.setDateObject(this.lunchEnd, this.datesArray[i], this.profileService.userProfile.lunchEndTime).getTime();
+            this.eventPayload.dinnerStart = this.setDateObject(this.dinnerStart, this.datesArray[i], this.profileService.userProfile.dinnerStartTime).getTime();
+            this.eventPayload.dinnerEnd = this.setDateObject(this.dinnerEnd, this.datesArray[i], this.profileService.userProfile.dinnerEndTime).getTime();
             this.displayModalSave = true;
             this.eventsService.saveEvent(this.eventPayload, this.forceSaveEvent, 'save', this.event.id).subscribe((data) => {
               count ++;
@@ -511,6 +555,11 @@ export class CalendarViewComponent implements OnInit {
     if (this.event.eventStart > this.event.eventEnd) {
       this.event.eventEnd = moment(this.event.eventStart).add(1, 'hours');
     }
+    this.forceSaveEvent = false;
+  }
+
+  updateFlag(): void{
+    this.forceSaveEvent = false;
   }
 
   closeDeleteModal(): void {

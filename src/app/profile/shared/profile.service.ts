@@ -74,11 +74,15 @@ export class ProfileService {
     return this.centralAPIService.callAPI('profile', payload, 'post');
   }
 
-  setUserDetails(walkingDistance: number, bicyclingDistance: number,
+  setUserDetails(lunchStartTime: string, lunchEndTime: string, dinnerStartTime: string, dinnerEndTime: string, walkingDistance: number, bicyclingDistance: number,
     preferredModes: any[]): void {
     this.userProfile.walkingDistance = walkingDistance;
     this.userProfile.bicyclingDistance = bicyclingDistance;
     this.userProfile.preferredMode = preferredModes;
+    this.userProfile.lunchStartTime = lunchStartTime;
+    this.userProfile.lunchEndTime = lunchEndTime;
+    this.userProfile.dinnerStartTime = dinnerStartTime;
+    this.userProfile.dinnerEndTime= dinnerEndTime;
   }
 
   // getUserProfile(): UserProfile {

@@ -160,16 +160,16 @@ export class ProfileComponent implements OnInit {
           this.lunchEndTime = data.Item.lunchTime.end_time;
           this.dinnerStartTime = data.Item.dinnerTime.start_time;
           this.dinnerEndTime = data.Item.dinnerTime.end_time;
-          console.log(this.lunchStart);
-          console.log(this.lunchEnd);
-          console.log(this.dinnerStart);
-          console.log(this.dinnerEnd);
           if (data.Item.walkingDistance) {
-            this.profileService.setUserDetails(data.Item.walkingDistance,
-              data.Item.bicyclingDistance, data.Item.preferredMode);
+            this.profileService.setUserDetails(data.Item.lunchTime.start_time, data.Item.lunchTime.end_time, data.Item.dinnerTime.start_time,
+              data.Item.dinnerTime.end_time, data.Item.walkingDistance, data.Item.bicyclingDistance, data.Item.preferredMode);
             this.walking = this.profileService.userProfile.walkingDistance;
             this.bicycling = this.profileService.userProfile.bicyclingDistance;
             this.travelMode = this.profileService.userProfile.preferredMode;
+            this.lunchStartTime = this.profileService.userProfile.lunchStartTime;
+            this.lunchEndTime = this.profileService.userProfile.lunchEndTime;
+            this.dinnerStartTime = this.profileService.userProfile.dinnerStartTime;
+            this.dinnerEndTime = this.profileService.userProfile.dinnerEndTime;
             this.walk = this.travelMode.indexOf('walking') > -1;
             this.drive = this.travelMode.indexOf('driving') > -1;
             this.cycle = this.travelMode.indexOf('bicycling') > -1;
@@ -185,7 +185,10 @@ export class ProfileComponent implements OnInit {
       this.walking = this.profileService.userProfile.walkingDistance;
       this.bicycling = this.profileService.userProfile.bicyclingDistance;
       this.travelMode = this.profileService.userProfile.preferredMode;
-      console.log(this.profileService.userProfile);
+      this.lunchStartTime = this.profileService.userProfile.lunchStartTime;
+      this.lunchEndTime = this.profileService.userProfile.lunchEndTime;
+      this.dinnerStartTime = this.profileService.userProfile.dinnerStartTime;
+      this.dinnerEndTime = this.profileService.userProfile.dinnerEndTime;
       this.walk = this.travelMode.indexOf('walking') > -1;
       this.drive = this.travelMode.indexOf('driving') > -1;
       this.cycle = this.travelMode.indexOf('bicycling') > -1;
@@ -207,7 +210,7 @@ export class ProfileComponent implements OnInit {
     this.profileService.saveUserProfile(this.homeLocation, this.workLocation, this.walking,
       this.bicycling, this.travelMode, this.lunchStartTime, this.lunchEndTime, this.dinnerStartTime,
       this.dinnerEndTime).subscribe((data) => {
-        this.profileService.setUserDetails(this.walking, this.bicycling,
+        this.profileService.setUserDetails(this.lunchStartTime,this.lunchEndTime, this.dinnerStartTime, this.dinnerEndTime, this.walking, this.bicycling,
           this.travelMode);
       });
   }
