@@ -681,9 +681,11 @@ exports.handler = (event, context, callback) => {
     var origin = event.body.eventDetails.origin.place_id;
     var destination = event.body.eventDetails.destination.place_id;
     var travelMode = event.body.eventDetails.travelMode.mode;
-    var lunchStart = event.body.lunchStart;
-    var lunchEnd = event.body.lunchEnd;
-
+    var lunchStart = event.body.eventDetails.lunchStart;
+    var lunchEnd = event.body.eventDetails.lunchEnd;
+    var dinnerStart = event.body.eventDetails.dinnerStart;
+    var dinnerEnd = event.body.eventDetails.dinnerEnd;
+    
     var eventObj = {
       origin: event.body.eventDetails.origin,
       destination: event.body.eventDetails.destination,
@@ -743,22 +745,8 @@ exports.handler = (event, context, callback) => {
 
             var max_dist_status = false;
 
-            if(user_distance.lunchTime) {
-              if (eventObj.eventEnd - eventObj.eventStart <= 24*60*60*1000) {
-                // console.log("Lets begin time handling")
-                // console.log(eventObj.eventStart)
-                // console.log(eventObj.eventEnd)
-                // var lunchStart1 = user_distance.lunchTime.start_time;
-                // var lunchEnd1 = user_distance.lunchTime.end_time;
-                // var dinnerStart1 = user_distance.dinnerTime.start_time;
-                // var dinnerEnd1 = user_distance.dinnerTime.end_time;
-                // console.log("Lunch: " + lunchStart1 + " to " + lunchEnd1)
-                // console.log("Dinner: " + dinnerStart1 + " to " + dinnerEnd1)
-                // lunchStart1 = convertStringTimeToMillis(lunchStart1, eventObj.eventStart)
-                // console.log(lunchStart1);
-
-                // context.fail("HERE");
-                // return;
+            if(user_distance.lunchTime && lunchStart != undefined) {
+              if (eventObj.eventEnd - eventObj.eventStart <= 24*60*60*1000) { // if an event is 24 hr long no need to check for lunch/ dinner time availability
                 var lunchTest = data;
                 lunchTest.Items.push(eventObj);
                 var meetingList = lunchConflicts(lunchTest, lunchStart, lunchEnd);
@@ -774,6 +762,35 @@ exports.handler = (event, context, callback) => {
                   };
                   context.succeed(error_message);
                   return;
+                }
+                else {
+                  lunchTest.Items.pop(eventObj);
+                  console.log("NEW:"+lunchTest);
+                }
+              }
+            }
+
+            if(user_distance.dinnerTime && dinnerStart != undefined) {
+              if (eventObj.eventEnd - eventObj.eventStart <= 24*60*60*1000) { // if an event is 24 hr long no need to check for lunch/ dinner time availability
+                var dinnerTest = data;
+                dinnerTest.Items.push(eventObj);
+                var meetingList = lunchConflicts(dinnerTest, dinnerStart, dinnerEnd);
+                console.log(meetingList);
+                console.log("LIST:" + meetingList);
+                var dinner = isLunchPossible(meetingList, dinnerStart, dinnerEnd);
+                if (dinner == false) {
+                  error_message = {
+                    "errorMessage": {
+                      "code": 6,
+                      "value": "No time for Dinner"
+                    }
+                  };
+                  context.succeed(error_message);
+                  return;
+                }
+                else {
+                  dinnerTest.Items.pop(eventObj);
+                  console.log("NEW:"+lunchTest);
                 }
               }
 
