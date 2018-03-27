@@ -681,11 +681,11 @@ exports.handler = (event, context, callback) => {
     var origin = event.body.eventDetails.origin.place_id;
     var destination = event.body.eventDetails.destination.place_id;
     var travelMode = event.body.eventDetails.travelMode.mode;
-    var lunchStart = event.body.lunchStart;
-    var lunchEnd = event.body.lunchEnd;
-    var dinnerStart = event.body.dinnerStart;
-    var dinnerEnd = event.body.dinnerEnd;
-
+    var lunchStart = event.body.eventDetails.lunchStart;
+    var lunchEnd = event.body.eventDetails.lunchEnd;
+    var dinnerStart = event.body.eventDetails.dinnerStart;
+    var dinnerEnd = event.body.eventDetails.dinnerEnd;
+    
     var eventObj = {
       origin: event.body.eventDetails.origin,
       destination: event.body.eventDetails.destination,
