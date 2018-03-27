@@ -129,8 +129,8 @@ export class CalendarViewComponent implements OnInit {
             this.changeLocation();
             this.event.travelMode = event.travelMode.mode;
             this.selectedPriorLocation = 'other';
-            if(this.event.isRepeat){
-              this.repeatEdit=true;
+            if (this.event.isRepeat) {
+              this.repeatEdit = true;
             }
             if (this.event.origin.place_id && this.event.origin.place_id === this.homeLocation.place_id) {
               this.selectedPriorLocation = 'home';
@@ -285,16 +285,17 @@ export class CalendarViewComponent implements OnInit {
   saveEvent(): void {
 
     this.eventPayload = Object.assign({}, this.event);
-    if(this.profileService.userProfile.lunchStartTime != "Not Set"){
+    console.log(this.profileService.userProfile);
+    if (this.profileService.userProfile.lunchStartTime && this.profileService.userProfile.lunchStartTime !== 'Not Set') {
       console.log(this.profileService.userProfile.lunchStartTime);
-      this.lunchStart=this.setDateObject(this.lunchStart, this.event.eventStart, this.profileService.userProfile.lunchStartTime);
-      this.lunchEnd=this.setDateObject(this.lunchEnd,this.event.eventStart, this.profileService.userProfile.lunchEndTime);
+      this.lunchStart = this.setDateObject(this.lunchStart, this.event.eventStart, this.profileService.userProfile.lunchStartTime);
+      this.lunchEnd = this.setDateObject(this.lunchEnd, this.event.eventStart, this.profileService.userProfile.lunchEndTime);
       this.eventPayload.lunchStart = new Date(this.lunchStart).getTime();
       this.eventPayload.lunchEnd = new Date(this.lunchEnd).getTime();
     }
-    if (this.profileService.userProfile.dinnerStartTime != "Not Set"){
-      this.dinnerStart=this.setDateObject(this.dinnerStart, this.event.eventStart, this.profileService.userProfile.dinnerStartTime);
-      this.dinnerEnd=this.setDateObject(this.dinnerEnd, this.event.eventStart, this.profileService.userProfile.dinnerEndTime);
+    if (this.profileService.userProfile.dinnerStartTime && this.profileService.userProfile.dinnerStartTime !== 'Not Set') {
+      this.dinnerStart = this.setDateObject(this.dinnerStart, this.event.eventStart, this.profileService.userProfile.dinnerStartTime);
+      this.dinnerEnd = this.setDateObject(this.dinnerEnd, this.event.eventStart, this.profileService.userProfile.dinnerEndTime);
       this.eventPayload.dinnerStart = new Date(this.dinnerStart).getTime();
       this.eventPayload.dinnerEnd = new Date(this.dinnerEnd).getTime();
     }
@@ -302,7 +303,7 @@ export class CalendarViewComponent implements OnInit {
     this.eventPayload.eventStart = new Date(this.eventPayload.eventStart).getTime();
     this.eventPayload.eventEnd = new Date(this.eventPayload.eventEnd).getTime();
 
-    if (this.event.isRepeat){
+    if (this.event.isRepeat) {
       this.eventPayload.repeatMax = new Date(this.eventPayload.repeatMax).getTime();
     }
 
@@ -337,27 +338,27 @@ export class CalendarViewComponent implements OnInit {
               + data.errorMessage.value + '. Click Save to proceed anyways.';
             break;
           case 5:
-              this.scheduleModalError = 'This event conflicts with the preferred Lunch Time Slot . Click Save to proceed anyways.';
-              break;
+            this.scheduleModalError = 'This event conflicts with the preferred Lunch Time Slot . Click Save to proceed anyways.';
+            break;
           case 6:
-              this.scheduleModalError = 'This event conflicts with the preferred Dinner Time Slot . Click Save to proceed anyways.';
-              break;
-          default :
-                  this.scheduleModalError = 'This Event is Conflicting. Click Save to proceed anyways.';
-                  break;
+            this.scheduleModalError = 'This event conflicts with the preferred Dinner Time Slot . Click Save to proceed anyways.';
+            break;
+          default:
+            this.scheduleModalError = 'This Event is Conflicting. Click Save to proceed anyways.';
+            break;
         }
         this.displayModalError = true;
         this.forceSaveEvent = true;
       } else {
         if (this.eventType === 'edit') {
-          switch (this.event.repeatEditChoice){
-            case "Current Event":
-              this.event.repeatPreference=false;
+          switch (this.event.repeatEditChoice) {
+            case 'Current Event':
+              this.event.repeatPreference = false;
               this.editEvent(this.event);
               break;
-            case "Future Repeated Events(Including this event)":
+            case 'Future Repeated Events(Including this event)':
               break;
-            case "All Repeated Events":
+            case 'All Repeated Events':
               break;
             default:
               this.editEvent(this.event);
@@ -365,33 +366,32 @@ export class CalendarViewComponent implements OnInit {
           }
         } else {
           this.eventPayload.id = data;
-            if (this.event.isRepeat){
-              this.repeatCheck(this.event);
-            }
-            else{
-              $('#eventModal').modal('toggle');
-              this.displaySuccessMessage('Event has been added successfully');
-              this.initEvent();
-            }
+          if (this.event.isRepeat) {
+            this.repeatCheck(this.event);
+          } else {
+            $('#eventModal').modal('toggle');
+            this.displaySuccessMessage('Event has been added successfully');
+            this.initEvent();
+          }
         }
       }
     });
   }
 
-  setDateObject(target: Date, source:Date, time: string): Date{
+  setDateObject(target: Date, source: Date, time: string): Date {
     target.setDate(source.getDate());
     target.setMonth(source.getMonth());
     target.setFullYear(source.getFullYear());
-    let split = time.split(":");
-    if(split[1].slice(2,4) == "pm"){
-      split[0]= (parseInt(split[0]) + 12).toString();
+    const split = time.split(':');
+    if (split[1].slice(2, 4) === 'pm') {
+      split[0] = (parseInt(split[0]) + 12).toString();
     }
     target.setHours(parseInt(split[0]));
-    target.setMinutes(parseInt(split[1].slice(0,2)));
+    target.setMinutes(parseInt(split[1].slice(0, 2)));
     return target;
   }
 
-  editEvent(event: any): void{
+  editEvent(event: any): void {
     for (let i = 0; i < this.events.length; i++) {
       if (this.events[i].id === event.id) {
         this.events[i].title = event.eventTitle;
@@ -403,18 +403,18 @@ export class CalendarViewComponent implements OnInit {
         this.events[i].isRepeat = this.eventPayload.isRepeat;
       }
     }
-  this.refresh.next();
-  this.displaySuccessMessage('Event has been edited successfully');
-  this.initEvent();
-  $('#eventModal').modal('hide');
-  this.activeDayIsOpen = false;
-  this.fetchEvents();
+    this.refresh.next();
+    this.displaySuccessMessage('Event has been edited successfully');
+    this.initEvent();
+    $('#eventModal').modal('hide');
+    this.activeDayIsOpen = false;
+    this.fetchEvents();
   }
 
 
-  repeatCheck(event: any): void{
-    if(this.event.repeatPreference){
-      switch(this.event.repeatPreference){
+  repeatCheck(event: any): void {
+    if (this.event.repeatPreference) {
+      switch (this.event.repeatPreference) {
         case 'Daily':
           const i = this.event.eventStart;
           while (i < this.event.repeatMax) {
@@ -431,67 +431,67 @@ export class CalendarViewComponent implements OnInit {
           break;
       }
     }
-    else{
+    else {
       $('#eventModal').modal('hide');
       this.initEvent();
     }
 
-    if(this.datesArray.length > 0){
-          let i = 0 ;
-          let count = 0;
-          while (i < this.datesArray.length){
-            this.eventPayload.eventStart = new Date(this.datesArray[i]).getTime();
-            this.eventPayload.eventEnd = this.eventPayload.eventStart + this.difference;
-            if(this.profileService.userProfile.lunchStartTime != "Not Set"){
-              this.eventPayload.lunchStart = this.setDateObject(this.lunchStart, this.datesArray[i], this.profileService.userProfile.lunchStartTime).getTime();
-              this.eventPayload.lunchEnd = this.setDateObject(this.lunchEnd, this.datesArray[i], this.profileService.userProfile.lunchEndTime).getTime();
-            }
-            if(this.profileService.userProfile.dinnerStartTime != "Not Set"){
-              this.eventPayload.dinnerStart = this.setDateObject(this.dinnerStart, this.datesArray[i], this.profileService.userProfile.dinnerStartTime).getTime();
-              this.eventPayload.dinnerEnd = this.setDateObject(this.dinnerEnd, this.datesArray[i], this.profileService.userProfile.dinnerEndTime).getTime();
-            }
-            this.displayModalSave = true;
-            this.eventsService.saveEvent(this.eventPayload, this.forceSaveEvent, 'save', this.event.id).subscribe((data) => {
-              count ++;
-              if (data.errorMessage) {
-                switch (data.errorMessage.code) {
-                  case 1:
-                    this.scheduleModalError = 'Maximum daily walking distance of '
-                      + data.errorMessage.value + ' miles will be exceeded on the event starting at '+ new Date(data.errorMessage.startTime) +
-                      '. Click Save to proceed anyways.';
-                    break;
-                  case 2:
-                    this.scheduleModalError = 'Maximum daily bicycling distance of '
-                      + data.errorMessage.value + ' miles will be exceeded on the event starting at '+ new Date(data.errorMessage.startTime) +
-                      ' . Click Save to proceed anyways.';
-                    break;
-                  case 3:
-                    this.scheduleModalError = 'The event  starting at ' + new Date(data.errorMessage.startTime) +
-                    ' conflicts with another meeting. Click Save to proceed anyways.';
-                    break;
-                  case 4:
-                    this.scheduleModalError = 'The travel time for The event  starting at ' + new Date(data.errorMessage.startTime) + ' conflicts with event: '
-                      + data.errorMessage.value + '. Click Save to proceed anyways.';
-                    break;
-                }
-                $('#eventModal').modal('show');
-                this.displayModalError = true;
-                this.displayModalSave = false;
-                this.forceSaveEvent = true;
-              }
-              else {
-                this.eventPayload.id = data;
-                this.refresh.next();
-              }
-              if(count == this.datesArray.length ){
-                $('#eventModal').modal('hide');
-                this.initEvent();
-                this.displaySuccessMessage('All the Events have been added successfully');
-              }
-            });
-            i++;
-          }
+    if (this.datesArray.length > 0) {
+      let i = 0;
+      let count = 0;
+      while (i < this.datesArray.length) {
+        this.eventPayload.eventStart = new Date(this.datesArray[i]).getTime();
+        this.eventPayload.eventEnd = this.eventPayload.eventStart + this.difference;
+        if (this.profileService.userProfile.lunchStartTime && this.profileService.userProfile.lunchStartTime != 'Not Set') {
+          this.eventPayload.lunchStart = this.setDateObject(this.lunchStart, this.datesArray[i], this.profileService.userProfile.lunchStartTime).getTime();
+          this.eventPayload.lunchEnd = this.setDateObject(this.lunchEnd, this.datesArray[i], this.profileService.userProfile.lunchEndTime).getTime();
         }
+        if (this.profileService.userProfile.dinnerStartTime && this.profileService.userProfile.dinnerStartTime != 'Not Set') {
+          this.eventPayload.dinnerStart = this.setDateObject(this.dinnerStart, this.datesArray[i], this.profileService.userProfile.dinnerStartTime).getTime();
+          this.eventPayload.dinnerEnd = this.setDateObject(this.dinnerEnd, this.datesArray[i], this.profileService.userProfile.dinnerEndTime).getTime();
+        }
+        this.displayModalSave = true;
+        this.eventsService.saveEvent(this.eventPayload, this.forceSaveEvent, 'save', this.event.id).subscribe((data) => {
+          count++;
+          if (data.errorMessage) {
+            switch (data.errorMessage.code) {
+              case 1:
+                this.scheduleModalError = 'Maximum daily walking distance of '
+                  + data.errorMessage.value + ' miles will be exceeded on the event starting at ' + new Date(data.errorMessage.startTime) +
+                  '. Click Save to proceed anyways.';
+                break;
+              case 2:
+                this.scheduleModalError = 'Maximum daily bicycling distance of '
+                  + data.errorMessage.value + ' miles will be exceeded on the event starting at ' + new Date(data.errorMessage.startTime) +
+                  ' . Click Save to proceed anyways.';
+                break;
+              case 3:
+                this.scheduleModalError = 'The event  starting at ' + new Date(data.errorMessage.startTime) +
+                  ' conflicts with another meeting. Click Save to proceed anyways.';
+                break;
+              case 4:
+                this.scheduleModalError = 'The travel time for The event  starting at ' + new Date(data.errorMessage.startTime) + ' conflicts with event: '
+                  + data.errorMessage.value + '. Click Save to proceed anyways.';
+                break;
+            }
+            $('#eventModal').modal('show');
+            this.displayModalError = true;
+            this.displayModalSave = false;
+            this.forceSaveEvent = true;
+          }
+          else {
+            this.eventPayload.id = data;
+            this.refresh.next();
+          }
+          if (count == this.datesArray.length) {
+            $('#eventModal').modal('hide');
+            this.initEvent();
+            this.displaySuccessMessage('All the Events have been added successfully');
+          }
+        });
+        i++;
+      }
+    }
   }
 
   handleEvent(action: string, event: any): void {
@@ -567,7 +567,7 @@ export class CalendarViewComponent implements OnInit {
     this.forceSaveEvent = false;
   }
 
-  updateFlag(): void{
+  updateFlag(): void {
     this.forceSaveEvent = false;
   }
 

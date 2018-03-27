@@ -32,7 +32,7 @@ exports.handler = (event, context, callback) => {
     }
 
     else {
-      var payload = {
+        var payload = {
         TableName: "user_events",
         Item: {
           "id": id,
@@ -356,7 +356,7 @@ exports.handler = (event, context, callback) => {
 
 
   function checkConflictOnLocationBasis(data,eventID, eventStart, eventEnd, origin, destination, travelMode, status){
-    console.log("Input AAAA checkConflictOnLocationBasis");
+    console.log("Input AAAAA");
     console.log(data);
     console.log(origin);
     console.log(eventStart);
@@ -424,13 +424,6 @@ exports.handler = (event, context, callback) => {
     var nextMeetingStartTime = 0;
     var nextMeetingEndTime = 0;
 
-    // Adding meeting IDs for sending colflicting information
-
-    var previousMeetingId = ""
-    var nextMeetingId = ""
-    var previousMeetingObject = null
-    var nextMeetingObject = null
-
     if (startmeetingDetails != null){
       // params["previousMeeting"] = startmeetingDetails
       // var previous_response = getDurationFromDistanceAPIInMins(startmeetingDetails.destination.place_id, origin, travelMode);
@@ -451,9 +444,6 @@ exports.handler = (event, context, callback) => {
       previousMeetingDestinationPlaceId = startmeetingDetails.destination.place_id;
       previousMeetingStartTime = startmeetingDetails.eventStart;
       previousMeetingEndTime = startmeetingDetails.eventEnd;
-      previousMeetingId = startmeetingDetails.id;
-      previousMeetingObject = startmeetingDetails
-
     }
 
 
@@ -472,8 +462,6 @@ exports.handler = (event, context, callback) => {
       nextMeetingDestinationPlaceId = endMeetinfDetails.destination.place_id;
       nextMeetingStartTime = endMeetinfDetails.eventStart;
       nextMeetingEndTime = endMeetinfDetails.eventEnd;
-      nextMeetingId = endMeetinfDetails.id;
-      nextMeetingObject = endMeetinfDetails
     }
 
 
@@ -489,9 +477,7 @@ exports.handler = (event, context, callback) => {
       "currentMeetingStartTime":currentMeetingStartTime,
       "currentMeetingEndTime":currentMeetingEndTime,
       "nextMeetingStartTime":nextMeetingStartTime,
-      "nextMeetingEndTime":nextMeetingEndTime,
-      "nextMeetingId":nextMeetingId,
-      "previousMeetingId":previousMeetingId
+      "nextMeetingEndTime":nextMeetingEndTime
     };
     console.log('AABB')
     console.log(params)
@@ -510,37 +496,37 @@ exports.handler = (event, context, callback) => {
     //   FunctionName: 'getLocationInformation',
     //   Payload: JSON.stringify(params, null, null) // pass params
     // }, function(error, data) {
-    // if(status == "new") {
-    //     console.log("Saved SSSS")
-    //     saveEvent();
-    //   } else {
-    //     saveModifiedEvent();
-    //   }
-    //   context.succeed(error_message);
-    //   return;
+      // if(status == "new") {
+      //     console.log("Saved SSSS")
+      //     saveEvent();
+      //   } else {
+      //     saveModifiedEvent();
+      //   }
+      //   context.succeed(error_message);
+      //   return;
 
-    // if (error) {
-    //   console.log("Error SSSS" + error);
+      // if (error) {
+      //   console.log("Error SSSS" + error);
 
-    //   // If the error occurs in fetching the service Still saving the data
+      //   // If the error occurs in fetching the service Still saving the data
 
-    // }else{
+      // }else{
 
-    //   console.log("Location data SSSS");
-    //   console.log(data)
-    //   // save the meeting
-    //   if (data['Payload'] == 'true'){
-    //       console.log("Conflict Found while comparing the location distance ")
-    //     var error_message = {
-    //       "errorMessage": {
-    //         "code": 4,
-    //         "value": "MEHUL EVENT"
-    //       }
-    //     };
-    //   }
-    // }
-    //   });
-    promiseCallFunction(params, status, previousMeetingObject, nextMeetingObject)
+      //   console.log("Location data SSSS");
+      //   console.log(data)
+      //   // save the meeting
+      //   if (data['Payload'] == 'true'){
+      //       console.log("Conflict Found while comparing the location distance ")
+      //     var error_message = {
+      //       "errorMessage": {
+      //         "code": 4,
+      //         "value": "MEHUL EVENT"
+      //       }
+      //     };
+      //   }
+      // }
+ //   });
+    promiseCallFunction(params, status)
   }
 
   function saveOrModifyEvents(status){
@@ -551,16 +537,16 @@ exports.handler = (event, context, callback) => {
     }
   }
 
-  function promiseCallFunction(params, status, previousMeetingObject, nextMeetingObject){
+  function promiseCallFunction(params, status){
     console.log("Inside Promise call function ")
     console.log(params)
 
     var callOtherLambdaFunction = new Promise(
-      function (resolve, reject) {
+    function (resolve, reject) {
 
         var aws = require('aws-sdk');
         var lambda = new aws.Lambda({
-          region: 'us-west-2'
+            region: 'us-west-2'
         });
 
         lambda.invoke({
@@ -568,106 +554,54 @@ exports.handler = (event, context, callback) => {
           Payload: JSON.stringify(params, null, null) // pass params
         }, function(error, data) {
 
-          if (error) {
-            console.log("Error SSSS" + error);
-            // If the error occurs in fetching the service Still saving the data
-            saveOrModifyEvents(status)
-            reject(error)
-          }else{
-            console.log("Location data ");
-            console.log(data)
-            // save the meeting
-
-            var jsonResult = JSON.parse(data['Payload'])
-
-            var conflictTitle = ""
-            var conflictInDuration = false
-            var conflictMeetingId =  ""
-            if(jsonResult != null && jsonResult['isConflictPresent'] != null && jsonResult['isConflictPresent'] == true){
-              conflictInDuration = true
-            }
-
-            if(jsonResult != null && jsonResult['conflictMeetingId'] != null){
-              conflictMeetingId = jsonResult['conflictMeetingId']
-            }
-
-
-
-            if (conflictInDuration == true){
-              console.log("Conflict Found while comparing the location distance ")
-
-
-              if (previousMeetingObject != null && previousMeetingObject.id != null && previousMeetingObject.id == conflictMeetingId && previousMeetingObject.eventTitle != null){
-                conflictTitle = previousMeetingObject.eventTitle
-              }
-
-              if(nextMeetingObject != null && nextMeetingObject.id != null && nextMeetingObject.id == conflictMeetingId && nextMeetingObject.eventTitle != null){
-                conflictTitle = nextMeetingObject.eventTitle
-              }
-
-
-
-              console.log("TTTTTT")
-              console.log(conflictTitle)
-              console.log(conflictMeetingId)
-              var error_message = {
-                "errorMessage": {
-                  "code": 4,
-                  "value": conflictTitle,
+            if (error) {
+                console.log("Error SSSS" + error);
+                // If the error occurs in fetching the service Still saving the data
+                saveOrModifyEvents(status)
+                reject(error)
+              }else{
+                console.log("Location data ");
+                console.log(data)
+                // save the meeting
+                if (data['Payload'] == 'true'){
+                    console.log("Conflict Found while comparing the location distance ")
+                  var error_message = {
+                    "errorMessage": {
+                      "code": 4,
+                      "value": "MEHUL EVENT"
+                    }
+                  };
+                 context.succeed(error_message);
+                 return;
+                }else{
+                  // No Conflict
+                saveOrModifyEvents(status)
                 }
-              };
-              context.succeed(error_message);
-              return;
-            }else{
-              // No Conflict
-              saveOrModifyEvents(status)
-            }
             resolve(data); // fulfilled
-          }
+        }
 
         });
 
-      });
+    });
 
 
     var promiseConsumeFunction = function () {
-      callOtherLambdaFunction
+    callOtherLambdaFunction
         .then(function (data) {
-          // yay, you got a new phone
-          //console.log(data);
-          //console.log("DDDD")
-          // output: { brand: 'Samsung', color: 'black' }
+            // yay, you got a new phone
+            //console.log(data);
+            //console.log("DDDD")
+         // output: { brand: 'Samsung', color: 'black' }
         })
         .catch(function (error) {
-          // oops, mom don't buy it
-          //console.log(error.message);
-          // output: 'mom is not happy'
+            // oops, mom don't buy it
+            //console.log(error.message);
+         // output: 'mom is not happy'
         });
 
 
-    };
-    promiseConsumeFunction();
-  }
-
-  function convertStringTimeToMillis(time, startDate) {
-    console.log("Inside convert function")
-    var hr = time[0]+time[1]
-    var min = time[3]+time[4]
-    console.log(time)
-    console.log(hr + " " + min)
-
-    var date = new Date(1522022400000)
-    console.log(date);
-    var yy = date.getFullYear();
-    var mm = date.getMonth() + 1;
-    var dd = date.getDate();
-    var hr = date.getHours();
-    var min = date.getMinutes();
-    console.log(yy + "/" + mm + "/" + dd + " " + hr +":"+min);
-
-    var timeInMillis = new Date(Date.UTC(yy,mm,dd,17,0,0)).getTime();
-
-    return timeInMillis;
+};
+promiseConsumeFunction();
   }
 
 
@@ -681,11 +615,9 @@ exports.handler = (event, context, callback) => {
     var origin = event.body.eventDetails.origin.place_id;
     var destination = event.body.eventDetails.destination.place_id;
     var travelMode = event.body.eventDetails.travelMode.mode;
-    var lunchStart = event.body.eventDetails.lunchStart;
-    var lunchEnd = event.body.eventDetails.lunchEnd;
-    var dinnerStart = event.body.eventDetails.dinnerStart;
-    var dinnerEnd = event.body.eventDetails.dinnerEnd;
-    
+    var lunchStart = event.body.lunchStart;
+    var lunchEnd = event.body.lunchEnd;
+
     var eventObj = {
       origin: event.body.eventDetails.origin,
       destination: event.body.eventDetails.destination,
@@ -716,7 +648,6 @@ exports.handler = (event, context, callback) => {
     };
 
     dynamo.query(params, function (err, data) {
-
       if (err) {
         context.fail(err);
       } else {
@@ -741,61 +672,29 @@ exports.handler = (event, context, callback) => {
             console.log("Query succeeded.");
             var user_distance = dist.Items[0];
             var error_message = "XYZ";
-            console.log("ALFRED" + user_distance);
+            // console.log(user_distance);
 
             var max_dist_status = false;
 
-            if(user_distance.lunchTime && lunchStart != undefined) {
-              if (eventObj.eventEnd - eventObj.eventStart <= 24*60*60*1000) { // if an event is 24 hr long no need to check for lunch/ dinner time availability
-                var lunchTest = data;
-                lunchTest.Items.push(eventObj);
-                var meetingList = lunchConflicts(lunchTest, lunchStart, lunchEnd);
-                console.log(meetingList);
-                console.log("LIST:" + meetingList);
-                var lunch = isLunchPossible(meetingList, lunchStart, lunchEnd);
-                if (lunch == false) {
-                  error_message = {
-                    "errorMessage": {
-                      "code": 5,
-                      "value": "No time for Lunch"
-                    }
-                  };
-                  context.succeed(error_message);
-                  return;
-                }
-                else {
-                  lunchTest.Items.pop(eventObj);
-                  console.log("NEW:"+lunchTest);
-                }
-              }
-            }
-
-            if(user_distance.dinnerTime && dinnerStart != undefined) {
-              if (eventObj.eventEnd - eventObj.eventStart <= 24*60*60*1000) { // if an event is 24 hr long no need to check for lunch/ dinner time availability
-                var dinnerTest = data;
-                dinnerTest.Items.push(eventObj);
-                var meetingList = lunchConflicts(dinnerTest, dinnerStart, dinnerEnd);
-                console.log(meetingList);
-                console.log("LIST:" + meetingList);
-                var dinner = isLunchPossible(meetingList, dinnerStart, dinnerEnd);
-                if (dinner == false) {
-                  error_message = {
-                    "errorMessage": {
-                      "code": 6,
-                      "value": "No time for Dinner"
-                    }
-                  };
-                  context.succeed(error_message);
-                  return;
-                }
-                else {
-                  dinnerTest.Items.pop(eventObj);
-                  console.log("NEW:"+lunchTest);
-                }
+            if (eventObj.eventEnd - eventObj.eventStart <= 24*60*60*1000) {
+              var lunchTest = data;
+              lunchTest.Items.push(eventObj);
+              var meetingList = lunchConflicts(lunchTest, lunchStart, lunchEnd);
+              console.log(meetingList);
+              console.log("LIST:" + meetingList);
+              var lunch = isLunchPossible(meetingList, lunchStart, lunchEnd);
+              if (lunch == false) {
+                error_message = {
+                  "errorMessage": {
+                    "code": 5,
+                    "value": "No time for Lunch"
+                  }
+                };
+                context.succeed(error_message);
+                return;
               }
 
             }
-
             if(travelMode == "walking") {
               if("walkingDistance" in user_distance) {
                 max_dist_status = true;
@@ -849,7 +748,7 @@ exports.handler = (event, context, callback) => {
               return;
 
             }else{
-              checkConflictOnLocationBasis(data, eventID, eventStart, eventEnd, origin, destination, travelMode, status)
+            checkConflictOnLocationBasis(data, eventID, eventStart, eventEnd, origin, destination, travelMode, status)
             }
 
             // else {
@@ -873,6 +772,11 @@ exports.handler = (event, context, callback) => {
         "id": event.body.eventID
       }
     }
+    dynamo.getItem(payload, function(err, data){
+      if(!err){
+       deleteRules(data.Item.eventTitle.replace(/\s/g,'') + data.Item.eventStart);
+      }
+    })
     dynamo.deleteItem(payload, function (err, data) {
       if (err) {
         context.fail(err);
@@ -882,11 +786,40 @@ exports.handler = (event, context, callback) => {
     })
   }
 
+  function deleteRules(uid) {
+        var ruleName = 'notification_for_' + uid;
+        var policyId = 'NID'+ uid;
+        var cloudwatchevents = new aws.CloudWatchEvents();
+        var lambda = new aws.Lambda();
+        var params = {
+            Ids: ['sendPushNotification'],
+            Rule: ruleName
+        };
+        cloudwatchevents.removeTargets(params, function (err, data) {
+            if (err) console.log(err, err.stack);
+            else {
+                var params = {
+                    Name: ruleName
+                };
+                cloudwatchevents.deleteRule(params, function (err, data) {
+                    if (err) console.log(err, err.stack);
+                });
+            }
+        });
+        var params = {
+            FunctionName: 'sendPushNotification',
+            StatementId: policyId,
+        };
+        lambda.removePermission(params, function (err, data) {
+            if (err) console.log(err, err.stack);
+        });
+    }
+
 
   function saveModifiedEvent() {
 
-    if(event.body.eventDetails.isRepeat){
-      var new_event_payload = {
+       if(event.body.eventDetails.isRepeat){
+        var new_event_payload = {
         TableName: "user_events",
         Item: {
           "id":  event.body.eventID,
@@ -905,19 +838,19 @@ exports.handler = (event, context, callback) => {
     }
 
     else{
-      var new_event_payload = {
-        TableName: "user_events",
-        Item: {
-          "id": event.body.eventID,
-          "username": username,
-          "eventStart": event.body.eventDetails.eventStart,
-          "eventEnd": event.body.eventDetails.eventEnd,
-          "eventTitle": event.body.eventDetails.eventTitle,
-          "origin": event.body.eventDetails.origin,
-          "destination": event.body.eventDetails.destination,
-          "travelMode": event.body.eventDetails.travelMode
-        }
-      };
+       var new_event_payload = {
+      TableName: "user_events",
+      Item: {
+        "id": event.body.eventID,
+        "username": username,
+        "eventStart": event.body.eventDetails.eventStart,
+        "eventEnd": event.body.eventDetails.eventEnd,
+        "eventTitle": event.body.eventDetails.eventTitle,
+        "origin": event.body.eventDetails.origin,
+        "destination": event.body.eventDetails.destination,
+        "travelMode": event.body.eventDetails.travelMode
+      }
+    };
     }
 
     dynamo.putItem(new_event_payload, function (err, data) {
