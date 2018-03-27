@@ -145,7 +145,6 @@ export class ProfileComponent implements OnInit {
   }
 
   ngOnInit() {
-    if (!this.profileService.userProfile.homeLocation || !this.profileService.userProfile.preferredMode) {
       this.profileService.fetchUserProfile().subscribe((data) => {
         if (data.Item) {
           this.homeLocation = this.profileService.userProfile.homeLocation;
@@ -182,23 +181,6 @@ export class ProfileComponent implements OnInit {
           }
         }
       });
-    } else {
-      this.homeLocation = this.profileService.userProfile.homeLocation;
-      this.workLocation = this.profileService.userProfile.workLocation;
-      this.homeLocationText = this.profileService.userProfile.homeLocation.formatted_address;
-      this.workLocationText = this.profileService.userProfile.workLocation.formatted_address;
-      this.walking = this.profileService.userProfile.walkingDistance;
-      this.bicycling = this.profileService.userProfile.bicyclingDistance;
-      this.travelMode = this.profileService.userProfile.preferredMode;
-      this.lunchStartTime = this.profileService.userProfile.lunchStartTime;
-      this.lunchEndTime = this.profileService.userProfile.lunchEndTime;
-      this.dinnerStartTime = this.profileService.userProfile.dinnerStartTime;
-      this.dinnerEndTime = this.profileService.userProfile.dinnerEndTime;
-      this.walk = this.travelMode.indexOf('walking') > -1;
-      this.drive = this.travelMode.indexOf('driving') > -1;
-      this.cycle = this.travelMode.indexOf('bicycling') > -1;
-      this.trans = this.travelMode.indexOf('transit') > -1;
-    }
   }
 
   selectAddress(place: any, location: string) {
