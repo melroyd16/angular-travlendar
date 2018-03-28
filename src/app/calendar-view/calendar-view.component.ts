@@ -448,7 +448,6 @@ export class CalendarViewComponent implements OnInit {
           this.payloadArray[i].dinnerEnd = this.setDateObject(this.dinnerEnd, this.datesArray[i], this.profileService.userProfile.dinnerEndTime).getTime();
         }
         this.displayModalSave = true;
-        console.log(i);
         this.eventsService.saveEvent(this.payloadArray[i], this.forceSaveEvent, 'save', this.event.id).subscribe((data) => {
           count++;
           if (data.errorMessage) {

@@ -1,0 +1,1154 @@
+[33mcommit c3c5053bc70ecd87da3ebfa424ac2d8e783a032b[m
+Author: deepakhaldar <dhaldar@asu.edu>
+Date:   Tue Mar 27 18:40:04 2018 -0700
+
+    #253 Updated Repetitve Payload
+
+[33mcommit cedb6ebd3f8ee2ad72ad6929a3315b6e33b840bd[m
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Tue Mar 27 16:16:30 2018 -0700
+
+    TG-255 #ready-for-test
+
+[33mcommit a0508e677696fc6b3ffba5ea8912bcdac980627a[m
+Author: Param Mehta <param.mehta95@gmail.com>
+Date:   Tue Mar 27 14:00:17 2018 -0700
+
+    TS-240 #ready-for-test
+
+[33mcommit 135130b90a8775e39612113da4de273bc31a34c4[m
+Author: Param Mehta <param.mehta95@gmail.com>
+Date:   Tue Mar 27 13:39:11 2018 -0700
+
+    Package install issues
+
+[33mcommit 5e63703b850759069cbe76cbd631c03e6dc66c75[m
+Merge: 18ab344 5fc86e1
+Author: deepakhaldar <dhaldar@asu.edu>
+Date:   Tue Mar 27 12:06:17 2018 -0700
+
+    Merge branch 'master' into repetitive_events
+
+[33mcommit 18ab3448532b5daf156995fe248c56e604cdec8d[m
+Author: deepakhaldar <dhaldar@asu.edu>
+Date:   Tue Mar 27 12:05:42 2018 -0700
+
+    #253 Lunch and Dinner Time Check
+
+[33mcommit 5fc86e19f9209988ba48d759bd472fa6c6419c84[m
+Merge: 6e212db 64e66dc
+Author: Deepak Haldar <dhaldar@asu.edu>
+Date:   Tue Mar 27 00:02:28 2018 -0700
+
+    Merge pull request #28 from melroyd16/repetitive_events
+    
+    Repetitive events
+
+[33mcommit 64e66dc0b8e91fee4634af1aeb517ab1f71bc8c5[m
+Merge: 61d7c30 6e212db
+Author: deepakhaldar <dhaldar@asu.edu>
+Date:   Tue Mar 27 00:00:12 2018 -0700
+
+    Merge branch 'master' into repetitive_events
+
+[33mcommit 61d7c3009ab5029485407924ab680f034b20eedc[m
+Author: deepakhaldar <dhaldar@asu.edu>
+Date:   Mon Mar 26 23:58:50 2018 -0700
+
+    #253 Lunch and Dinner Times are updated to Unix and the Payload too has been updated.
+
+[33mcommit 6e212dbcfa16eb0ce35de2e0aefb4381c9ba94bb[m
+Author: Alfred Gonsalves <alfredfgonsalves@gmail.com>
+Date:   Mon Mar 26 22:04:43 2018 -0700
+
+    Task #225
+    Modified parameters as per received from front-end for lunch/dinner time
+
+[33mcommit 85b4efebaf1666fe8498bc63f648262a8e0a31ca[m
+Merge: 8923a41 69414ca
+Author: Alfred Gonsalves <alfredfgonsalves@gmail.com>
+Date:   Mon Mar 26 20:54:16 2018 -0700
+
+    Merge pull request #29 from melroyd16/lunch_dinner_lambda
+    
+    Lunch dinner lambda
+
+[33mcommit 69414ca1714b0ce803084b41b7da4c6f36f81421[m
+Author: Alfred Gonsalves <alfredfgonsalves@gmail.com>
+Date:   Mon Mar 26 20:52:50 2018 -0700
+
+    Adding previously completed lambda file to git
+
+[33mcommit 8c979c1400a64fb30cfb342378af7707fcb474f4[m
+Author: Alfred Gonsalves <alfredfgonsalves@gmail.com>
+Date:   Mon Mar 26 15:18:04 2018 -0700
+
+    Task #225 - Created dinner check of 30min during dinner hours
+
+[33mcommit 6d693c0d9a11b86e3a849c01e24561e6bbdb6879[m
+Merge: 93a1f4f 8923a41
+Author: deepakhaldar <dhaldar@asu.edu>
+Date:   Mon Mar 26 13:01:56 2018 -0700
+
+    Merge branch 'master' into repetitive_events
+
+[33mcommit 8923a41d3bfe1f5629a24b53c80a9973bf285868[m
+Author: Mehul Shah <mehul_shah_19@live.com>
+Date:   Mon Mar 26 03:39:58 2018 -0700
+
+    Sending the conflict Title for the conflict file
+
+[33mcommit cc8f6bd538da5e2e64167da1f73f335a6d06a20c[m
+Merge: 25575d4 0fed5cc
+Author: Mehul Shah <mehul_shah_19@live.com>
+Date:   Mon Mar 26 01:55:02 2018 -0700
+
+    Merge branch 'master' of https://github.com/melroyd16/angular-travlendar
+
+[33mcommit 93a1f4ff5153d0d282a3f6402fba25b71058c9ea[m
+Author: deepakhaldar <dhaldar@asu.edu>
+Date:   Sun Mar 25 23:47:41 2018 -0700
+
+    #219 Added Event Saving Alert and Updated Success Message
+
+[33mcommit 29cb1cbacab0cceebffeff9e959301320d55d199[m
+Merge: ffebc52 0fed5cc
+Author: deepakhaldar <dhaldar@asu.edu>
+Date:   Sun Mar 25 23:04:14 2018 -0700
+
+    Merge Master
+
+[33mcommit ffebc52b86089c050fa5991e7c87e08e011fe9f3[m
+Author: deepakhaldar <dhaldar@asu.edu>
+Date:   Sun Mar 25 22:58:51 2018 -0700
+
+    #219 Editing the Current Repeated Event
+    
+    User is given the option to select which all repeated events to edit.
+    Currently, the user is able to edit the Selected repeated event.
+
+[33mcommit 0fed5cc4ab14f4654bf64ab5661932ce61b925e5[m
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Sun Mar 25 22:05:46 2018 -0700
+
+    TG-228 #ready-for-test
+    
+    created cron jobs that run as per user events and tested them out
+
+[33mcommit b2edd6397188d633a102de31b782f2d0142aa795[m
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Sun Mar 25 15:32:53 2018 -0700
+
+    TG-228
+    
+    implemented code that schedules individual cross for each event from
+    the scanned payload
+
+[33mcommit e9ab1d0f4c3b779ca8e27ed175cf9e22aaea1413[m
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Sun Mar 25 14:29:29 2018 -0700
+
+    minor issue
+
+[33mcommit 856e034c6b6bb264c0b0382b99db623226bad9b1[m
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Sun Mar 25 00:14:49 2018 -0700
+
+    TG-228 #in-progress
+    
+    created a lambda that scans the user events table
+
+[33mcommit 25575d43e4ca6a8cb983b14a9dae4c54e2a98de3[m
+Author: Mehul Shah <mehul_shah_19@live.com>
+Date:   Sat Mar 24 23:21:21 2018 -0700
+
+    Fetched the endPoint of all the user information
+
+[33mcommit e483f5034cbbe34d87f0f2dd028baf794d93cf46[m
+Author: deepakhaldar <dhaldar@asu.edu>
+Date:   Sat Mar 24 22:51:58 2018 -0700
+
+    #219 Adding Edit checks
+
+[33mcommit 220f7278f9fec40b7101fc9fa14b1756314dbaca[m
+Author: deepakhaldar <dhaldar@asu.edu>
+Date:   Thu Mar 22 16:39:17 2018 -0700
+
+    #219 Adding Options for the User to select which repeated events to edit.
+
+[33mcommit 613f8d68b4c950dde3e60df7ecd9b315541e51ce[m
+Author: deepakhaldar <dhaldar@asu.edu>
+Date:   Mon Mar 19 23:39:19 2018 -0700
+
+    #217 Update the Display Modal Error
+
+[33mcommit b2c581e9f7f668a66a5b58436fe8fe59f9d02c5a[m
+Author: deepakhaldar <dhaldar@asu.edu>
+Date:   Sun Mar 18 21:53:05 2018 -0700
+
+    #195 Conflct Check on the Repeated Events
+
+[33mcommit 87661e1060deab3b2a795307f20ac1f3e7b0f608[m
+Merge: aa22407 b266d7b
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Sun Mar 18 21:25:32 2018 -0700
+
+    Merge branch 'master' of https://github.com/melroyd16/angular-travlendar
+
+[33mcommit aa22407e092a3712b9bfc20de3a593a45c453672[m
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Sun Mar 18 21:25:22 2018 -0700
+
+    success and error codes for scheduling an event
+
+[33mcommit b266d7bb1dbe6fe904a8f169e4bf30d9073571e4[m
+Merge: 1e4220d f6cd618
+Author: Deepak Haldar <dhaldar@asu.edu>
+Date:   Sun Mar 18 21:21:28 2018 -0700
+
+    Merge pull request #27 from melroyd16/repetitive_events
+    
+    Repetitive events
+
+[33mcommit f6cd618ef7150ab2389ed282e15817992bbd50e4[m
+Merge: 7bc2a2a 1e4220d
+Author: Deepak Haldar <dhaldar@asu.edu>
+Date:   Sun Mar 18 21:21:06 2018 -0700
+
+    Merge branch 'master' into repetitive_events
+
+[33mcommit 1e4220d19cc4ea8eb5e520b33a3fb151a751d534[m
+Merge: 081b9bc 69dd49a
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Sun Mar 18 20:30:36 2018 -0700
+
+    Merge pull request #26 from melroyd16/TG_185
+    
+    TG-185
+
+[33mcommit 69dd49ad1fe3c3b2ef4fa142ae0c067d0af28c24[m
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Sun Mar 18 20:29:12 2018 -0700
+
+    TG-185 #ready-for-test
+    
+    displaying only the travel modes as per the users preferences
+
+[33mcommit 081b9bcc6e37483610a778db0f9e071a33bee4bb[m
+Author: Alfred Gonsalves <alfredfgonsalves@gmail.com>
+Date:   Sun Mar 18 19:48:12 2018 -0700
+
+    Renamed biking parameter to bicycling and cyclingDistance to bicyclingDistance
+
+[33mcommit 3c4f4d052cd38d09e0a0425f603ccf4af139c350[m
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Sun Mar 18 18:53:47 2018 -0700
+
+    TG-185
+    
+    fixed bug for populating profile of newly registered users
+
+[33mcommit 7af3c52c9b3b7d732408a23964d7e8729d38b0e0[m
+Author: Mehul Shah <mehul_shah_19@live.com>
+Date:   Sun Mar 18 16:27:30 2018 -0700
+
+    TG-207 #ready-for-test
+    
+    Added the lambda function which sends dummy push notification to the mentioned device token and application Id
+
+[33mcommit 90ced25b1fed41ad054ab0fd4b748e362af392e6[m
+Merge: 58df0cb c58fe22
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Sun Mar 18 13:54:06 2018 -0700
+
+    Merge pull request #25 from melroyd16/TG_185
+    
+    TG-184 #ready-for-test
+
+[33mcommit c58fe228384cd12d8c9e793f6bfa26e1762ab0c6[m
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Sun Mar 18 13:52:33 2018 -0700
+
+    TG-184 #ready-for-test
+    
+    storing the user profile details in UserProfileService to be made
+    available to the rest of the application
+
+[33mcommit 58df0cb213b9a627bc7295745e356d6fc9e11fd0[m
+Author: Alfred Gonsalves <alfredfgonsalves@gmail.com>
+Date:   Sun Mar 18 13:09:51 2018 -0700
+
+    Working on conflict return packet and error codes
+
+[33mcommit 6362768296c0d14301b91ca96bd937b742e98717[m
+Author: Mehul Shah <mehul_shah_19@live.com>
+Date:   Sat Mar 17 10:36:16 2018 -0700
+
+    changed the logic of conflicting events on location basis
+
+[33mcommit 7bc2a2aa359183392a7883d500865683d5ee6f8a[m
+Merge: c65099f 1ca5f18
+Author: deepakhaldar <dhaldar@asu.edu>
+Date:   Fri Mar 16 17:33:04 2018 -0700
+
+    Merge
+
+[33mcommit c65099f167410a80e631dce74312e8f86526cd30[m
+Author: deepakhaldar <dhaldar@asu.edu>
+Date:   Fri Mar 16 17:20:27 2018 -0700
+
+    #196 Saving and Fetching the Repeated Events from Backend.
+
+[33mcommit cacbdf9e0a6c8ee7997f09513d7739cac67be399[m
+Author: Mehul Shah <mehul_shah_19@live.com>
+Date:   Fri Mar 16 16:45:24 2018 -0700
+
+    TG 209 #ready-for-test
+
+[33mcommit e45db046842842a092d1972379841e89b0275377[m
+Author: Mehul Shah <mehul_shah_19@live.com>
+Date:   Fri Mar 16 11:54:00 2018 -0700
+
+    added parsing of event function
+
+[33mcommit c58bc2ac561ff5e0eb2f13b610dca379aca1bdf5[m
+Author: Mehul Shah <mehul_shah_19@live.com>
+Date:   Fri Mar 16 01:31:35 2018 -0700
+
+    Added Method to connect to DynamoDb
+
+[33mcommit 29bd25aed8bf0d4d900033c5a56c2a46c506d21c[m
+Author: deepakhaldar <dhaldar@asu.edu>
+Date:   Thu Mar 15 01:24:53 2018 -0700
+
+    #196 Storing Updated Repetitive events in DynamoDB
+
+[33mcommit 1ca5f188bbae764c573fe58df0e3ae4ddf1e48fa[m
+Author: Mehul Shah <mehul_shah_19@live.com>
+Date:   Wed Mar 14 15:44:37 2018 -0700
+
+    TG - 208 #in-progress
+    
+    Used boto3 library and endpoint obtained from Android device to send Push Notification
+
+[33mcommit 8c909a77d5107865ef7a3ad180e2017cb705ccac[m
+Merge: 2c51a56 a369096
+Author: Mehul Shah <mehul_shah_19@live.com>
+Date:   Sun Mar 11 20:30:37 2018 -0700
+
+    Merge branch 'master' of https://github.com/melroyd16/angular-travlendar
+
+[33mcommit 2c51a56b9a591463782440530c2eca4c25fa98be[m
+Author: Mehul Shah <mehul_shah_19@live.com>
+Date:   Sun Mar 11 20:30:32 2018 -0700
+
+    Using AWS sdk to send push notification to the device
+
+[33mcommit a36909600c42617170461b02ddf080f44cc5dc02[m
+Merge: 91d8205 52052b8
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Sun Mar 11 15:54:12 2018 -0700
+
+    Merge pull request #24 from melroyd16/landing-page
+    
+    code clean up
+
+[33mcommit 52052b8826eb2175100003d92a34fe19297fa88d[m
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Sun Mar 11 15:53:29 2018 -0700
+
+    code clean up
+
+[33mcommit 91d82050a058fadebdfef53db5f3bad4e92708fb[m
+Merge: 0333bbf 28426d3
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Sun Mar 11 15:15:56 2018 -0700
+
+    Merge pull request #23 from melroyd16/landing-page
+    
+    Landing page
+
+[33mcommit 28426d386bcf37ab53fe651a36190b16e47619a1[m
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Sun Mar 11 15:12:16 2018 -0700
+
+    TG-213 #closed
+    
+    completed login, register, forgot password and resend code functionality
+
+[33mcommit a458e50932da63e19335bc1ebf11bf424ed2bb11[m
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Sun Mar 11 11:00:43 2018 -0700
+
+    TG-213 #ready-for-test
+
+[33mcommit 98361fc5b259262a2cfb5d836a7f6386143866c0[m
+Author: Mehul Shah <mehul_shah_19@live.com>
+Date:   Sat Mar 10 20:26:08 2018 -0700
+
+    Added Comments and passed more field to conflict function
+
+[33mcommit 466370cfbe370a35b4fad3c165c6ea6567b24fc3[m
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Sat Mar 10 20:14:56 2018 -0700
+
+    TG-136 #ready-for-test; TG-213
+    
+    added forgot password functionality
+
+[33mcommit 284d4ea640d3245d90abe813798a5cc6b1dd6b8d[m
+Author: deepakhaldar <dhaldar@asu.edu>
+Date:   Sat Mar 10 14:28:06 2018 -0700
+
+    #196 Saving the Repetitive Events in Backend.
+
+[33mcommit 97f192c5d133332dbebdd317901a5b5b1cd40254[m
+Author: deepakhaldar <dhaldar@asu.edu>
+Date:   Sat Mar 10 14:26:33 2018 -0700
+
+    #193 Completed the Modal with Repeat Functionality
+
+[33mcommit 9eda4cdc93ca241865d01e03fb55ca43db40a951[m
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Fri Mar 9 22:49:03 2018 -0700
+
+    TG-136
+    
+    created a landing page and implemented login and register modals
+
+[33mcommit 3f5581e85b0167b8c6ff5938b800f2c0e1ba9bb6[m
+Author: deepakhaldar <dhaldar@asu.edu>
+Date:   Fri Mar 9 20:26:36 2018 -0700
+
+    Updated Events Modal
+
+[33mcommit 0333bbfacf3209dbd8671ec2f48338f71aa40fae[m
+Merge: a80a30a a5f7599
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Fri Mar 9 14:01:49 2018 -0700
+
+    Merge pull request #22 from melroyd16/draggable_events
+    
+    Draggable events
+
+[33mcommit a5f75990c09267fd3492d47e8948bd455f93e061[m
+Merge: d6200ff a80a30a
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Fri Mar 9 14:01:31 2018 -0700
+
+    Merge branch 'master' into draggable_events
+
+[33mcommit a80a30ad9e8f4cb39558d45fefd1d64d0fea5b8c[m
+Merge: 2dc2889 6fcc1f7
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Fri Mar 9 13:58:59 2018 -0700
+
+    Merge pull request #21 from melroyd16/repetitive_events
+    
+    Repetitive events
+
+[33mcommit d6200ff0e1778e219ec1123fc04f346761a0aa25[m
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Fri Mar 9 13:56:38 2018 -0700
+
+    TG-191 #closed; TG-194 #ready-for-test
+    
+    completed editing event schedule through drag and drop and fixed issue
+    where travel mode was not appearing on reload of page
+
+[33mcommit 57e248af5399eafb74ea590e48b15acb44551a23[m
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Wed Mar 7 21:55:06 2018 -0700
+
+    TG-191 #ready-for-test
+
+[33mcommit 6fcc1f7151e7fc4e990c4b5a2354548fbecfaf03[m
+Author: deepakhaldar <dhaldar@asu.edu>
+Date:   Sat Mar 3 21:08:52 2018 -0700
+
+    #193 Add Validation on the Repeating Modal
+
+[33mcommit 4236ebce35ff57cc86b58fae078e0364673029e0[m
+Merge: d9b66f9 2dc2889
+Author: deepakhaldar <dhaldar@asu.edu>
+Date:   Sat Mar 3 18:22:10 2018 -0700
+
+    Resolving conflicts
+
+[33mcommit 2dc28892b398e66570b95cc5f252749d3e2d4484[m
+Author: Alfred Gonsalves <alfredfgonsalves@gmail.com>
+Date:   Fri Feb 23 21:08:21 2018 -0700
+
+    TG-141 #closed
+    Tested lunch time conflicts and created return packet with code 5
+
+[33mcommit 3810c58ea50fbd20073df481ff81c0cf43665cbe[m
+Merge: da1bc1b b78c3bd
+Author: Alfred Gonsalves <alfredfgonsalves@gmail.com>
+Date:   Fri Feb 23 20:59:12 2018 -0700
+
+    Merge pull request #20 from melroyd16/lunch_30min_check
+    
+    TG-141 #ready-for-test
+
+[33mcommit da1bc1b496d7f68be2123e757b71f7a1acb04972[m
+Author: Aditya Nimbalkar <aditya.nimbalkar@asu.edu>
+Date:   Fri Feb 23 17:28:52 2018 -0700
+
+    TG-144 "ready-for-test"
+    
+    Updated Lunch Conflict function. Requires test case inside Query nearby
+    meeting function.
+
+[33mcommit 2f44bfe32e62531062ca84b837a7b8c58b1611ef[m
+Merge: c411488 e893fb6
+Author: Alfred Gonsalves <alfredfgonsalves@gmail.com>
+Date:   Fri Feb 23 14:02:55 2018 -0700
+
+    Merge pull request #19 from melroyd16/signup_validation
+    
+    Signup validation
+
+[33mcommit e893fb63ec73c11dbfd4b1d6a3c1d858c2a3dc79[m
+Author: Alfred Gonsalves <alfredfgonsalves@gmail.com>
+Date:   Fri Feb 23 14:00:42 2018 -0700
+
+    TG-137 #closed
+    Submit button disabled successfully if all form controls are invalid
+    Tested for different inputs and values
+
+[33mcommit d9b66f9a683e34b24d41bc8ee616c3437d06a1e6[m
+Author: deepakhaldar <dhaldar@asu.edu>
+Date:   Thu Feb 22 18:07:18 2018 -0700
+
+    #159 Updating the Repeat Event Modal and Saving Events
+
+[33mcommit b78c3bd890802c25ede409ea50551945fe3c130f[m
+Author: Alfred Gonsalves <alfredfgonsalves@gmail.com>
+Date:   Thu Feb 22 11:24:17 2018 -0700
+
+    TG-141 #ready-for-test
+    Code for checking if 30 min time exists between meetings during preferred lunch time
+
+[33mcommit c4114888317b29f4d4c14ff22b9fc63cc9b4f93b[m
+Merge: 679f685 ebf6522
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Wed Feb 21 14:49:06 2018 -0700
+
+    TG-153 #closed
+    
+    Integrated edit event with the API
+
+[33mcommit ebf652287d0daa8d05ef24ca8b085a6dddb79c7a[m
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Wed Feb 21 14:37:07 2018 -0700
+
+    TG-152 #closed
+    
+    completed UI end of Edit event
+
+[33mcommit fe726cb3be54ad29815bef16a2ff3cd55fc8c894[m
+Author: Alfred Gonsalves <alfredfgonsalves@gmail.com>
+Date:   Wed Feb 21 03:03:16 2018 -0700
+
+    TG-137 #ready-for-test
+    Added specific validation for name, email and password on sign up page
+
+[33mcommit 55e9f425a73ec7d4c81cb42e0346702ae3e9ea74[m
+Author: deepakhaldar <dhaldar@asu.edu>
+Date:   Tue Feb 20 23:54:04 2018 -0700
+
+    #159  Add/Remove functionality repeat date fields
+
+[33mcommit 679f68566cc061f992d0fd63d53c26928909dd66[m
+Merge: 643951e 45864e7
+Author: Param Mehta <psmehta@asu.edu>
+Date:   Tue Feb 20 21:39:26 2018 -0700
+
+    Merge pull request #18 from melroyd16/param
+    
+    Param
+
+[33mcommit 45864e7b4f8c582b52126c06959edc458a02fd5b[m
+Author: Param Mehta <param.mehta95@gmail.com>
+Date:   Tue Feb 20 21:25:42 2018 -0700
+
+    TG-178 #closed
+
+[33mcommit a15cc5909070256b47d9ccb73f16c017495d578f[m
+Author: Param Mehta <param.mehta95@gmail.com>
+Date:   Tue Feb 20 21:25:01 2018 -0700
+
+    TG-177 #closed
+
+[33mcommit 189e1ee2053ddb59d631b157c44c8a037c603d86[m
+Merge: e4815ea 643951e
+Author: Param Mehta <param.mehta95@gmail.com>
+Date:   Tue Feb 20 21:12:45 2018 -0700
+
+    TG-174 #ready-for-test
+
+[33mcommit e4815eaab4c2fa45473e06e228e6a36bd82bdd91[m
+Author: Param Mehta <param.mehta95@gmail.com>
+Date:   Tue Feb 20 21:00:22 2018 -0700
+
+    TG-178 #ready-for-test
+
+[33mcommit 643951e8c0951936419702708bdd4c24b65b4bcf[m
+Author: Mehul Shah <mehul_shah_19@live.com>
+Date:   Tue Feb 20 09:26:31 2018 -0700
+
+    TG-128 #ready-for-test
+    Added code to verify with the conflict while editing the location
+
+[33mcommit 1323dbdabd089f79ca4d9aaf2802d79cb4074821[m
+Author: Mehul Shah <mehul_shah_19@live.com>
+Date:   Tue Feb 20 09:03:07 2018 -0700
+
+    TG-142 #ready-for-test
+    Optimized the Method
+    verified the edge cases
+
+[33mcommit af2b13a7c12df421f93a4543029837ef2073ad78[m
+Author: Mehul Shah <mehul_shah_19@live.com>
+Date:   Tue Feb 20 08:57:04 2018 -0700
+
+    Removed unused files
+
+[33mcommit 47adbb95d4afb5f9493d721d804251ac3968c8e6[m
+Author: Alfred Gonsalves <alfredfgonsalves@gmail.com>
+Date:   Mon Feb 19 22:58:35 2018 -0700
+
+    Task #137 - Added regular expression check for email and name
+
+[33mcommit 0fb2ac318b6e09a58effa2d5f628a0559235c6fe[m
+Author: Alfred Gonsalves <alfredfgonsalves@gmail.com>
+Date:   Mon Feb 19 21:47:39 2018 -0700
+
+    Task #137 - added specific message for errors
+    Added pattern check
+
+[33mcommit 6a921ef1d5345cc3f203cb8010cf63f0f52fc4a6[m
+Author: Alfred Gonsalves <alfredfgonsalves@gmail.com>
+Date:   Mon Feb 19 16:02:13 2018 -0700
+
+    Task #137 - Working on RegistrationPage validation
+    Validation for username added
+
+[33mcommit 964aeee3731a5fa9b336b0d0c97401413ffe35d8[m
+Merge: 7446476 18603a8
+Author: Mehul Shah <mehul_shah_19@live.com>
+Date:   Mon Feb 19 00:27:52 2018 -0700
+
+    Removed conflict in the travlendarEvents.js file
+
+[33mcommit 744647656930fd6e9d143cb3b958862c29e6862d[m
+Author: Mehul Shah <mehul_shah_19@live.com>
+Date:   Mon Feb 19 00:18:05 2018 -0700
+
+    TG - 142 # in-progress
+    Optimizing the method by avoiding calling of other lambda function multiple times
+
+[33mcommit b185bf757a6cd34e77f507553ccd7accac052166[m
+Author: Param Mehta <param.mehta95@gmail.com>
+Date:   Sun Feb 18 11:05:25 2018 -0700
+
+    TG-177 #ready-for-test
+
+[33mcommit 56ddbb5bf118e6b2dfd16a787a37ba140fdafac3[m
+Author: deepakhaldar <dhaldar@asu.edu>
+Date:   Fri Feb 16 21:34:02 2018 -0700
+
+    #159
+    
+    Updated Storage Array
+
+[33mcommit 18603a8a1c617284a898f65018f47bd28131d2cd[m
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Fri Feb 16 21:29:55 2018 -0700
+
+    success handling in a common function
+
+[33mcommit 5649805f3898a6ca87af215193681b92f134c1d2[m
+Merge: 34fa080 3fe1dc4
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Fri Feb 16 21:18:28 2018 -0700
+
+    Merge branch 'master' into edit-event
+
+[33mcommit 3fe1dc4e6048445c92625e3211fb3384c2ffbdfa[m
+Author: Aditya Nimbalkar <aditya.nimbalkar@asu.edu>
+Date:   Fri Feb 16 21:06:20 2018 -0700
+
+    TG-180 #closed
+    Included Refresh and closed event space after deletion.
+
+[33mcommit 2b03d9ad43f6d9457d283f78d55cda4c3e7b55ca[m
+Merge: 6f86e1f d9d7490
+Author: Aditya Nimbalkar <aditya.nimbalkar@asu.edu>
+Date:   Fri Feb 16 21:01:15 2018 -0700
+
+    Merge pull request #16 from melroyd16/Prevent-Edit/Delete
+    
+    Prevent edit delete
+
+[33mcommit d9d749048ffcf1cf456d26361f34d33b7625acb7[m
+Author: Aditya Nimbalkar <aditya.nimbalkar@asu.edu>
+Date:   Fri Feb 16 20:57:51 2018 -0700
+
+    TG-168 #closed
+
+[33mcommit 34fa0800feba9ab7e67fe643f4586f3f5889ac4f[m
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Fri Feb 16 20:52:17 2018 -0700
+
+    added success handler for deleting an event
+
+[33mcommit 3136655606ebe0e80a59edc85ac7f30c652230d0[m
+Author: deepakhaldar <dhaldar@asu.edu>
+Date:   Fri Feb 16 20:49:46 2018 -0700
+
+    Rectified Profile Page error
+
+[33mcommit 0e8beae1012d26f9e8956d8331b6d078b06996ef[m
+Author: deepakhaldar <dhaldar@asu.edu>
+Date:   Fri Feb 16 20:47:28 2018 -0700
+
+    #159
+    
+    Adding Multiple date selections for the user
+
+[33mcommit e00c93aa2d8fce6d8fac7c69ae45f9ef0b911537[m
+Author: Aditya Nimbalkar <aditya.nimbalkar@asu.edu>
+Date:   Fri Feb 16 20:21:02 2018 -0700
+
+    TG-168 #ready-for-test
+
+[33mcommit 6f86e1fcd1920d27ec4a623825361fccd95bce54[m
+Merge: 3b83b47 0ae0342
+Author: Aditya Nimbalkar <aditya.nimbalkar@asu.edu>
+Date:   Fri Feb 16 00:25:06 2018 -0700
+
+    Merge pull request #15 from melroyd16/Spinner-Loader
+    
+    Task 145 - Spinner loader
+
+[33mcommit 3b83b475c6cf8287c116f8526418f10f913031ef[m
+Merge: 4493fd1 5f050e3
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Fri Feb 16 00:14:20 2018 -0700
+
+    Merge pull request #14 from melroyd16/edit-event
+    
+    Edit event
+
+[33mcommit 5f050e3f69124b428f01d266fe32e2ed8e7c1e3d[m
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Fri Feb 16 00:13:35 2018 -0700
+
+    TG-152 implemented date validation
+
+[33mcommit 0ae03423263ba954003b4e45172ef82f183e875a[m
+Author: Aditya Nimbalkar <aditya.nimbalkar@asu.edu>
+Date:   Thu Feb 15 23:57:43 2018 -0700
+
+    TG-145 #closed
+
+[33mcommit f83a0a34e910ba4e3d93bdd92e7a4e3a3b0b2d91[m
+Author: Aditya Nimbalkar <aditya.nimbalkar@asu.edu>
+Date:   Thu Feb 15 20:39:53 2018 -0700
+
+    TG-145 #ready-for-test
+    Test commit to move task in taiga
+
+[33mcommit ed5f4fe7063381cf3b209553da8e1caaf254f3a8[m
+Author: Aditya Nimbalkar <aditya.nimbalkar@asu.edu>
+Date:   Thu Feb 15 20:11:20 2018 -0700
+
+    TG-145 #ready-for-test
+
+[33mcommit 2caa8ad982945683babd3bde9e9db8160eb08498[m
+Author: Aditya Nimbalkar <aditya.nimbalkar@asu.edu>
+Date:   Thu Feb 15 17:48:14 2018 -0700
+
+    TG-145 #in-progress
+
+[33mcommit 4493fd111b63078a1ba7904285b554e962fb731b[m
+Merge: 2a9a54d ee013a8
+Author: Alfred Gonsalves <alfredfgonsalves@gmail.com>
+Date:   Thu Feb 15 16:19:45 2018 -0700
+
+    Merge pull request #13 from melroyd16/conflict_return_packet
+    
+    Conflict return packet created and sent correctly
+
+[33mcommit ee013a88a6705741b777d15e406f03725b6429ce[m
+Author: Alfred Gonsalves <agonsal2@asu.edu>
+Date:   Thu Feb 15 16:14:29 2018 -0700
+
+    TG-165 #closed
+    Modified code for checking walking/biking distance.
+    Completed testing for return packet on various test cases.
+
+[33mcommit 90affb1256fee71d1136601b84c25bfe7d1f3448[m
+Author: deepakhaldar <dhaldar@asu.edu>
+Date:   Wed Feb 14 20:39:24 2018 -0700
+
+    #159
+    
+    Creating the modal for the recurring events.
+
+[33mcommit 8e95317104d8c8cc77f14fcb552bc3bb45bbd8bb[m
+Author: Alfred Gonsalves <agonsal2@asu.edu>
+Date:   Wed Feb 14 19:16:42 2018 -0700
+
+    TG-165 #ready-for-test
+    Return packet on conflict meeting is ready for testing.
+
+[33mcommit efb411108d7946b45a0b98bdfb8248cc9fb58558[m
+Author: Alfred Gonsalves <agonsal2@asu.edu>
+Date:   Wed Feb 14 19:10:17 2018 -0700
+
+    TS-165 #ready-for-test
+    Created an object with code reference for conflicting meetings and the reason for the conflict.
+
+[33mcommit 089b153a937488858eb1c37f4768acc9dd37be65[m
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Tue Feb 13 16:14:12 2018 -0700
+
+    TG-96 #closed
+
+[33mcommit 2a9a54dc5aa4158911e41a5ca55792865a952817[m
+Merge: 53db5ec 985b385
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Tue Feb 13 15:45:36 2018 -0700
+
+    Merge pull request #12 from melroyd16/edit-event
+    
+    Edit event
+
+[33mcommit 985b385c89aedfbd90adc11617eb652dcfd2a3bd[m
+Merge: 1b459fe 53db5ec
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Tue Feb 13 15:41:15 2018 -0700
+
+    Merge branch 'master' of https://github.com/melroyd16/angular-travlendar into edit-event
+
+[33mcommit 1b459fe7d1575c3ee2bcc2903ee499e548d8b855[m
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Tue Feb 13 15:39:27 2018 -0700
+
+    Task #152: integrated selection of "Other Location"
+    
+    allowing the user to input a different origin location and calling the
+    google distance matrix API according to the location entered
+
+[33mcommit 53db5ecab6dc73e1ffb6e05bff824d3786d1c915[m
+Merge: 6eddb60 afab348
+Author: Alfred Gonsalves <alfredfgonsalves@gmail.com>
+Date:   Tue Feb 13 12:37:05 2018 -0700
+
+    Merge pull request #11 from melroyd16/conflict_return_packet
+    
+    Task #165 - Created a structure to return to front end
+
+[33mcommit afab3489d2fdc688ac3b5be2fcbf9a1c82f59583[m
+Author: Alfred Gonsalves <agonsal2@asu.edu>
+Date:   Tue Feb 13 12:33:45 2018 -0700
+
+    Task #165 - Created a structure to return to front end
+    Needs work from front end to change the errorMessage check
+
+[33mcommit 6eddb60ab978c48741ea9f60e1fbcaa7860978cf[m
+Merge: bff3ca3 7ea4b3a
+Author: Alfred Gonsalves <alfredfgonsalves@gmail.com>
+Date:   Tue Feb 13 12:19:04 2018 -0700
+
+    Merge pull request #10 from melroyd16/lambda_user_distance
+    
+    Lambda user distance
+
+[33mcommit 7ea4b3aca174d492a001bad80cd7fa42ce12b2de[m
+Author: Alfred Gonsalves <agonsal2@asu.edu>
+Date:   Mon Feb 12 13:43:18 2018 -0700
+
+    Taiga task #121 #127 #148
+    Renamed meeting_events to travlendarEvents.js for better code readability
+    Added code for checking user preferred walking/biking distance in the day
+
+[33mcommit 7b55380e40b380cd69502a5aef304b789fda3fd7[m
+Author: Alfred Gonsalves <agonsal2@asu.edu>
+Date:   Mon Feb 12 13:39:01 2018 -0700
+
+    test commit
+
+[33mcommit 2dc00cdce23b3878480b1dd9d4fe43879949737a[m
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Fri Feb 9 09:41:36 2018 -0700
+
+    displaying success message and fetching new distance matrix if previous location is changed
+
+[33mcommit bff3ca310b9cdd2988be62ae10eb3015ba42fbd1[m
+Author: Mehul Shah <mehul_shah_19@live.com>
+Date:   Thu Feb 8 23:06:42 2018 -0700
+
+    Buld the logic of considering the time from previous meeting location and next meeting location.
+
+[33mcommit 2adbd6cb4a97a48b713beb5425e8f20ad97551fb[m
+Author: Aditya Nimbalkar <aditya.nimbalkar@asu.edu>
+Date:   Thu Feb 8 21:31:32 2018 -0700
+
+    Refactoring/ Minor Changes
+
+[33mcommit 27c5ef2000474ee12ab7e948b7c84d8c3e1c26d3[m
+Merge: 10c3bfe 6501af8
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Thu Feb 8 21:22:14 2018 -0700
+
+    Merge pull request #8 from melroyd16/validation
+    
+    Task #130 Add Event Form Validation : merging with master
+
+[33mcommit 6501af89722295faf8a05f38dc77a6810a3bad0d[m
+Author: Aditya Nimbalkar <aditya.nimbalkar@asu.edu>
+Date:   Thu Feb 8 21:17:58 2018 -0700
+
+    Task #130 Add Event Form Validation
+
+[33mcommit 10c3bfeacca7a4dab389f13420824591850a58e1[m
+Merge: 5740e53 fcce382
+Author: Mehul Shah <mehul_shah_19@live.com>
+Date:   Thu Feb 8 17:51:37 2018 -0700
+
+    Merge branch 'master' of https://github.com/melroyd16/angular-travlendar
+
+[33mcommit fcce382f1c4e5646bb6f7821ede5a033d26b1a79[m
+Author: Aditya Nimbalkar <aditya.nimbalkar@asu.edu>
+Date:   Thu Feb 8 17:16:34 2018 -0700
+
+    Task #133, 135 - Changed CalendarEvent type to any
+
+[33mcommit f0b4170b7bacb5c182ddaf43856e9b8464785d50[m
+Merge: 4350b6e d29eccb
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Thu Feb 8 16:49:31 2018 -0700
+
+    Merge pull request #7 from melroyd16/deletebranch
+    
+    merging after resolving conflicts
+
+[33mcommit d29eccbae8fc7dff34dd33c7d4fa2166ac0ad9a0[m
+Merge: be0454c 4350b6e
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Thu Feb 8 16:49:02 2018 -0700
+
+    Merge branch 'master' into deletebranch
+
+[33mcommit be0454ccf3ed9f4013a4869cb7efeaaadeb5acbd[m
+Author: Aditya Nimbalkar <aditya.nimbalkar@asu.edu>
+Date:   Thu Feb 8 16:17:23 2018 -0700
+
+    delete
+
+[33mcommit 4350b6ecf0d88765513bdfdb2ecdfae61e9e20e6[m
+Author: deepakhaldar <dhaldar@asu.edu>
+Date:   Thu Feb 8 16:09:28 2018 -0700
+
+    Minor changes in user profile
+
+[33mcommit f4f3127dfca53eea28443010b964550e910764c8[m
+Merge: 1873f36 308242c
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Thu Feb 8 16:01:56 2018 -0700
+
+    Merge branch 'schedule-event-ui'
+
+[33mcommit 308242c7161297a5371ceeb6cf6e973d82e27cf0[m
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Thu Feb 8 15:43:20 2018 -0700
+
+    clearing UI modal values after saving event
+
+[33mcommit 1873f363c9c15191b64d60a5e29e152066e10988[m
+Author: deepakhaldar <dhaldar@asu.edu>
+Date:   Thu Feb 8 15:11:13 2018 -0700
+
+    Updated set User Details functions
+
+[33mcommit 8bae131d17ca3bc23c75db4090c19af464bdd4e5[m
+Merge: 47d491a 2faad0d
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Thu Feb 8 14:44:55 2018 -0700
+
+    Merge pull request #5 from melroyd16/Profile
+    
+    Merging Profile branch with master
+
+[33mcommit 2faad0df0125f3b38fb733eea2eeab3f283cd9e3[m
+Author: deepakhaldar <dhaldar@asu.edu>
+Date:   Thu Feb 8 14:42:30 2018 -0700
+
+    Updated the init function for Profile page.
+
+[33mcommit 47d491a1a7d0bc2f442faf417823ced944ef9ca3[m
+Merge: f327ce6 c846bf8
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Thu Feb 8 13:18:40 2018 -0700
+
+    Merge pull request #4 from melroyd16/schedule-event-ui
+    
+    success and error handling of adding an event
+
+[33mcommit c846bf8252ff5042f58541784eb096cb3f8bef6f[m
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Thu Feb 8 13:16:39 2018 -0700
+
+    success and error handling of adding an event
+
+[33mcommit f327ce675a0d1406066f22965b9db796fde71581[m
+Merge: 3e9b7ea 7414330
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Thu Feb 8 11:46:46 2018 -0700
+
+    Merge pull request #3 from melroyd16/schedule-event-ui
+    
+    Schedule event ui
+
+[33mcommit 7414330e1d8fe6b37f6643e781b1a8049c654991[m
+Merge: c68b843 3e9b7ea
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Thu Feb 8 11:46:13 2018 -0700
+
+    Merge branch 'master' into schedule-event-ui
+
+[33mcommit c68b8434167b72a74f52b508adfb237d6bd35a10[m
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Thu Feb 8 11:39:27 2018 -0700
+
+    scheduling a meeting UI done
+    
+    added google distance matrix API and integrated UI with API
+
+[33mcommit 3d3fc71f0b9b7156942fcc4d6f8eba0e7699a0fa[m
+Author: deepakhaldar <dhaldar@asu.edu>
+Date:   Thu Feb 8 00:56:10 2018 -0700
+
+    Backend code for User preference
+    
+    Saving the user preferred walking, cycling distance and mode of
+    transport.
+
+[33mcommit c1a88a31014c38851457843209159a545647d1be[m
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Wed Feb 7 20:36:36 2018 -0700
+
+    fix for address not getting loaded
+
+[33mcommit 2fe24a11cbfeea973fe96165ad9372ea58dc7cba[m
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Wed Feb 7 20:04:19 2018 -0700
+
+    fixed web pack building issues and added event origin input field
+
+[33mcommit c86ab5dcef534ba41421ddd7fddb36e148c1312a[m
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Wed Feb 7 17:21:55 2018 -0700
+
+    Added Date pickers and google place autocomplete
+    
+    Added Datetime pickers and destination address input for the schedule
+    event modal
+
+[33mcommit 3e9b7ea8f70aa5fbbdcf06088c3e9d3d0f54b76e[m
+Author: Param Mehta <param.mehta95@gmail.com>
+Date:   Wed Feb 7 12:05:13 2018 -0700
+
+    Time Range Slider and Travel Checkbox
+
+[33mcommit 9a22e7ab11a0d071567829800dc5004a86daad11[m
+Merge: 5b56261 5041f21
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Tue Feb 6 19:29:36 2018 -0700
+
+    Merge branch 'master' of https://github.com/melroyd16/angular-travlendar
+
+[33mcommit 5b562611c9d3d31ff70de5874605244d7b0244f3[m
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Tue Feb 6 19:29:06 2018 -0700
+
+    changing TS types
+
+[33mcommit 5041f21aece49f5a7c2514b39af1b94136c3816b[m
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Tue Feb 6 19:10:47 2018 -0700
+
+    Revert "Merge pull request #1 from melroyd16/param"
+    
+    This reverts commit b2c9bb47df5d18059c17d40947024fb7628ca53b, reversing
+    changes made to 0036a697d62916fa59b227f92eca2814c2c9db25.
+
+[33mcommit 5740e53c8cde65e87bacde51549cf95f92aea742[m
+Merge: a8548d9 b2c9bb4
+Author: Mehul Shah <mehul_shah_19@live.com>
+Date:   Tue Feb 6 18:32:50 2018 -0700
+
+    Merge branch 'master' of https://github.com/melroyd16/angular-travlendar
+
+[33mcommit a8548d90fbfaa5e29cf8c62b016b0aca1f6f0896[m
+Author: Mehul Shah <mehul_shah_19@live.com>
+Date:   Tue Feb 6 18:32:45 2018 -0700
+
+    Added Conflict function with previous and next meeting location consider
+
+[33mcommit b2c9bb47df5d18059c17d40947024fb7628ca53b[m
+Merge: 0036a69 89cbc17
+Author: Param Mehta <psmehta@asu.edu>
+Date:   Tue Feb 6 17:56:38 2018 -0700
+
+    Merge pull request #1 from melroyd16/param
+    
+    Param
+
+[33mcommit 89cbc179a19ab3c0570ddb0b17e651263b6a20c1[m
+Author: Param Mehta <param.mehta95@gmail.com>
+Date:   Tue Feb 6 17:47:00 2018 -0700
+
+    Changes to Profile Page
+
+[33mcommit 0036a697d62916fa59b227f92eca2814c2c9db25[m
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Sun Feb 4 23:36:08 2018 -0700
+
+    added functionality for fetching user events onto the calendar
+
+[33mcommit ee0751a91df7113d747dd97c0e43cff82c637c59[m
+Author: Mehul Shah <mehul_shah_19@live.com>
+Date:   Fri Feb 2 11:31:01 2018 -0700
+
+    Integrated API with the current save meeting events
+
+[33mcommit 10bbd1f55656ca0fc6224f1d9782f5bf99824caa[m
+Author: Mehul Shah <mehul_shah_19@live.com>
+Date:   Thu Feb 1 17:58:19 2018 -0700
+
+    Added options to add multiple origin and destination location
+
+[33mcommit f80320ad9637cbf41f58cee308e32418192d8de4[m
+Author: Param Mehta <param.mehta95@gmail.com>
+Date:   Thu Jan 25 20:00:36 2018 -0700
+
+    Changes to Profile Page
+
+[33mcommit b1f6745dabb4b5a51e7df803889b7b5968b5f95b[m
+Author: Param Mehta <param.mehta95@gmail.com>
+Date:   Thu Jan 25 19:58:31 2018 -0700
+
+    Changes to Profile Page
+
+[33mcommit 4816c82cb97b8633bfb836e5c4f8ee3909b4800e[m
+Author: Melroy Dmello <m_dmello@live.com>
+Date:   Thu Jan 25 15:35:55 2018 -0700
+
+    initial commit
+    
+    added authentication and calendar layout
