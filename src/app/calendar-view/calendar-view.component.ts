@@ -92,6 +92,8 @@ export class CalendarViewComponent implements OnInit {
   locationTypes = ['home', 'work', 'prior event location', 'other'];
   selectedPriorLocation = 'home';
   travelModeArray = [];
+  payloadArray=[];
+  repeatPayload: any;
   datesArray = [];
   deleteEventId = '';
   ifSelected = false;
@@ -283,11 +285,8 @@ export class CalendarViewComponent implements OnInit {
   }
 
   saveEvent(): void {
-
     this.eventPayload = Object.assign({}, this.event);
-    console.log(this.profileService.userProfile);
     if (this.profileService.userProfile.lunchStartTime && this.profileService.userProfile.lunchStartTime !== 'Not Set') {
-      console.log(this.profileService.userProfile.lunchStartTime);
       this.lunchStart = this.setDateObject(this.lunchStart, this.event.eventStart, this.profileService.userProfile.lunchStartTime);
       this.lunchEnd = this.setDateObject(this.lunchEnd, this.event.eventStart, this.profileService.userProfile.lunchEndTime);
       this.eventPayload.lunchStart = new Date(this.lunchStart).getTime();
@@ -299,14 +298,12 @@ export class CalendarViewComponent implements OnInit {
       this.eventPayload.dinnerStart = new Date(this.dinnerStart).getTime();
       this.eventPayload.dinnerEnd = new Date(this.dinnerEnd).getTime();
     }
-
-    this.eventPayload.eventStart = new Date(this.eventPayload.eventStart).getTime();
-    this.eventPayload.eventEnd = new Date(this.eventPayload.eventEnd).getTime();
+    this.eventPayload.eventStart = new Date(this.event.eventStart).getTime();
+    this.eventPayload.eventEnd = new Date(this.event.eventEnd).getTime();
 
     if (this.event.isRepeat) {
       this.eventPayload.repeatMax = new Date(this.eventPayload.repeatMax).getTime();
     }
-
     this.difference = this.eventPayload.eventEnd - this.eventPayload.eventStart;
     for (let i = 0; i < this.travelModeArray.length; i++) {
       if (this.eventPayload.travelMode === this.travelModeArray[i].mode) {
@@ -317,7 +314,6 @@ export class CalendarViewComponent implements OnInit {
         };
       }
     }
-
     this.eventsService.saveEvent(this.eventPayload, this.forceSaveEvent, this.eventType, this.event.id).subscribe((data) => {
       if (data.errorMessage) {
         switch (data.errorMessage.code) {
@@ -416,13 +412,13 @@ export class CalendarViewComponent implements OnInit {
     if (this.event.repeatPreference) {
       switch (this.event.repeatPreference) {
         case 'Daily':
-          const i = this.event.eventStart;
+          let i = this.event.eventStart;
           while (i < this.event.repeatMax) {
             this.datesArray.push(new Date(i.setDate(i.getDate() + 1)));
           }
           break;
         case 'Weekly':
-          const j = this.event.eventStart;
+          let j = this.event.eventStart;
           j.setDate(j.getDate() + 7);
           while (j < this.event.repeatMax) {
             this.datesArray.push(new Date(j));
@@ -440,18 +436,20 @@ export class CalendarViewComponent implements OnInit {
       let i = 0;
       let count = 0;
       while (i < this.datesArray.length) {
-        this.eventPayload.eventStart = new Date(this.datesArray[i]).getTime();
-        this.eventPayload.eventEnd = this.eventPayload.eventStart + this.difference;
+        this.payloadArray[i]= Object.assign({}, this.event);
+        this.payloadArray[i].eventStart = new Date(this.datesArray[i]).getTime();
+        this.payloadArray[i].eventEnd = this.payloadArray[i].eventStart + this.difference;
         if (this.profileService.userProfile.lunchStartTime && this.profileService.userProfile.lunchStartTime != 'Not Set') {
-          this.eventPayload.lunchStart = this.setDateObject(this.lunchStart, this.datesArray[i], this.profileService.userProfile.lunchStartTime).getTime();
-          this.eventPayload.lunchEnd = this.setDateObject(this.lunchEnd, this.datesArray[i], this.profileService.userProfile.lunchEndTime).getTime();
+          this.payloadArray[i].lunchStart = this.setDateObject(this.lunchStart, this.datesArray[i], this.profileService.userProfile.lunchStartTime).getTime();
+          this.payloadArray[i].lunchEnd = this.setDateObject(this.lunchEnd, this.datesArray[i], this.profileService.userProfile.lunchEndTime).getTime();
         }
         if (this.profileService.userProfile.dinnerStartTime && this.profileService.userProfile.dinnerStartTime != 'Not Set') {
-          this.eventPayload.dinnerStart = this.setDateObject(this.dinnerStart, this.datesArray[i], this.profileService.userProfile.dinnerStartTime).getTime();
-          this.eventPayload.dinnerEnd = this.setDateObject(this.dinnerEnd, this.datesArray[i], this.profileService.userProfile.dinnerEndTime).getTime();
+          this.payloadArray[i].dinnerStart = this.setDateObject(this.dinnerStart, this.datesArray[i], this.profileService.userProfile.dinnerStartTime).getTime();
+          this.payloadArray[i].dinnerEnd = this.setDateObject(this.dinnerEnd, this.datesArray[i], this.profileService.userProfile.dinnerEndTime).getTime();
         }
         this.displayModalSave = true;
-        this.eventsService.saveEvent(this.eventPayload, this.forceSaveEvent, 'save', this.event.id).subscribe((data) => {
+        console.log(i);
+        this.eventsService.saveEvent(this.payloadArray[i], this.forceSaveEvent, 'save', this.event.id).subscribe((data) => {
           count++;
           if (data.errorMessage) {
             switch (data.errorMessage.code) {
