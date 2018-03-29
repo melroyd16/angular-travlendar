@@ -201,6 +201,12 @@ export class ProfileComponent implements OnInit {
     if (this.lunchEndTime == null) {
       this.lunchEndTime = '03:00pm';
     }
+    if (this.dinnerStartTime == null) {
+      this.dinnerStartTime = '06:00pm';
+    }
+    if (this.dinnerEndTime == null) {
+      this.dinnerEndTime = '10:00pm';
+    }
 
     this.profileService.saveUserProfile(this.homeLocation, this.workLocation, this.walking,
       this.bicycling, this.travelMode, this.lunchStartTime, this.lunchEndTime, this.dinnerStartTime,
