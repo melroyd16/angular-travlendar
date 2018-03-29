@@ -1,9 +1,9 @@
-import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
-import { Router } from '@angular/router';
-import { UserLoginService } from '../services/user-login.service';
-import { ProfileService } from './shared/profile.service';
-import { IonRangeSliderComponent } from 'ng2-ion-range-slider';
-import { Location } from '../classes/location';
+import {Component, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
+import {Router} from '@angular/router';
+import {UserLoginService} from '../services/user-login.service';
+import {ProfileService} from './shared/profile.service';
+import {IonRangeSliderComponent} from 'ng2-ion-range-slider';
+import {Location} from '../classes/location';
 
 
 @Component({
@@ -79,8 +79,8 @@ export class ProfileComponent implements OnInit {
   walking = 0;
   bicycling = 0;
 
-  advancedSlider1 = { name: 'Lunch Slider', onUpdate: undefined, onFinish: undefined };
-  advancedSlider = { name: 'Dinner Slider', onUpdate: undefined, onFinish: undefined };
+  advancedSlider1 = {name: 'Lunch Slider', onUpdate: undefined, onFinish: undefined};
+  advancedSlider = {name: 'Dinner Slider', onUpdate: undefined, onFinish: undefined};
 
   // User preferred mode checkboxes
   walk = true;
@@ -145,42 +145,43 @@ export class ProfileComponent implements OnInit {
   }
 
   ngOnInit() {
-      this.profileService.fetchUserProfile().subscribe((data) => {
-        if (data.Item) {
-          this.homeLocation = this.profileService.userProfile.homeLocation;
-          this.workLocation = this.profileService.userProfile.workLocation;
-          this.homeLocationText = this.profileService.userProfile.homeLocation.formatted_address;
-          this.workLocationText = this.profileService.userProfile.workLocation.formatted_address;
-          if(data.Item.lunchTime){
-            this.lunchStart = this.mapLunchTime.get(data.Item.lunchTime.start_time);
-            this.lunchEnd = this.mapLunchTime.get(data.Item.lunchTime.end_time);
-            this.lunchStartTime = data.Item.lunchTime.start_time;
-            this.lunchEndTime = data.Item.lunchTime.end_time;
-          }
-          if(data.Item.dinnerTime){
-            this.dinnerStart = this.mapDinnerTime.get(data.Item.dinnerTime.start_time);
-            this.dinnerEnd = this.mapDinnerTime.get(data.Item.dinnerTime.end_time);
-            this.dinnerStartTime = data.Item.dinnerTime.start_time;
-            this.dinnerEndTime = data.Item.dinnerTime.end_time;
-          }
-
-          if (data.Item.walkingDistance) {
-            this.profileService.setUserDetails(data.Item.lunchTime.start_time, data.Item.lunchTime.end_time, data.Item.dinnerTime.start_time,
-              data.Item.dinnerTime.end_time, data.Item.walkingDistance, data.Item.bicyclingDistance, data.Item.preferredMode);
-            this.walking = this.profileService.userProfile.walkingDistance;
-            this.bicycling = this.profileService.userProfile.bicyclingDistance;
-            this.travelMode = this.profileService.userProfile.preferredMode;
-            this.lunchStartTime = this.profileService.userProfile.lunchStartTime;
-            this.lunchEndTime = this.profileService.userProfile.lunchEndTime;
-            this.dinnerStartTime = this.profileService.userProfile.dinnerStartTime;
-            this.dinnerEndTime = this.profileService.userProfile.dinnerEndTime;
-            this.walk = this.travelMode.indexOf('walking') > -1;
-            this.drive = this.travelMode.indexOf('driving') > -1;
-            this.cycle = this.travelMode.indexOf('bicycling') > -1;
-            this.trans = this.travelMode.indexOf('transit') > -1;
-          }
+    this.profileService.fetchUserProfile().subscribe((data) => {
+      if (data.Item) {
+        this.homeLocation = this.profileService.userProfile.homeLocation;
+        this.workLocation = this.profileService.userProfile.workLocation;
+        this.homeLocationText = this.profileService.userProfile.homeLocation.formatted_address;
+        this.workLocationText = this.profileService.userProfile.workLocation.formatted_address;
+        if (data.Item.lunchTime) {
+          this.lunchStart = this.mapLunchTime.get(data.Item.lunchTime.start_time);
+          this.lunchEnd = this.mapLunchTime.get(data.Item.lunchTime.end_time);
+          this.lunchStartTime = data.Item.lunchTime.start_time;
+          this.lunchEndTime = data.Item.lunchTime.end_time;
         }
-      });
+        if (data.Item.dinnerTime) {
+          this.dinnerStart = this.mapDinnerTime.get(data.Item.dinnerTime.start_time);
+          this.dinnerEnd = this.mapDinnerTime.get(data.Item.dinnerTime.end_time);
+          this.dinnerStartTime = data.Item.dinnerTime.start_time;
+          this.dinnerEndTime = data.Item.dinnerTime.end_time;
+        }
+
+        if (data.Item.walkingDistance) {
+          this.profileService.setUserDetails(data.Item.lunchTime.start_time, data.Item.lunchTime.end_time,
+            data.Item.dinnerTime.start_time, data.Item.dinnerTime.end_time, data.Item.walkingDistance,
+            data.Item.bicyclingDistance, data.Item.preferredMode);
+          this.walking = this.profileService.userProfile.walkingDistance;
+          this.bicycling = this.profileService.userProfile.bicyclingDistance;
+          this.travelMode = this.profileService.userProfile.preferredMode;
+          this.lunchStartTime = this.profileService.userProfile.lunchStartTime;
+          this.lunchEndTime = this.profileService.userProfile.lunchEndTime;
+          this.dinnerStartTime = this.profileService.userProfile.dinnerStartTime;
+          this.dinnerEndTime = this.profileService.userProfile.dinnerEndTime;
+          this.walk = this.travelMode.indexOf('walking') > -1;
+          this.drive = this.travelMode.indexOf('driving') > -1;
+          this.cycle = this.travelMode.indexOf('bicycling') > -1;
+          this.trans = this.travelMode.indexOf('transit') > -1;
+        }
+      }
+    });
   }
 
   selectAddress(place: any, location: string) {
@@ -194,12 +195,20 @@ export class ProfileComponent implements OnInit {
   }
 
   saveUserProfile(): void {
+    if (this.lunchStartTime == null) {
+      this.lunchStartTime = '11:00am';
+    }
+    if (this.lunchEndTime == null) {
+      this.lunchEndTime = '03:00pm';
+    }
+
     this.profileService.saveUserProfile(this.homeLocation, this.workLocation, this.walking,
       this.bicycling, this.travelMode, this.lunchStartTime, this.lunchEndTime, this.dinnerStartTime,
       this.dinnerEndTime).subscribe((data) => {
-        this.profileService.setUserDetails(this.lunchStartTime,this.lunchEndTime, this.dinnerStartTime, this.dinnerEndTime, this.walking, this.bicycling,
-          this.travelMode);
-      });
+      this.profileService.setUserDetails(this.lunchStartTime, this.lunchEndTime, this.dinnerStartTime,
+        this.dinnerEndTime, this.walking, this.bicycling,
+        this.travelMode);
+    });
   }
 
   update(slider, event) {
