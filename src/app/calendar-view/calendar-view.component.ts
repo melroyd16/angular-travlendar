@@ -95,6 +95,7 @@ export class CalendarViewComponent implements OnInit {
   payloadArray=[];
   repeatPayload: any;
   datesArray = [];
+  editArray = []
   deleteEventId = '';
   ifSelected = false;
   difference: any;
@@ -220,6 +221,7 @@ export class CalendarViewComponent implements OnInit {
     this.eventType = 'save';
     this.travelModeArray = [];
     this.datesArray = [];
+    this.editArray = [];
     this.otherLocationDetails = new Location();
     this.eventsService.fetchEvents().subscribe((eventList) => {
       this.eventsLoaded = true;
@@ -287,13 +289,13 @@ export class CalendarViewComponent implements OnInit {
   saveEvent(): void {
 
     this.eventPayload = Object.assign({}, this.event);
-    if (this.profileService.userProfile.lunchStartTime && this.profileService.userProfile.lunchStartTime !== 'Not Set') {
+    if (this.profileService.userProfile.lunchStartTime && this.profileService.userProfile.lunchStartTime !== 'Not_Set') {
       this.lunchStart = this.setDateObject(this.lunchStart, this.event.eventStart, this.profileService.userProfile.lunchStartTime);
       this.lunchEnd = this.setDateObject(this.lunchEnd, this.event.eventStart, this.profileService.userProfile.lunchEndTime);
       this.eventPayload.lunchStart = new Date(this.lunchStart).getTime();
       this.eventPayload.lunchEnd = new Date(this.lunchEnd).getTime();
     }
-    if (this.profileService.userProfile.dinnerStartTime && this.profileService.userProfile.dinnerStartTime !== 'Not Set') {
+    if (this.profileService.userProfile.dinnerStartTime && this.profileService.userProfile.dinnerStartTime !== 'Not_Set') {
       this.dinnerStart = this.setDateObject(this.dinnerStart, this.event.eventStart, this.profileService.userProfile.dinnerStartTime);
       this.dinnerEnd = this.setDateObject(this.dinnerEnd, this.event.eventStart, this.profileService.userProfile.dinnerEndTime);
       this.eventPayload.dinnerStart = new Date(this.dinnerStart).getTime();
@@ -361,10 +363,11 @@ export class CalendarViewComponent implements OnInit {
             case 'Future Repeated Events(Including this event)':
               for (let i = 0; i < this.events.length; i++){
                 if (this.events[i].id === this.event.id) {
-                    this.checkFutureRepeatedEvents(this.events[i]);
+                    this.editArray = this.checkFutureRepeatedEvents(this.events[i]);
                     break;
                   }
                 }
+                //this.saveEditEvents(this.editArray, this.event);
                 break;
             case 'All Repeated Events':
               // for (let i = 0; i < this.events.length; i++){
@@ -425,18 +428,87 @@ export class CalendarViewComponent implements OnInit {
     this.fetchEvents();
   }
 
-  checkFutureRepeatedEvents(event: any) : void{
-      console.log(event);
+  checkFutureRepeatedEvents(event: any) : any[]{
+      let editArray = [];
       for (let i = 0; i < this.events.length; i++){
         if( this.events[i].id !== event.id &&
             this.events[i].title == event.title &&
             this.events[i].origin.place_id === event.origin.place_id  &&
             this.events[i].destination.place_id === event.destination.place_id &&
-            this.events[i].isRepeat
-        ){
-              console.log(this.events[i].start);
+            this.events[i].isRepeat){
+              if((event.repeatPreference == "Daily") &&
+              (new Date(this.events[i].start).getTime() - new Date(event.repeatMax).getTime()) < 86400000 &&
+              (new Date(this.events[i].start).getTime() - new Date(event.start).getTime()) % 86400000 == 0
+            ){
+                  editArray.push(this.events[i]);
+              }
+            }
+          }
+          return editArray;
+      }
+
+      saveEditEvents(events: any, event: any): void{
+
+        if (this.events.length > 0) {
+          let i = 0;
+          let count = 0;
+          while (i < events.length) {
+            if(event.repeatPreference == "Daily")
+            this.events[i].eventStart = new Date(this.events[i].eventStart).getTime();
+            this.payloadArray[i].eventEnd = this.payloadArray[i].eventStart + this.difference;
+            this.payloadArray[i].travelMode = this.eventPayload.travelMode;
+            this.payloadArray[i].repeatMax = this.eventPayload.repeatMax;
+            if (this.profileService.userProfile.lunchStartTime && this.profileService.userProfile.lunchStartTime != 'Not Set') {
+              this.payloadArray[i].lunchStart = this.setDateObject(this.lunchStart, this.datesArray[i], this.profileService.userProfile.lunchStartTime).getTime();
+              this.payloadArray[i].lunchEnd = this.setDateObject(this.lunchEnd, this.datesArray[i], this.profileService.userProfile.lunchEndTime).getTime();
+            }
+            if (this.profileService.userProfile.dinnerStartTime && this.profileService.userProfile.dinnerStartTime != 'Not Set') {
+              this.payloadArray[i].dinnerStart = this.setDateObject(this.dinnerStart, this.datesArray[i], this.profileService.userProfile.dinnerStartTime).getTime();
+              this.payloadArray[i].dinnerEnd = this.setDateObject(this.dinnerEnd, this.datesArray[i], this.profileService.userProfile.dinnerEndTime).getTime();
+            }
+            this.displayModalSave = true;
+            this.eventsService.saveEvent(this.payloadArray[i], this.forceSaveEvent, 'save', this.event.id).subscribe((data) => {
+              count++;
+              if (data.errorMessage) {
+                switch (data.errorMessage.code) {
+                  case 1:
+                    this.scheduleModalError = 'Maximum daily walking distance of '
+                      + data.errorMessage.value + ' miles will be exceeded on the event starting at ' + new Date(data.errorMessage.startTime) +
+                      '. Click Save to proceed anyways.';
+                    break;
+                  case 2:
+                    this.scheduleModalError = 'Maximum daily bicycling distance of '
+                      + data.errorMessage.value + ' miles will be exceeded on the event starting at ' + new Date(data.errorMessage.startTime) +
+                      ' . Click Save to proceed anyways.';
+                    break;
+                  case 3:
+                    this.scheduleModalError = 'The event  starting at ' + new Date(data.errorMessage.startTime) +
+                      ' conflicts with another meeting. Click Save to proceed anyways.';
+                    break;
+                  case 4:
+                    this.scheduleModalError = 'The travel time for The event  starting at ' + new Date(data.errorMessage.startTime) + ' conflicts with event: '
+                      + data.errorMessage.value + '. Click Save to proceed anyways.';
+                    break;
+                }
+                $('#eventModal').modal('show');
+                this.displayModalError = true;
+                this.displayModalSave = false;
+                this.forceSaveEvent = true;
+              }
+              else {
+                this.eventPayload.id = data;
+                this.refresh.next();
+              }
+              if (count == this.datesArray.length) {
+                $('#eventModal').modal('hide');
+                this.initEvent();
+                this.displaySuccessMessage('All the Events have been edited successfully');
+              }
+            });
+            i++;
           }
         }
+
       }
 
   repeatCheck(event: any): void {
@@ -468,7 +540,7 @@ export class CalendarViewComponent implements OnInit {
       let count = 0;
       while (i < this.datesArray.length) {
         this.payloadArray[i]= Object.assign({}, this.event);
-        this.payloadArray[i].eventStart = new Date(this.datesArray[i]).getTime();
+        this.payloadArray[i].eventStart = new Date(this.event[i]).getTime();
         this.payloadArray[i].eventEnd = this.payloadArray[i].eventStart + this.difference;
         this.payloadArray[i].travelMode = this.eventPayload.travelMode;
         this.payloadArray[i].repeatMax = this.eventPayload.repeatMax;
@@ -661,8 +733,8 @@ export class CalendarViewComponent implements OnInit {
     const eventCopy: any = Object.assign({}, event);
     this.event.id = eventCopy.id;
     this.event.eventTitle = eventCopy.title;
-    this.event.eventStart = new Date(newStart).getTime();
-    this.event.eventEnd = new Date(newEnd).getTime();
+    this.event.eventStart = new Date(newStart);
+    this.event.eventEnd = new Date(newEnd);
     this.event.origin = eventCopy.origin;
     this.event.otherLocation = eventCopy.origin.formatted_address;
     this.event.destination = eventCopy.destination;
