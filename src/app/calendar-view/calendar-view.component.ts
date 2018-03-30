@@ -625,22 +625,25 @@ export class CalendarViewComponent implements OnInit {
     newStart,
     newEnd
   }: CalendarEventTimesChangedEvent): void {
-    const eventCopy: any = Object.assign({}, event);
-    this.event.id = eventCopy.id;
-    this.event.eventTitle = eventCopy.title;
+
     if(isPast(newStart)) {
       console.log("DRAGGED INTO PAST");
+      this.displaySuccessMessage('Cannot Drag Event Onto Past Date.');
     }
     else {
+      const eventCopy: any = Object.assign({}, event);
+      this.event.id = eventCopy.id;
+      this.event.eventTitle = eventCopy.title;
       this.event.eventStart = new Date(newStart);
       this.event.eventEnd = new Date(newEnd);
+      this.event.origin = eventCopy.origin;
+      this.event.otherLocation = eventCopy.origin.formatted_address;
+      this.event.destination = eventCopy.destination;
+      this.event.eventLocation = eventCopy.destination.formatted_address;
+      this.eventType = 'edit';
+      this.event.travelMode = eventCopy.travelMode;
+      this.saveEvent();
     }
-    this.event.origin = eventCopy.origin;
-    this.event.otherLocation = eventCopy.origin.formatted_address;
-    this.event.destination = eventCopy.destination;
-    this.event.eventLocation = eventCopy.destination.formatted_address;
-    this.eventType = 'edit';
-    this.event.travelMode = eventCopy.travelMode;
-    this.saveEvent();
+
   }
 }
