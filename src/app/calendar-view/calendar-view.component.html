@@ -82,7 +82,6 @@
           {{scheduleModalError}}
         </div>
         <form #eventForm="ngForm">
-
           <div class="form-group">
             <label for="eventTitle">Event Title</label>
             <input type="text" name="eventTitle" [(ngModel)]="event.eventTitle" class="form-control" id="eventTitle" placeholder="Enter event title" required name="eventTitle" #eventTitle="ngModel">
@@ -99,7 +98,7 @@
             </div>
             <div class="col-xs-12 col-md-6">
               <label for="eventEnd">Event End</label>
-              <input required name="eventEnd" [(ngModel)]="event.eventEnd" class="form-control" [owlDateTimeTrigger]="dtPicker2" [owlDateTime]="dtPicker2" [min]="event.eventStart" #dateTime="ngModel">
+              <input required name="eventEnd" [(ngModel)]="event.eventEnd" class="form-control" [owlDateTimeTrigger]="dtPicker2" [owlDateTime]="dtPicker2" [min]="event.eventStart" #dateTime="ngModel" (ngModelChange)="updateFlag()">
               <owl-date-time #dtPicker2></owl-date-time>
             </div>
           </div>
@@ -152,14 +151,25 @@
                 <option>Weekly</option>
             </select>
             <label for="repeatUntil">Repeat Until</label>
-            <input required name="Until" class="form-control" [owlDateTimeTrigger]="dt4" [owlDateTime]="dt4" [min]="eventStartMinDate" [max]="maxRepeatDate"  [(ngModel)]="event.repeatMax">
+            <input required name="Until" class="form-control" [owlDateTimeTrigger]="dt4" [owlDateTime]="dt4" [min]="event.eventEnd" [max]="maxRepeatDate"  [(ngModel)]="event.repeatMax">
             <owl-date-time [pickerType]="'calendar'" #dt4></owl-date-time>
           </div>
+          <div  class="col-xs-12 col-md-6" *ngIf="repeatEdit">
+            <label for="repeatSelect">Choose the Event(s) to be edited</label>
+            <select class="form-control" id="redit" name="repeatEdit" required [disabled]="!event.isRepeat" [(ngModel)]="event.repeatEditChoice">
+              <option>Current Event</option>
+              <option>Future Repeated Events(Including this event)</option>
+              <option>All Repeated Events</option>
+            </select>
+          </div>
         </form>
+        <div class="alert alert-success" role="alert" *ngIf="displayModalSave">
+          Your Events are being saved
+        </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="initEvent()">Close  </button>
-        <button type="button" class="btn btn-primary"  (click)="saveEvent()">Save</button>
+        <button type="button" class="btn btn-primary"   (click)="saveEvent()">Save</button>
       </div>
     </div>
   </div>

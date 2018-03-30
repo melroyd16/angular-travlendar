@@ -30,10 +30,10 @@ export class ProfileService {
     this.userProfile.walkingDistance = item.walkingDistance;
     this.userProfile.bicyclingDistance = item.bicyclingDistance;
     this.userProfile.preferredMode = item.preferredMode;
-    this.userProfile.lunchStartTime = item.lunchTime ? item.lunchTime.start_time : 'Not Set';
-    this.userProfile.lunchEndTime = item.lunchTime ? item.lunchTime.end_time : 'Not Set';
-    this.userProfile.dinnerStartTime = item.dinnerTime ? item.dinnerTime.start_time : 'Not Set';
-    this.userProfile.dinnerEndTime = item.dinnerTime ? item.dinnerTime.end_time : 'Not Set';
+    this.userProfile.lunchStartTime = item.lunchTime ? item.lunchTime.start_time : 'Not_Set';
+    this.userProfile.lunchEndTime = item.lunchTime ? item.lunchTime.end_time : 'Not_Set';
+    this.userProfile.dinnerStartTime = item.dinnerTime ? item.dinnerTime.start_time : 'Not_Set';
+    this.userProfile.dinnerEndTime = item.dinnerTime ? item.dinnerTime.end_time : 'Not_Set';
   }
 
   setLocationDetails(homeLocation: Location, workLocation: Location): void {
@@ -74,15 +74,15 @@ export class ProfileService {
     return this.centralAPIService.callAPI('profile', payload, 'post');
   }
 
-  setUserDetails(walkingDistance: number, bicyclingDistance: number,
+  setUserDetails(lunchStartTime: string, lunchEndTime: string, dinnerStartTime: string, dinnerEndTime: string,
+                 walkingDistance: number, bicyclingDistance: number,
     preferredModes: any[]): void {
     this.userProfile.walkingDistance = walkingDistance;
     this.userProfile.bicyclingDistance = bicyclingDistance;
     this.userProfile.preferredMode = preferredModes;
+    this.userProfile.lunchStartTime = lunchStartTime;
+    this.userProfile.lunchEndTime = lunchEndTime;
+    this.userProfile.dinnerStartTime = dinnerStartTime;
+    this.userProfile.dinnerEndTime = dinnerEndTime;
   }
-
-  // getUserProfile(): UserProfile {
-  //   console.log(this.userProfile);
-  //   return this.userProfile;
-  // }
 }
