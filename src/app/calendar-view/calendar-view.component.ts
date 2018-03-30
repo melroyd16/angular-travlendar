@@ -286,13 +286,13 @@ export class CalendarViewComponent implements OnInit {
 
   saveEvent(): void {
     this.eventPayload = Object.assign({}, this.event);
-    if (this.profileService.userProfile.lunchStartTime && this.profileService.userProfile.lunchStartTime !== 'Not Set') {
+    if (this.profileService.userProfile.lunchStartTime && this.profileService.userProfile.lunchStartTime !== 'Not_Set') {
       this.lunchStart = this.setDateObject(this.lunchStart, this.event.eventStart, this.profileService.userProfile.lunchStartTime);
       this.lunchEnd = this.setDateObject(this.lunchEnd, this.event.eventStart, this.profileService.userProfile.lunchEndTime);
       this.eventPayload.lunchStart = new Date(this.lunchStart).getTime();
       this.eventPayload.lunchEnd = new Date(this.lunchEnd).getTime();
     }
-    if (this.profileService.userProfile.dinnerStartTime && this.profileService.userProfile.dinnerStartTime !== 'Not Set') {
+    if (this.profileService.userProfile.dinnerStartTime && this.profileService.userProfile.dinnerStartTime !== 'Not_Set') {
       this.dinnerStart = this.setDateObject(this.dinnerStart, this.event.eventStart, this.profileService.userProfile.dinnerStartTime);
       this.dinnerEnd = this.setDateObject(this.dinnerEnd, this.event.eventStart, this.profileService.userProfile.dinnerEndTime);
       this.eventPayload.dinnerStart = new Date(this.dinnerStart).getTime();
@@ -628,8 +628,8 @@ export class CalendarViewComponent implements OnInit {
     const eventCopy: any = Object.assign({}, event);
     this.event.id = eventCopy.id;
     this.event.eventTitle = eventCopy.title;
-    this.event.eventStart = new Date(newStart).getTime();
-    this.event.eventEnd = new Date(newEnd).getTime();
+    this.event.eventStart = new Date(newStart);
+    this.event.eventEnd = new Date(newEnd);
     this.event.origin = eventCopy.origin;
     this.event.otherLocation = eventCopy.origin.formatted_address;
     this.event.destination = eventCopy.destination;
