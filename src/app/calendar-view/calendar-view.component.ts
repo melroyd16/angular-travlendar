@@ -285,6 +285,7 @@ export class CalendarViewComponent implements OnInit {
   }
 
   saveEvent(): void {
+
     this.eventPayload = Object.assign({}, this.event);
     if (this.profileService.userProfile.lunchStartTime && this.profileService.userProfile.lunchStartTime !== 'Not Set') {
       this.lunchStart = this.setDateObject(this.lunchStart, this.event.eventStart, this.profileService.userProfile.lunchStartTime);
@@ -312,6 +313,11 @@ export class CalendarViewComponent implements OnInit {
           distance: this.travelModeArray[i].value.distance,
           duration: this.travelModeArray[i].value.duration
         };
+      }
+    }
+    if(this.eventType=='edit' && this.event.isRepeat ){
+      if(this.event.repeatEditChoice == 'Current Event'){
+        this.eventPayload.isRepeat = false;
       }
     }
     this.eventsService.saveEvent(this.eventPayload, this.forceSaveEvent, this.eventType, this.event.id).subscribe((data) => {
@@ -353,9 +359,21 @@ export class CalendarViewComponent implements OnInit {
               this.editEvent(this.event);
               break;
             case 'Future Repeated Events(Including this event)':
-              break;
+              for (let i = 0; i < this.events.length; i++){
+                if (this.events[i].id === this.event.id) {
+                    this.checkFutureRepeatedEvents(this.events[i]);
+                    break;
+                  }
+                }
+                break;
             case 'All Repeated Events':
-              break;
+              // for (let i = 0; i < this.events.length; i++){
+              //   if (this.events[i].id === this.event.id) {
+              //       this.checkRepeatedEvents(this.events[i]);
+              //       break;
+              //     }
+              //   }
+              //     break;
             default:
               this.editEvent(this.event);
               break;
@@ -407,6 +425,19 @@ export class CalendarViewComponent implements OnInit {
     this.fetchEvents();
   }
 
+  checkFutureRepeatedEvents(event: any) : void{
+      console.log(event);
+      for (let i = 0; i < this.events.length; i++){
+        if( this.events[i].id !== event.id &&
+            this.events[i].title == event.title &&
+            this.events[i].origin.place_id === event.origin.place_id  &&
+            this.events[i].destination.place_id === event.destination.place_id &&
+            this.events[i].isRepeat
+        ){
+              console.log(this.events[i].start);
+          }
+        }
+      }
 
   repeatCheck(event: any): void {
     if (this.event.repeatPreference) {
@@ -439,6 +470,8 @@ export class CalendarViewComponent implements OnInit {
         this.payloadArray[i]= Object.assign({}, this.event);
         this.payloadArray[i].eventStart = new Date(this.datesArray[i]).getTime();
         this.payloadArray[i].eventEnd = this.payloadArray[i].eventStart + this.difference;
+        this.payloadArray[i].travelMode = this.eventPayload.travelMode;
+        this.payloadArray[i].repeatMax = this.eventPayload.repeatMax;
         if (this.profileService.userProfile.lunchStartTime && this.profileService.userProfile.lunchStartTime != 'Not Set') {
           this.payloadArray[i].lunchStart = this.setDateObject(this.lunchStart, this.datesArray[i], this.profileService.userProfile.lunchStartTime).getTime();
           this.payloadArray[i].lunchEnd = this.setDateObject(this.lunchEnd, this.datesArray[i], this.profileService.userProfile.lunchEndTime).getTime();
