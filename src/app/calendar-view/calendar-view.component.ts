@@ -628,8 +628,13 @@ export class CalendarViewComponent implements OnInit {
     const eventCopy: any = Object.assign({}, event);
     this.event.id = eventCopy.id;
     this.event.eventTitle = eventCopy.title;
-    this.event.eventStart = new Date(newStart);
-    this.event.eventEnd = new Date(newEnd);
+    if(isPast(newStart)) {
+      console.log("DRAGGED INTO PAST");
+    }
+    else {
+      this.event.eventStart = new Date(newStart);
+      this.event.eventEnd = new Date(newEnd);
+    }
     this.event.origin = eventCopy.origin;
     this.event.otherLocation = eventCopy.origin.formatted_address;
     this.event.destination = eventCopy.destination;
