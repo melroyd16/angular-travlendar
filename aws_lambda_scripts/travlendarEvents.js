@@ -550,47 +550,57 @@ exports.handler = (event, context, callback) => {
   function saveOrModifyEvents(status){
     // Adding eventLeaveTime Code
 
-    var aws = require('aws-sdk');
-    var lambda = new aws.Lambda({
-      region: 'us-west-2'
-    });
+    // var aws = require('aws-sdk');
+    // var lambda = new aws.Lambda({
+    //   region: 'us-west-2'
+    // });
 
+
+    // var eventLeaveTime = event.body.eventDetails.eventStart;
+
+    // params = {
+    //   "currentLocationOrigin": event.body.eventDetails.origin.place_id ,
+    //   "currentLocationDestination": event.body.eventDetails.destination.place_id,
+    //   "travelMode": event.body.eventDetails.travelMode.mode,
+    //   "currentMeetingStartTime": event.body.eventDetails.eventStart
+    // }
+    // lambda.invoke({
+    //   FunctionName: 'getLocationInformation',
+    //   Payload: JSON.stringify(params, null, null) // pass params
+    // }, function(error, data) {
+
+    //   if (error) {
+    //     console.log("Error in getting eventLeaveTime " + error);
+
+
+    //   }else{
+    //     console.log("EventLEaveTime API data");
+    //     console.log(data);
+
+    //     var jsonResult = JSON.parse(data['Payload']);
+
+    //     if(jsonResult != null && jsonResult['eventLeaveTime'] != null){
+    //       eventLeaveTime = jsonResult['eventLeaveTime']
+    //     }
+
+    //     }
+
+    //   if(status == 'new') {
+    //     saveEvent(eventLeaveTime)
+    //   }else{
+    //     saveModifiedEvent(eventLeaveTime)
+    //   }
+    // });
 
     var eventLeaveTime = event.body.eventDetails.eventStart;
-
-    params = {
-      "currentLocationOrigin": event.body.eventDetails.origin.place_id ,
-      "currentLocationDestination": event.body.eventDetails.destination.place_id,
-      "travelMode": event.body.eventDetails.travelMode.mode,
-      "currentMeetingStartTime": event.body.eventDetails.eventStart
+    if(event.body.eventDetails.travelMode.duration != null && event.body.eventDetails.travelMode.duration.value!= null ) {
+      eventLeaveTime = event.body.eventDetails.eventStart - event.body.eventDetails.travelMode.duration.value * 1000
     }
-    lambda.invoke({
-      FunctionName: 'getLocationInformation',
-      Payload: JSON.stringify(params, null, null) // pass params
-    }, function(error, data) {
-
-      if (error) {
-        console.log("Error in getting eventLeaveTime " + error);
-
-
-      }else{
-        console.log("EventLEaveTime API data");
-        console.log(data);
-
-        var jsonResult = JSON.parse(data['Payload']);
-
-        if(jsonResult != null && jsonResult['eventLeaveTime'] != null){
-          eventLeaveTime = jsonResult['eventLeaveTime']
-        }
-
-        }
-
-      if(status == 'new') {
-        saveEvent(eventLeaveTime)
-      }else{
-        saveModifiedEvent(eventLeaveTime)
-      }
-    });
+    if(status == 'new') {
+      saveEvent(eventLeaveTime)
+    }else{
+      saveModifiedEvent(eventLeaveTime)
+    }
 
     // if(status == 'new'){
     //   saveEvent();
@@ -1083,7 +1093,7 @@ exports.handler = (event, context, callback) => {
         case "editEvent":
           if(event.body.forceSaveEvent){
             saveOrModifyEvents("modified")
-         //   saveModifiedEvent();
+            //   saveModifiedEvent();
           } else {
             queryForFetchingNearMeetings("modified");
           }
