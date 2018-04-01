@@ -94,7 +94,7 @@ def getLocationInformation(event, context):
     print(event)
 
     if event is None:
-        return sendingResultValues(False, "")
+        return sendingResultValues(False, "", 0)
         # return result
 
     '''
@@ -134,10 +134,6 @@ def getLocationInformation(event, context):
     nextMeetingStartTime = 0
     nextMeetingEndTime = 0
 
-    if 'travelMode' in event and len(event['travelMode'].strip()) != 0:
-        travelMode = event['travelMode'].strip()
-    else:
-        return sendingResultValues(False, "")
 
     if 'currentLocationOrigin' in event and len(event['currentLocationOrigin'].strip()) != 0:
         currentLocationOrigin = "place_id:" + event['currentLocationOrigin'].strip()
@@ -157,31 +153,39 @@ def getLocationInformation(event, context):
     if 'nextMeetingDestinationPlaceId' in event and len(event['nextMeetingDestinationPlaceId'].strip()) != 0:
         nextMeetingDestinationPlaceId = "place_id:" + event['nextMeetingDestinationPlaceId'].strip()
 
-    if event['previousMeetingStartTime'] is not None:
+    if 'previousMeetingStartTime' in event:
         previousMeetingStartTime = event['previousMeetingStartTime']
 
-    if event['previousMeetingEndTime'] is not None:
+    if 'previousMeetingEndTime' in event:
         previousMeetingEndTime = event['previousMeetingEndTime']
 
-    if event['currentMeetingStartTime'] is not None:
+    if 'currentMeetingStartTime' in event:
         currentMeetingStartTime = event['currentMeetingStartTime']
 
-    if event['currentMeetingEndTime'] is not None:
+    if 'currentMeetingEndTime' in event:
         currentMeetingEndTime = event['currentMeetingEndTime']
 
-    if event['nextMeetingStartTime'] is not None:
+    if 'nextMeetingStartTime' in event:
         nextMeetingStartTime = event['nextMeetingStartTime']
 
-    if event['nextMeetingEndTime'] is not None:
+    if 'nextMeetingEndTime' in event:
         nextMeetingEndTime = event['nextMeetingEndTime']
 
-    if event['nextMeetingId'] is not None:
+    if 'nextMeetingId' in event:
         nextMeetingId = event['nextMeetingId']
 
-    if event['previousMeetingId'] is not None:
+    if 'previousMeetingId' in event:
         previousMeetingId = event['previousMeetingId']
 
-    print("BBBB")
+    durationCurrent = getDurationbetweenTwoLocations(currentLocationOrigin, currentLocationDestination, travelMode)
+    # THis will provide the time taken to reach from source to destination
+    eventLeaveTime = currentMeetingStartTime - durationCurrent
+
+
+    if 'travelMode' in event and len(event['travelMode'].strip()) != 0:
+        travelMode = event['travelMode'].strip()
+    else:
+        return sendingResultValues(False, "", eventLeaveTime)
 
     print(currentLocationOrigin)
     print(currentLocationDestination)
@@ -200,7 +204,6 @@ def getLocationInformation(event, context):
     print(travelMode)
 
     result = [0, 0, 0, 0]
-    durationCurrent = getDurationbetweenTwoLocations(currentLocationOrigin, currentLocationDestination, travelMode)
     durationNext = getDurationbetweenTwoLocations(nextMeetingOriginPlaceId, nextMeetingDestinationPlaceId, travelMode)
 
     result[0] = getDurationbetweenTwoLocations(previousMeetingDestinationPlaceId, currentLocationOrigin, travelMode)
@@ -218,7 +221,7 @@ def getLocationInformation(event, context):
 
     if (previousMeetingDestinationPlaceId != "" and previousMeetingEndTime + result[0] > (
         currentMeetingStartTime - durationCurrent) and previousMeetingEndTime + result[1] > currentMeetingStartTime):
-        return sendingResultValues(True, previousMeetingId)
+        return sendingResultValues(True, previousMeetingId, eventLeaveTime)
 
     result[2] = getDurationbetweenTwoLocations(currentLocationDestination, nextMeetingOriginPlaceId, travelMode)
     result[3] = getDurationbetweenTwoLocations(currentLocationDestination, nextMeetingDestinationPlaceId, travelMode)
@@ -229,16 +232,18 @@ def getLocationInformation(event, context):
     #     return True
     if (nextMeetingOriginPlaceId != "" and currentMeetingEndTime + result[2] > (
         nextMeetingStartTime - durationNext) and currentMeetingEndTime + result[3] > nextMeetingStartTime):
-        return sendingResultValues(True, nextMeetingId)
+        return sendingResultValues(True, nextMeetingId, eventLeaveTime)
 
     print(result)
-    return sendingResultValues(False, "")
+    return sendingResultValues(False, "", eventLeaveTime)
+
 
 
 # Adding the conflict Meeting result format
-def sendingResultValues(isConflictPresent, conflictMeetingId):
+def sendingResultValues(isConflictPresent, conflictMeetingId, eventLeaveTime):
     result = {"isConflictPresent" : isConflictPresent,
-              "conflictMeetingId" : conflictMeetingId
+              "conflictMeetingId" : conflictMeetingId,
+              "eventLeaveTime": eventLeaveTime
     }
     return result
 
@@ -257,10 +262,10 @@ def isConflictPresentForTwoLocations(eventStart1, eventEnd1, eventStart2, eventE
 
 
 def getDurationbetweenTwoLocations(start_placeid, end_placeid, mode):
-    duration_in_milleseconds = 0
+    durationInSeconds = 0
 
     if start_placeid is None or end_placeid is None or start_placeid.strip() == "" or end_placeid.strip() == "":
-        return duration_in_milleseconds
+        return durationInSeconds
 
     url = "https://maps.googleapis.com/maps/api/distancematrix/json"
     key = "AIzaSyAFcqYxQE7IZjZtZ7tgMt_wb_1ghRCKbXk"
@@ -273,33 +278,33 @@ def getDurationbetweenTwoLocations(start_placeid, end_placeid, mode):
         response = requests.get(url, params)
 
         if not response.ok:
-            return duration_in_milleseconds
+            return durationInSeconds
 
         json_response = json.loads(response.content)
         if json_response['status'] != 'OK':
-            return duration_in_milleseconds
+            return durationInSeconds
 
         print(json_response)
 
         if json_response is None:
-            return duration_in_milleseconds
+            return durationInSeconds
 
         if 'rows' not in json_response or len(json_response['rows']) == 0:
-            return duration_in_milleseconds
+            return durationInSeconds
 
         for row in json_response['rows']:
             if 'elements' not in row or len(row['elements']) == 0:
                 continue
             for element in row['elements']:
                 if element['status'] == 'OK':
-                    duration_in_milleseconds = element['duration']['value']
+                    durationInSeconds = element['duration']['value']
                     break
                 else:
                     break
     except:
-        return duration_in_milleseconds
+        return durationInSeconds
 
-    return duration_in_milleseconds * 1000
+    return durationInSeconds * 1000
 
 # def getLocationInformation(event, context):
 #
