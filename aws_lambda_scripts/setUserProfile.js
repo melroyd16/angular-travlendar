@@ -19,6 +19,8 @@ exports.handler = (event, context, callback) => {
         "preferredMode": event.body.preferredModes,
         "bicyclingDistance": event.body.bicyclingDistance,
         "walkingDistance": event.body.walkingDistance,
+        "lunchTime": event.body.lunchTime,
+        "dinnerTime": event.body.dinnerTime
       }
     }
     //context.succeed(payload);
