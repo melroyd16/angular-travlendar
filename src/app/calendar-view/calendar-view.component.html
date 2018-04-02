@@ -55,6 +55,9 @@
 <div class="alert alert-success" role="alert" *ngIf="displaySuccess">
   {{successMessage}}
 </div>
+<div class="alert alert-danger" role="alert" *ngIf="displayError">
+  {{errorMessage}}
+</div>
 <div [ngSwitch]="view" *ngIf="eventsLoaded">
   <mwl-calendar-month-view *ngSwitchCase="'month'" [viewDate]="viewDate" [events]="events" [refresh]="refresh" [activeDayIsOpen]="activeDayIsOpen" (dayClicked)="dayClicked($event.day)" (eventTimesChanged)="eventTimesChanged($event)">
   </mwl-calendar-month-view>
