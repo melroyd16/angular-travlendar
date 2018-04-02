@@ -92,8 +92,10 @@ export class CalendarViewComponent implements OnInit {
   displaySuccess = false;
   startDifference = 0;
   endDifference = 0;
+  displayError = false;
   scheduleModalError = '';
   successMessage = '';
+  errorMessage = '';
   locationTypes = ['home', 'work', 'prior event location', 'other'];
   selectedPriorLocation = 'home';
   travelModeArray = [];
@@ -700,6 +702,15 @@ export class CalendarViewComponent implements OnInit {
     }, 3000);
   }
 
+  displayErrorMessage(message): void {
+    this.errorMessage = message;
+    this.displayError = true;
+    const timeoutId = setTimeout(() => {
+      this.displayError = false;
+      clearTimeout(timeoutId);
+    }, 3000);
+  }
+
   openRepeatBlock(element: HTMLInputElement): void {
     console.log(this.event.isRepeat);
     this.repeatCheckbox = element;
@@ -842,17 +853,25 @@ export class CalendarViewComponent implements OnInit {
     newStart,
     newEnd
   }: CalendarEventTimesChangedEvent): void {
-    const eventCopy: any = Object.assign({}, event);
-    this.event.id = eventCopy.id;
-    this.event.eventTitle = eventCopy.title;
-    this.event.eventStart = new Date(newStart);
-    this.event.eventEnd = new Date(newEnd);
-    this.event.origin = eventCopy.origin;
-    this.event.otherLocation = eventCopy.origin.formatted_address;
-    this.event.destination = eventCopy.destination;
-    this.event.eventLocation = eventCopy.destination.formatted_address;
-    this.eventType = 'edit';
-    this.event.travelMode = eventCopy.travelMode;
-    this.saveEvent();
+
+    if(isPast(newStart)) {
+      // console.log("DRAGGED INTO PAST");
+      this.displayErrorMessage('Cannot Drag Event Onto Past Date.');
+    }
+    else {
+      const eventCopy: any = Object.assign({}, event);
+      this.event.id = eventCopy.id;
+      this.event.eventTitle = eventCopy.title;
+      this.event.eventStart = new Date(newStart);
+      this.event.eventEnd = new Date(newEnd);
+      this.event.origin = eventCopy.origin;
+      this.event.otherLocation = eventCopy.origin.formatted_address;
+      this.event.destination = eventCopy.destination;
+      this.event.eventLocation = eventCopy.destination.formatted_address;
+      this.eventType = 'edit';
+      this.event.travelMode = eventCopy.travelMode;
+      this.saveEvent();
+    }
+
   }
 }
