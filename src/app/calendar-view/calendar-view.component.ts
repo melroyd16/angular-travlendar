@@ -84,8 +84,11 @@ export class CalendarViewComponent implements OnInit {
   repeatEvents = false;
   displayModalError = false;
   displayModalSave = false;
+  repeatDeleteChoice : any;
   forceSaveEvent = false;
   repeatEdit = false;
+  deletePrompt = true;
+  repeatDelete = false;
   displaySuccess = false;
   startDifference = 0;
   endDifference = 0;
@@ -97,8 +100,9 @@ export class CalendarViewComponent implements OnInit {
   payloadArray=[];
   repeatPayload: any;
   datesArray = [];
-  editArray = []
-  deleteEventId = '';
+  editArray = [];
+  deleteArray = [];
+  deleteEvent : any;
   ifSelected = false;
   difference: any;
   repeatCheckbox: any;
@@ -151,8 +155,15 @@ export class CalendarViewComponent implements OnInit {
     {
       label: '<i class="fa fa-fw fa-times"></i>',
       onClick: ({ event }: { event: any }): void => {
+        for (let i = 0; i < this.events.length; i++) {
+              if (event.id === this.events[i].id && this.events[i].isRepeat == true){
+                this.repeatDelete = true;
+                this.deletePrompt = false;
+              }
+        }
         $('#deleteModal').modal('toggle');
-        this.deleteEventId = event.id;
+        this.deleteEvent = event;
+
       }
     }
   ];
@@ -217,13 +228,17 @@ export class CalendarViewComponent implements OnInit {
     this.displayModalSave = false;
     this.ifSelected = false;
     this.forceSaveEvent = false;
+    this.repeatDeleteChoice = '';
     this.repeatEdit = false;
+    this.deletePrompt = true;
+    this.repeatDelete = false;
     this.scheduleModalError = '';
     this.selectedPriorLocation = 'home';
     this.eventType = 'save';
     this.travelModeArray = [];
     this.datesArray = [];
     this.editArray = [];
+    this.deleteArray = [];
     this.otherLocationDetails = new Location();
     this.eventsService.fetchEvents().subscribe((eventList) => {
       this.eventsLoaded = true;
@@ -232,6 +247,11 @@ export class CalendarViewComponent implements OnInit {
         this.addEvent(eventList.Items[i]);
       }
     });
+  }
+
+  opendeletePrompt() : void{
+    this.deletePrompt = true;
+    console.log(this.repeatDeleteChoice);
   }
 
   addEvent(event): void {
@@ -514,8 +534,6 @@ export class CalendarViewComponent implements OnInit {
           let eventEnd = 0;
           let count = 0;
           let id=0;
-          console.log(startDifference);
-          console.log(endDifference);
           while (i < events.length) {
             this.events[i].eventStart = this.events[i].start;
             this.events[i].eventEnd = this.events[i].end;
@@ -747,12 +765,37 @@ export class CalendarViewComponent implements OnInit {
   }
 
 
-  deleteEvent(): void {
+  deleteEvents(): void {
     this.closeDeleteModal();
-    this.eventsService.deleteEvent(this.deleteEventId).subscribe(() => {
+    switch (this.repeatDeleteChoice){
+      case "Current Event":
+          this.eventDeletion(this.deleteEvent.id);
+          break;
+      case "All Repeated Events":
+      this.eventDeletion(this.deleteEvent.id);
+        this.deleteArray = this.checkRepeatedEvents(this.deleteEvent);
+        if(this.deleteArray.length > 0){
+          let i = 0;
+          while (i < this.deleteArray.length){
+            this.eventDeletion(this.deleteArray[i].id);
+            i++;
+          }
+          if(i==this.deleteArray.length){
+              this.initEvent();
+          }
+        }
+          break;
+      default:
+        this.eventDeletion(this.deleteEvent.id);
+        break;
+    }
+
+  }
+
+  eventDeletion(id: any): void{
+    this.eventsService.deleteEvent(id).subscribe(() => {
       for (let i = 0; i < this.events.length; i++) {
-        if (this.events[i].id === this.deleteEventId) {
-          this.events.splice(i, 1);
+        if (this.events[i].id === this.deleteEvent.id) {
           this.refresh.next();
           this.activeDayIsOpen = false;
           this.displaySuccessMessage('Event has been deleted successfully');
