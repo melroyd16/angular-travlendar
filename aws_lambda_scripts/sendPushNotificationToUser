@@ -1,10 +1,8 @@
 import boto3
-
-# client = boto3.client('pinpoint',region_name="us-east-1")
 # print(client)
 #
 # # Dynamo Db Client
-# dynamoDbClient = boto3.client('dynamodb')
+
 #
 #
 # # Getting List of Apps API
@@ -351,3 +349,4 @@ def lambda_handler(event, context):
 
 
 lambda_handler(None, None)
+
