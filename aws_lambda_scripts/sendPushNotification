@@ -6,9 +6,9 @@ exports.handler = (event, context, callback) => {
   sendNotification();
 
   function sendNotification(){
-    getListOfENdPointsForGivenUser(event['username'])
-
-
+    if(event != null && event['username'] != null){
+        getListOfENdPointsForGivenUser(event['username'])
+    }
 
     console.log(event);
     deleteRules(event.ruleToDelete.ruleName, event.ruleToDelete.policyId);
@@ -40,7 +40,7 @@ exports.handler = (event, context, callback) => {
             { console.log(endPoint['EndpointArn']);
               console.log(endPoint['Attributes']['Token']);
               console.log(endPoint['Attributes']['CustomUserData']);
-              listOfEndPoints.add(endPoint['EndpointArn'])
+              listOfEndPoints.push(endPoint['EndpointArn'])
             }
           }
         }
