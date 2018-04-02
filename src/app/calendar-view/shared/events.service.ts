@@ -40,6 +40,7 @@ export class EventsService {
         forceSaveEvent: forceSaveEvent
       };
     }
+    console.log(payload);
     return this.centralAPIService.callAPI('events', payload, 'post');
   }
 
