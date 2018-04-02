@@ -87,8 +87,10 @@ export class CalendarViewComponent implements OnInit {
   forceSaveEvent = false;
   repeatEdit = false;
   displaySuccess = false;
+  displayError = false;
   scheduleModalError = '';
   successMessage = '';
+  errorMessage = '';
   locationTypes = ['home', 'work', 'prior event location', 'other'];
   selectedPriorLocation = 'home';
   travelModeArray = [];
@@ -508,6 +510,15 @@ export class CalendarViewComponent implements OnInit {
     }, 3000);
   }
 
+  displayErrorMessage(message): void {
+    this.errorMessage = message;
+    this.displayError = true;
+    const timeoutId = setTimeout(() => {
+      this.displayError = false;
+      clearTimeout(timeoutId);
+    }, 3000);
+  }
+
   openRepeatBlock(element: HTMLInputElement): void {
     console.log(this.event.isRepeat);
     this.repeatCheckbox = element;
@@ -627,8 +638,8 @@ export class CalendarViewComponent implements OnInit {
   }: CalendarEventTimesChangedEvent): void {
 
     if(isPast(newStart)) {
-      console.log("DRAGGED INTO PAST");
-      this.displaySuccessMessage('Cannot Drag Event Onto Past Date.');
+      // console.log("DRAGGED INTO PAST");
+      this.displayErrorMessage('Cannot Drag Event Onto Past Date.');
     }
     else {
       const eventCopy: any = Object.assign({}, event);
