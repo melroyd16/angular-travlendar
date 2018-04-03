@@ -125,92 +125,129 @@ import boto3
 
 # Need to get the token from the user Interface
 
-# Sending Messages to the single pinendPoint
-# endPoint = "eTUnwUGiaUA:APA91bGlLmRreuC4Ij97fN1_PWGS_arIqpt8EhVRs6VRBHHXuE0ruIRg3AKadKL-j3WkInVjwnDoN0n_n6jUQQ8QbsvTZrsl4OXyLcfQAhpAXOMhQR3v6f46zr3VPZHVR-9dJCxyImBl"
-#
-# endPoint_alfred = "dCavzv5sLgo:APA91bFaUpuqJhbYTUC5a155UJWEYmIind2oMNqEgnbCbfvLAKv_KP0MY7d027myCgmH24-FJalZoKj9q0wVm40S4jB87zcgDcKtkzGU0RdHUsJuj6U0h-Mby5TumUM1fL0sIw8u0vU8"
-# endPoint_mehul = "eCPF7mCEuis:APA91bGUR-GFOKTCclBq2QQiUSYh1LDdfo-eKI3alYuEU5y-HVyBI5BASrcSQrg1UUBHQ3CllupnHVSTEfhMAF5w6sPgoma2TGe2oaLpUDXa8qDuMftmGoGvKbZFwK9FXNHLwIXqms1V"
-# endPoint_aditya = "f7_PwxiDCCc:APA91bF_mcyIIsCWpjetiW180xU5Y8LbVx1bgEPmXFOpZKQu3PcxeLngavqdH1HN5mqTO_nBK4spHaknLCJipNNZBZ9qPTzRYo1btNHQediiBKjyFlnkt_2SeGTDavG_FGEOjG3D_uBt"
-#
-#
-# response = client.send_messages(
-#     ApplicationId='30187d92e3a84f9bb5313f23b07038d4',
-#     MessageRequest= {
-#       "Addresses":{
-#             endPoint:{"ChannelType" : "GCM",
-#                       "BodyOverride":"New XXXX messages",
-#                       "Context":{
-#                             'eventEnd':"1519599600000",
-#                             'eventStart':"1519592400000",
-#                             'origin_place_id':"ChIJa8f1cO8IK4cRhFzAxK2hLPc",
-#                             'origin_formatted_address':"1137 E Orange St, Tempe, AZ 85281, USA",
-#                             'destination_place_id' : "ChIJffoao2cJK4cRpDZy6Da-T8E",
-#                             "destination_formatted_address":"1312 N Scottsdale Rd, Scottsdale, AZ 85257, USA",
-#                             "travelMode":"walking",
-#                             'timeNeeded':"669", # In Seconds
-#                             'username':"addy3429@live.com",
-#                             'eventTitle':"lunch Test 2 - 4",
-#                             }
-#                         },
-#           endPoint_alfred: {"ChannelType": "GCM",
-#                      "BodyOverride": "New XXXX messages",
-#                      "Context": {
-#                          'eventEnd': "1519599600000",
-#                          'eventStart': "1519592400000",
-#                          'origin_place_id': "ChIJa8f1cO8IK4cRhFzAxK2hLPc",
-#                          'origin_formatted_address': "1137 E Orange St, Tempe, AZ 85281, USA",
-#                          'destination_place_id': "ChIJffoao2cJK4cRpDZy6Da-T8E",
-#                          "destination_formatted_address": "1312 N Scottsdale Rd, Scottsdale, AZ 85257, USA",
-#                          "travelMode": "walking",
-#                          'timeNeeded': "669",  # In Seconds
-#                          'username': "addy3429@live.com",
-#                          'eventTitle': "lunch Test 2 - 4",
-#                      }
-#                     },
-#             endPoint_mehul: {"ChannelType": "GCM",
-#                      "BodyOverride": "New XXXX messages",
-#                      "Context": {
-#                          'eventEnd': "1519599600000",
-#                          'eventStart': "1519592400000",
-#                          'origin_place_id': "ChIJa8f1cO8IK4cRhFzAxK2hLPc",
-#                          'origin_formatted_address': "1137 E Orange St, Tempe, AZ 85281, USA",
-#                          'destination_place_id': "ChIJffoao2cJK4cRpDZy6Da-T8E",
-#                          "destination_formatted_address": "1312 N Scottsdale Rd, Scottsdale, AZ 85257, USA",
-#                          "travelMode": "walking",
-#                          'timeNeeded': "669",  # In Seconds
-#                          'username': "addy3429@live.com",
-#                          'eventTitle': "lunch Test 2 - 4",
-#                      }
-#                     },
-#             endPoint_aditya: {"ChannelType": "GCM",
-#                      "BodyOverride": "New XXXX messages",
-#                      "Context": {
-#                          'eventEnd': "1519599600000",
-#                          'eventStart': "1519592400000",
-#                          'origin_place_id': "ChIJa8f1cO8IK4cRhFzAxK2hLPc",
-#                          'origin_formatted_address': "1137 E Orange St, Tempe, AZ 85281, USA",
-#                          'destination_place_id': "ChIJffoao2cJK4cRpDZy6Da-T8E",
-#                          "destination_formatted_address": "1312 N Scottsdale Rd, Scottsdale, AZ 85257, USA",
-#                          "travelMode": "walking",
-#                          'timeNeeded': "669",  # In Seconds
-#                          'username': "addy3429@live.com",
-#                          'eventTitle': "lunch Test 2 - 4",
-#                      }
-#                     }
-#
-#       },
-#       "MessageConfiguration": {
-#           "DefaultPushNotificationMessage" : {
-#             "Action" : "OPEN_APP",
-#             "Body" : "Message Body",
-#             "Title" : " Body Title"
-#           }
-#       }
-#     }
-# )
-#
-# print(response)
-# print("Completed sending messages")
+
+# List of Endpoints
+
+client = boto3.client('pinpoint',region_name="us-east-1")
+dynamoDbClient = boto3.client('dynamodb')
+
+snsClient = boto3.client('sns',region_name="us-west-2")
+print("LIST OF ENDPOINTS")
+response = snsClient.list_endpoints_by_platform_application(
+    PlatformApplicationArn='arn:aws:sns:us-west-2:016911789346:app/GCM/PushNotificationSample'
+)
+print(response)
+
+endPoint1 = "arn:aws:sns:us-west-2:016911789346:endpoint/GCM/PushNotificationExample2/2c2aceec-de9c-370d-b37f-c4713987f3e2"
+endPoint2  = "arn:aws:sns:us-west-2:016911789346:endpoint/GCM/PushNotificationExample2/b9163b5a-b71a-3199-8b45-1ee7e20237b4"
+
+# Sending Push Notification
+for i in range(10):
+    response = snsClient.publish(
+        TargetArn=endPoint2,
+        Message='HELLo' + str(i)
+    )
+
+
+
+
+
+
+
+
+for endpoint in response['Endpoints']:
+    print(endpoint['EndpointArn'])
+    print(endpoint['Attributes']['Token'])
+    print(endpoint['Attributes']['CustomUserData'])
+
+
+#Sending Messages to the single pinendPoint
+endPoint = "eTUnwUGiaUA:APA91bGlLmRreuC4Ij97fN1_PWGS_arIqpt8EhVRs6VRBHHXuE0ruIRg3AKadKL-j3WkInVjwnDoN0n_n6jUQQ8QbsvTZrsl4OXyLcfQAhpAXOMhQR3v6f46zr3VPZHVR-9dJCxyImBl"
+
+endPoint_alfred = "dCavzv5sLgo:APA91bFaUpuqJhbYTUC5a155UJWEYmIind2oMNqEgnbCbfvLAKv_KP0MY7d027myCgmH24-FJalZoKj9q0wVm40S4jB87zcgDcKtkzGU0RdHUsJuj6U0h-Mby5TumUM1fL0sIw8u0vU8"
+endPoint_mehul = "eCPF7mCEuis:APA91bGUR-GFOKTCclBq2QQiUSYh1LDdfo-eKI3alYuEU5y-HVyBI5BASrcSQrg1UUBHQ3CllupnHVSTEfhMAF5w6sPgoma2TGe2oaLpUDXa8qDuMftmGoGvKbZFwK9FXNHLwIXqms1V"
+endPoint_aditya = "f7_PwxiDCCc:APA91bF_mcyIIsCWpjetiW180xU5Y8LbVx1bgEPmXFOpZKQu3PcxeLngavqdH1HN5mqTO_nBK4spHaknLCJipNNZBZ9qPTzRYo1btNHQediiBKjyFlnkt_2SeGTDavG_FGEOjG3D_uBt"
+
+
+response = client.send_messages(
+    ApplicationId='30187d92e3a84f9bb5313f23b07038d4',
+    MessageRequest= {
+      "Addresses":{
+            endPoint:{"ChannelType" : "GCM",
+                      "B"
+                      "odyOverride":"New XXXX messages",
+                      "Context":{
+                            'eventEnd':"1519599600000",
+                            'eventStart':"1519592400000",
+                            'origin_place_id':"ChIJa8f1cO8IK4cRhFzAxK2hLPc",
+                            'origin_formatted_address':"1137 E Orange St, Tempe, AZ 85281, USA",
+                            'destination_place_id' : "ChIJffoao2cJK4cRpDZy6Da-T8E",
+                            "destination_formatted_address":"1312 N Scottsdale Rd, Scottsdale, AZ 85257, USA",
+                            "travelMode":"walking",
+                            'timeNeeded':"669", # In Seconds
+                            'username':"addy3429@live.com",
+                            'eventTitle':"lunch Test 2 - 4",
+                            }
+                        },
+          endPoint_alfred: {"ChannelType": "GCM",
+                     "BodyOverride": "New XXXX messages",
+                     "Context": {
+                         'eventEnd': "1519599600000",
+                         'eventStart': "1519592400000",
+                         'origin_place_id': "ChIJa8f1cO8IK4cRhFzAxK2hLPc",
+                         'origin_formatted_address': "1137 E Orange St, Tempe, AZ 85281, USA",
+                         'destination_place_id': "ChIJffoao2cJK4cRpDZy6Da-T8E",
+                         "destination_formatted_address": "1312 N Scottsdale Rd, Scottsdale, AZ 85257, USA",
+                         "travelMode": "walking",
+                         'timeNeeded': "669",  # In Seconds
+                         'username': "addy3429@live.com",
+                         'eventTitle': "lunch Test 2 - 4",
+                     }
+                    },
+            endPoint_mehul: {"ChannelType": "GCM",
+                     "BodyOverride": "New XXXX messages",
+                     "Context": {
+                         'eventEnd': "1519599600000",
+                         'eventStart': "1519592400000",
+                         'origin_place_id': "ChIJa8f1cO8IK4cRhFzAxK2hLPc",
+                         'origin_formatted_address': "1137 E Orange St, Tempe, AZ 85281, USA",
+                         'destination_place_id': "ChIJffoao2cJK4cRpDZy6Da-T8E",
+                         "destination_formatted_address": "1312 N Scottsdale Rd, Scottsdale, AZ 85257, USA",
+                         "travelMode": "walking",
+                         'timeNeeded': "669",  # In Seconds
+                         'username': "addy3429@live.com",
+                         'eventTitle': "lunch Test 2 - 4",
+                     }
+                    },
+            endPoint_aditya: {"ChannelType": "GCM",
+                     "BodyOverride": "New XXXX messages",
+                     "Context": {
+                         'eventEnd': "1519599600000",
+                         'eventStart': "1519592400000",
+                         'origin_place_id': "ChIJa8f1cO8IK4cRhFzAxK2hLPc",
+                         'origin_formatted_address': "1137 E Orange St, Tempe, AZ 85281, USA",
+                         'destination_place_id': "ChIJffoao2cJK4cRpDZy6Da-T8E",
+                         "destination_formatted_address": "1312 N Scottsdale Rd, Scottsdale, AZ 85257, USA",
+                         "travelMode": "walking",
+                         'timeNeeded': "669",  # In Seconds
+                         'username': "addy3429@live.com",
+                         'eventTitle': "lunch Test 2 - 4",
+                     }
+                    }
+
+      },
+      "MessageConfiguration": {
+          "DefaultPushNotificationMessage" : {
+            "Action" : "OPEN_APP",
+            "Body" : "Message Body",
+            "Title" : " Body Title"
+          }
+      }
+    }
+)
+
+print(response)
+print("Completed sending messages")
 
 
 
@@ -348,5 +385,5 @@ def lambda_handler(event, context):
 
 
 
-lambda_handler(None, None)
+# lambda_handler(None, None)
 
