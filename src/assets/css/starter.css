@@ -189,7 +189,7 @@ p.copyright {
   display: flex;
   justify-content: center;
   /* Center and scale the image nicely */
-  background: url(../img/software-1.jpg.2000x587_q40_crop_upscale-1.jpg) no-repeat center;
+  background: url(../img/software.jpg) no-repeat center;
   background-size: cover;
   padding-top: 0px;
   padding-bottom: 0px;
@@ -197,21 +197,25 @@ p.copyright {
 }
 
 .container_marketing {
-  /*margin-right: auto;*/
-  /*margin-left: auto;*/
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
   width: 1250px;
   padding-top: 20px;
-  position: absolute;
-  bottom: 0;
-  background-color: #ffffff;
-  opacity: 0.8;
+  background-color: rgba(255, 255, 255, 0.8);
   filter: alpha(opacity=90); /* For IE8 and earlier */
   text-align: center
 }
 .row{
   padding-top: 20px;
   margin-right: 0;
+  margin-left: 0;
+
 }
 .linksContainer a {
   color: #66b3ff;
 }
+a { cursor: pointer; }
+

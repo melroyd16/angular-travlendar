@@ -1,7 +1,9 @@
 <div class="jumbotron jumbotron-fluid" style="text-align: center">
 
 
-  <div class="container_marketing" >
+  <div class="container_marketing">
+    <img src="../../assets/img/logo2-transparent.png" height="181" width="500"><br>
+    <h1>A Travel Time Aware Calendar</h1>
     <button type="button" class="btn btn-primary btn-lg" style="width: 200px; margin-top: 20px" data-toggle="modal"
             data-target="#loginModal">Login
     </button>
@@ -65,12 +67,15 @@
             </button>
           </div>
           <hr>
-          <p style="color:66b3ff"><a (click)="toggleModals('loginModal','registerModal')"> <i
-            class="fas fa-list-ul"></i> Register</a>
-            <a (click)="toggleModals('loginModal','fp1Modal')"> <i class="fas fa-key"></i> Forgot Password?</a><br/>
-            <a (click)="toggleModals('loginModal','resendCodeModal')"> <i class="fas fa-envelope"></i> Resend
-              Confirmation Code</a>
-          </p>
+            <div class="col-sm-7" style="padding-bottom: 5px">
+              <a (click)="toggleModals('loginModal','registerModal')"><i class="fas fa-list-ul"></i>&nbsp;Register</a>
+            </div>
+            <div class="col-sm-8"style="padding-bottom: 5px">
+              <a (click)="toggleModals('loginModal','fp1Modal')"><i class="fas fa-key"></i>&nbsp;Forgot Password?</a>
+            </div>
+            <div class="col-sm-10"style="padding-bottom: 5px">
+              <a (click)="toggleModals('loginModal','resendCodeModal')"><i class="fas fa-envelope"></i>&nbsp;Resend Confirmation Code</a>
+            </div>
         </form>
       </div>
     </div>
