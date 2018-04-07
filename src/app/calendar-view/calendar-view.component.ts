@@ -102,6 +102,7 @@ export class CalendarViewComponent implements OnInit {
   payloadArray=[];
   repeatPayload: any;
   datesArray = [];
+  errorList = [];
   editArray = [];
   deleteArray = [];
   deleteEvent : any;
@@ -240,6 +241,7 @@ export class CalendarViewComponent implements OnInit {
     this.travelModeArray = [];
     this.datesArray = [];
     this.editArray = [];
+    this.deleteArray = [];
     this.deleteArray = [];
     this.otherLocationDetails = new Location();
     this.eventsService.fetchEvents().subscribe((eventList) => {
@@ -561,7 +563,6 @@ export class CalendarViewComponent implements OnInit {
               if (data.errorMessage) {
                 switch (data.errorMessage.code) {
                   case 1:
-                  case 1:
                     this.scheduleModalError = 'Maximum daily walking distance of '
                       + data.errorMessage.value + ' miles will be exceeded. Click Save to proceed anyways.';
                     break;
@@ -651,28 +652,29 @@ export class CalendarViewComponent implements OnInit {
         }
         this.displayModalSave = true;
         this.eventsService.saveEvent(this.payloadArray[i], this.forceSaveEvent, 'save', this.event.id).subscribe((data) => {
-          count++;
           if (data.errorMessage) {
+            this.deleteArray.push(data);
             switch (data.errorMessage.code) {
               case 1:
                 this.scheduleModalError = 'Maximum daily walking distance of '
-                  + data.errorMessage.value + ' miles will be exceeded on the event starting at ' + new Date(data.errorMessage.startTime) +
+                  + data.errorMessage.value + ' miles will be exceeded on the event starting at ' +new Date(this.payloadArray[count].eventStart)  +
                   '. Click Save to proceed anyways.';
                 break;
               case 2:
                 this.scheduleModalError = 'Maximum daily bicycling distance of '
-                  + data.errorMessage.value + ' miles will be exceeded on the event starting at ' + new Date(data.errorMessage.startTime) +
+                  + data.errorMessage.value + ' miles will be exceeded on the event starting at ' +new Date(this.payloadArray[count].eventStart)  +
                   ' . Click Save to proceed anyways.';
                 break;
               case 3:
-                this.scheduleModalError = 'The event  starting at ' + new Date(data.errorMessage.startTime) +
-                  ' conflicts with another meeting. Click Save to proceed anyways.';
+                this.scheduleModalError = 'The event  starting at ' + new Date(this.payloadArray[count].eventStart) +
+                  ' conflicts with meeting starting at '+new Date(data.errorMessage.startTime) '. Click Save to proceed anyways.';
                 break;
               case 4:
-                this.scheduleModalError = 'The travel time for The event  starting at ' + new Date(data.errorMessage.startTime) + ' conflicts with event: '
+                this.scheduleModalError = 'The travel time for The event  starting at ' +new Date(this.payloadArray[count].eventStart) + ' conflicts with event: '
                   + data.errorMessage.value + '. Click Save to proceed anyways.';
                 break;
             }
+            count++;
             $('#eventModal').modal('show');
             this.displayModalError = true;
             this.displayModalSave = false;
@@ -682,10 +684,15 @@ export class CalendarViewComponent implements OnInit {
             this.eventPayload.id = data;
             this.refresh.next();
           }
-          if (count == this.datesArray.length) {
-            $('#eventModal').modal('hide');
-            this.initEvent();
-            this.displaySuccessMessage('All the Events have been added successfully');
+          if (count == this.datesArray.length){
+            if(this.deleteArray.length < 1){
+              $('#eventModal').modal('hide');
+              this.initEvent();
+              this.displaySuccessMessage('All the Events have been added successfully');
+            }
+            else{
+              console.log(this.deleteArray);
+            }
           }
         });
         i++;
