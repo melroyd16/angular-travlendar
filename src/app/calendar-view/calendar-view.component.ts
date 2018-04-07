@@ -561,22 +561,30 @@ export class CalendarViewComponent implements OnInit {
               if (data.errorMessage) {
                 switch (data.errorMessage.code) {
                   case 1:
+                  case 1:
                     this.scheduleModalError = 'Maximum daily walking distance of '
-                      + data.errorMessage.value + ' miles will be exceeded on the event starting at ' + new Date(data.errorMessage.startTime) +
-                      '. Click Save to proceed anyways.';
+                      + data.errorMessage.value + ' miles will be exceeded. Click Save to proceed anyways.';
                     break;
                   case 2:
                     this.scheduleModalError = 'Maximum daily bicycling distance of '
-                      + data.errorMessage.value + ' miles will be exceeded on the event starting at ' + new Date(data.errorMessage.startTime) +
-                      ' . Click Save to proceed anyways.';
+                      + data.errorMessage.value + ' miles will be exceeded. Click Save to proceed anyways.';
                     break;
                   case 3:
-                    this.scheduleModalError = 'The event  starting at ' + new Date(data.errorMessage.startTime) +
-                      ' conflicts with another meeting. Click Save to proceed anyways.';
+                    this.scheduleModalError = 'This event directly conflicts with event: '
+                      + data.errorMessage.value + '. Click Save to proceed anyways.';
                     break;
                   case 4:
-                    this.scheduleModalError = 'The travel time for The event  starting at ' + new Date(data.errorMessage.startTime) + ' conflicts with event: '
+                    this.scheduleModalError = 'The travel time for this event conflicts with event: '
                       + data.errorMessage.value + '. Click Save to proceed anyways.';
+                    break;
+                  case 5:
+                    this.scheduleModalError = 'This event conflicts with the preferred Lunch Time Slot . Click Save to proceed anyways.';
+                    break;
+                  case 6:
+                    this.scheduleModalError = 'This event conflicts with the preferred Dinner Time Slot . Click Save to proceed anyways.';
+                    break;
+                  default:
+                    this.scheduleModalError = 'This Event is Conflicting. Click Save to proceed anyways.';
                     break;
                 }
                 $('#eventModal').modal('show');
