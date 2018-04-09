@@ -33,8 +33,6 @@ import * as $ from 'jquery';
 import * as bootstrap from 'bootstrap';
 import * as moment from 'moment';
 
-
-
 import { HomeComponent, LogoutComponent } from './home/home.component';
 import { AuthInterceptor } from './apiinterceptor';
 import { IonRangeSliderModule } from 'ng2-ion-range-slider';
