@@ -10,7 +10,7 @@ var username = "";
 exports.handler = (event, context, callback) => {
   console.log(event)
 
-  function saveEvent() {
+  function saveEvent(eventLeaveTime) {
     var id = new Date().getTime() + "_" + username
     if(event.body.eventDetails.isRepeat){
       var payload = {
@@ -26,7 +26,9 @@ exports.handler = (event, context, callback) => {
           "travelMode": event.body.eventDetails.travelMode,
           "repeatMax" : event.body.eventDetails.repeatMax,
           "isRepeat" : event.body.eventDetails.isRepeat,
-          "repeatPreference" : event.body.eventDetails.repeatPreference
+          "repeatPreference" : event.body.eventDetails.repeatPreference,
+          "eventLeaveTime":eventLeaveTime
+
         }
       }
     }
@@ -43,7 +45,9 @@ exports.handler = (event, context, callback) => {
           "origin": event.body.eventDetails.origin,
           "destination": event.body.eventDetails.destination,
           "travelMode": event.body.eventDetails.travelMode,
-          "isRepeat" : false
+          "isRepeat" : false,
+          "eventLeaveTime":eventLeaveTime
+
         }
       }
     }
@@ -275,6 +279,7 @@ exports.handler = (event, context, callback) => {
       return [false, currentEvent.body.eventDetails.eventTitle];
     }
     for(var i= 0; i < allEvents.length; i++){
+      console.log("Checking event: " + allEvents[i].eventTitle)
       if (allEvents[i].id == currentEvent.id) {
         continue;
       }
@@ -544,14 +549,69 @@ exports.handler = (event, context, callback) => {
   }
 
   function saveOrModifyEvents(status){
-    if(status == 'new'){
-      saveEvent();
-    }else{
-      saveModifiedEvent();
-    }
+    // Adding eventLeaveTime Code
+
+    // var aws = require('aws-sdk');
+    // var lambda = new aws.Lambda({
+    //   region: 'us-west-2'
+    // });
+
+
+    // var eventLeaveTime = event.body.eventDetails.eventStart;
+
+    // params = {
+    //   "currentLocationOrigin": event.body.eventDetails.origin.place_id ,
+    //   "currentLocationDestination": event.body.eventDetails.destination.place_id,
+    //   "travelMode": event.body.eventDetails.travelMode.mode,
+    //   "currentMeetingStartTime": event.body.eventDetails.eventStart
+    // }
+    // lambda.invoke({
+    //   FunctionName: 'getLocationInformation',
+    //   Payload: JSON.stringify(params, null, null) // pass params
+    // }, function(error, data) {
+
+    //   if (error) {
+    //     console.log("Error in getting eventLeaveTime " + error);
+
+
+    //   }else{
+    //     console.log("EventLEaveTime API data");
+    //     console.log(data);
+
+    //     var jsonResult = JSON.parse(data['Payload']);
+
+    //     if(jsonResult != null && jsonResult['eventLeaveTime'] != null){
+    //       eventLeaveTime = jsonResult['eventLeaveTime']
+    //     }
+
+    //     }
+
+    //   if(status == 'new') {
+    //     saveEvent(eventLeaveTime)
+    //   }else{
+    //     saveModifiedEvent(eventLeaveTime)
+    //   }
+    // });
+
+    var eventLeaveTime = event.body.eventDetails.eventStart;
+    if(event.body.eventDetails.travelMode.duration != null && event.body.eventDetails.travelMode.duration.value!= null ) {
+        eventLeaveTime = event.body.eventDetails.eventStart - event.body.eventDetails.travelMode.duration.value * 1000
+      }
+      if(status == 'new') {
+        saveEvent(eventLeaveTime)
+      }else{
+        saveModifiedEvent(eventLeaveTime)
+      }
+
+    // if(status == 'new'){
+    //   saveEvent();
+    // }else{
+    //   saveModifiedEvent();
+    // }
   }
 
   function promiseCallFunction(params, status, previousMeetingObject, nextMeetingObject){
+
     console.log("Inside Promise call function ")
     console.log(params)
 
@@ -703,7 +763,7 @@ exports.handler = (event, context, callback) => {
       TableName: tableName,
       IndexName: "username-index",
       KeyConditionExpression: "#username = :u",
-      ProjectionExpression: "id, eventTitle, eventStart, eventEnd, origin, destination",
+      ProjectionExpression: "id, eventTitle, eventStart, eventEnd, origin, destination, travelMode",
       FilterExpression: "eventStart >= :start and eventStart <= :end",
       ExpressionAttributeNames: {
         "#username": "username"
@@ -807,8 +867,10 @@ exports.handler = (event, context, callback) => {
               }
             }
             if(max_dist_status) {
+              console.log("Original Data in DynamoDB: ");
+              console.log(data);
               if(travelMode == 'walking' || travelMode == 'bicycling') {
-                var s = isUnderPreferredTransportation(event, travelMode, user_distance, data);
+                var s = isUnderPreferredTransportation(event, travelMode, user_distance, data.Items);
                 if (s[0] == false) {
                   var user_miles = null;
                   var error_code = -1;
@@ -833,6 +895,9 @@ exports.handler = (event, context, callback) => {
                 }
               }
             }
+
+            context.fail("STOP HERE")
+            return;
 
             var s2 = isConflictPresent(data, eventID, eventStart, eventEnd);
             console.log("Time Conflict Response: ", s2);
@@ -867,57 +932,57 @@ exports.handler = (event, context, callback) => {
   }
 
   function deleteEvent() {
-      var payload = {
-        TableName: "user_events",
-        Key: {
-          "id": event.body.eventID
-        }
+    var payload = {
+      TableName: "user_events",
+      Key: {
+        "id": event.body.eventID
       }
-      dynamo.getItem(payload, function(err, data){
-        if(!err){
-         deleteRules(data.Item.eventTitle.replace(/\s/g,'') + data.Item.eventStart);
-        }
-      })
-      dynamo.deleteItem(payload, function (err, data) {
-        if (err) {
-          context.fail(err);
-        } else {
-          context.succeed(data);
-        }
-      })
     }
+    dynamo.getItem(payload, function(err, data){
+      if(!err){
+        deleteRules(data.Item.eventTitle.replace(/\s/g,'') + data.Item.eventStart);
+      }
+    })
+    dynamo.deleteItem(payload, function (err, data) {
+      if (err) {
+        context.fail(err);
+      } else {
+        context.succeed(data);
+      }
+    })
+  }
 
-    function deleteRules(uid) {
-      var ruleName = 'notification_for_' + uid;
-      var policyId = 'NID'+ uid;
-      var cloudwatchevents = new aws.CloudWatchEvents();
-      var lambda = new aws.Lambda();
-      var params = {
-          Ids: ['sendPushNotification'],
-          Rule: ruleName
-      };
-      cloudwatchevents.removeTargets(params, function (err, data) {
+  function deleteRules(uid) {
+    var ruleName = 'notification_for_' + uid;
+    var policyId = 'NID'+ uid;
+    var cloudwatchevents = new aws.CloudWatchEvents();
+    var lambda = new aws.Lambda();
+    var params = {
+      Ids: ['sendPushNotification'],
+      Rule: ruleName
+    };
+    cloudwatchevents.removeTargets(params, function (err, data) {
+      if (err) console.log(err, err.stack);
+      else {
+        var params = {
+          Name: ruleName
+        };
+        cloudwatchevents.deleteRule(params, function (err, data) {
           if (err) console.log(err, err.stack);
-          else {
-              var params = {
-                  Name: ruleName
-              };
-              cloudwatchevents.deleteRule(params, function (err, data) {
-                  if (err) console.log(err, err.stack);
-              });
-          }
-      });
-      var params = {
-          FunctionName: 'sendPushNotification',
-          StatementId: policyId,
-      };
-      lambda.removePermission(params, function (err, data) {
-          if (err) console.log(err, err.stack);
-      });
+        });
+      }
+    });
+    var params = {
+      FunctionName: 'sendPushNotification',
+      StatementId: policyId,
+    };
+    lambda.removePermission(params, function (err, data) {
+      if (err) console.log(err, err.stack);
+    });
   }
 
 
-  function saveModifiedEvent() {
+  function saveModifiedEvent(eventLeaveTime) {
 
     if(event.body.eventDetails.isRepeat){
       var new_event_payload = {
@@ -933,7 +998,8 @@ exports.handler = (event, context, callback) => {
           "travelMode": event.body.eventDetails.travelMode,
           "repeatMax" : event.body.eventDetails.repeatMax,
           "isRepeat" : event.body.eventDetails.isRepeat,
-          "repeatPreference" : event.body.eventDetails.repeatPreference
+          "repeatPreference" : event.body.eventDetails.repeatPreference,
+          "eventLeaveTime":eventLeaveTime
         }
       }
     }
@@ -949,7 +1015,8 @@ exports.handler = (event, context, callback) => {
           "eventTitle": event.body.eventDetails.eventTitle,
           "origin": event.body.eventDetails.origin,
           "destination": event.body.eventDetails.destination,
-          "travelMode": event.body.eventDetails.travelMode
+          "travelMode": event.body.eventDetails.travelMode,
+          "eventLeaveTime":eventLeaveTime
         }
       };
     }
@@ -962,7 +1029,6 @@ exports.handler = (event, context, callback) => {
       }
     });
   }
-
 
 
   // function queryForFetchingEventForModifiedEvent() {
@@ -1018,7 +1084,8 @@ exports.handler = (event, context, callback) => {
       switch (event.body.operation) {
         case "saveEvent":
           if(event.body.forceSaveEvent){
-            saveEvent();
+            //saveEvent();
+            saveOrModifyEvents("new")
           } else {
             queryForFetchingNearMeetings("new");
           }
@@ -1031,7 +1098,8 @@ exports.handler = (event, context, callback) => {
           break;
         case "editEvent":
           if(event.body.forceSaveEvent){
-            saveModifiedEvent();
+            saveOrModifyEvents("modified")
+         //   saveModifiedEvent();
           } else {
             queryForFetchingNearMeetings("modified");
           }
