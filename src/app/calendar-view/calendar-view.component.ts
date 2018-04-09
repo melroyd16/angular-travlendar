@@ -247,8 +247,10 @@ export class CalendarViewComponent implements OnInit {
     this.eventsService.fetchEvents().subscribe((eventList) => {
       this.eventsLoaded = true;
       this.events = [];
-      for (let i = 0; i < eventList.Items.length; i++) {
-        this.addEvent(eventList.Items[i]);
+      if(eventList.Items){
+        for (let i = 0; i < eventList.Items.length; i++) {
+          this.addEvent(eventList.Items[i]);
+        }
       }
     });
   }
@@ -652,33 +654,37 @@ export class CalendarViewComponent implements OnInit {
         }
         this.displayModalSave = true;
         this.eventsService.saveEvent(this.payloadArray[i], this.forceSaveEvent, 'save', this.event.id).subscribe((data) => {
+          count++;
           if (data.errorMessage) {
-            this.deleteArray.push(data);
+            this.deleteArray.push(this.payloadArray[count]);
             switch (data.errorMessage.code) {
               case 1:
-                this.scheduleModalError = 'Maximum daily walking distance of '
-                  + data.errorMessage.value + ' miles will be exceeded on the event starting at ' +new Date(this.payloadArray[count].eventStart)  +
+                this.scheduleModalError = 'Maximum daily walking distance of ' + data.errorMessage.value + ' miles will be exceeded on the event starting at ' +new Date(this.payloadArray[count - 1].eventStart)  +
                   '. Click Save to proceed anyways.';
                 break;
               case 2:
-                this.scheduleModalError = 'Maximum daily bicycling distance of '
-                  + data.errorMessage.value + ' miles will be exceeded on the event starting at ' +new Date(this.payloadArray[count].eventStart)  +
+                this.scheduleModalError = 'Maximum daily bicycling distance of '+ data.errorMessage.value + ' miles will be exceeded on the event starting at ' +new Date(this.payloadArray[count - 1].eventStart)  +
                   ' . Click Save to proceed anyways.';
                 break;
               case 3:
-                this.scheduleModalError = 'The event  starting at ' + new Date(this.payloadArray[count].eventStart) +
-                  ' conflicts with meeting starting at '+new Date(data.errorMessage.startTime) '. Click Save to proceed anyways.';
+                this.scheduleModalError = 'The event  starting at ' + new Date(this.payloadArray[count - 1].eventStart) +
+                  ' conflicts with meeting  '+ data.errorMessage.value +' starting at '+new Date(data.errorMessage.startTime)+ '. Click Save to proceed anyways.';
                 break;
               case 4:
-                this.scheduleModalError = 'The travel time for The event  starting at ' +new Date(this.payloadArray[count].eventStart) + ' conflicts with event: '
+                this.scheduleModalError = 'The travel time for The event  starting at ' +new Date(this.payloadArray[count - 1].eventStart) + ' conflicts with event: '
                   + data.errorMessage.value + '. Click Save to proceed anyways.';
                 break;
             }
-            count++;
+
             $('#eventModal').modal('show');
             this.displayModalError = true;
             this.displayModalSave = false;
             this.forceSaveEvent = true;
+            this.event= Object.assign({},this.payloadArray[count - 1] );
+            this.event.eventStart = new Date(this.event.eventStart);
+            this.event.eventEnd = new Date(this.event.eventEnd);
+            this.event.travelMode = this.payloadArray[count-1].travelMode.mode;
+
           }
           else {
             this.eventPayload.id = data;
@@ -806,9 +812,6 @@ export class CalendarViewComponent implements OnInit {
             this.eventDeletion(this.deleteArray[i].id);
             i++;
           }
-          if(i==this.deleteArray.length){
-              this.initEvent();
-          }
         }
           break;
       default:
@@ -824,6 +827,7 @@ export class CalendarViewComponent implements OnInit {
         if (this.events[i].id === this.deleteEvent.id) {
           this.refresh.next();
           this.activeDayIsOpen = false;
+          this.initEvent();
           this.displaySuccessMessage('Event has been deleted successfully');
           break;
         }
