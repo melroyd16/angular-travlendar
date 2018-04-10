@@ -896,9 +896,6 @@ exports.handler = (event, context, callback) => {
               }
             }
 
-            context.fail("STOP HERE")
-            return;
-
             var s2 = isConflictPresent(data, eventID, eventStart, eventEnd);
             console.log("Time Conflict Response: ", s2);
             if(s2[0] == true) {
