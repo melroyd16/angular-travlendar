@@ -204,7 +204,7 @@ exports.handler = (event, context, callback) => {
     console.log("CONFLICT CHECK")
     console.log(data)
     if (data == null || data.Items.length == 0){
-      return [false, null, null];
+      return [false, null, null, null];
     }
     console.log("Inside is conflict present");
     var itemList = data.Items
@@ -225,10 +225,10 @@ exports.handler = (event, context, callback) => {
       }
     }
     if(isMeetingOverlaps) {
-      return [isMeetingOverlaps, itemList[i].eventTitle, itemList[i].eventStart];
+      return [isMeetingOverlaps, itemList[i].eventTitle, itemList[i].eventStart, eventStart];
     }
     else {
-      return [isMeetingOverlaps, null, null];
+      return [isMeetingOverlaps, null, null, null];
     }
 
 
@@ -273,8 +273,9 @@ exports.handler = (event, context, callback) => {
     console.log(allEvents);
 
     distance = distance * 1609; //converting to meters
-
+    console.log("Total: " + distance)
     distance -= currentEvent.body.eventDetails.travelMode.distance.value;
+    console.log("Current: "+distance)
     if (distance < 0) {
       return [false, currentEvent.body.eventDetails.eventTitle];
     }
@@ -896,6 +897,9 @@ exports.handler = (event, context, callback) => {
               }
             }
 
+            // context.fail("STOP HERE")
+            // return;
+
             var s2 = isConflictPresent(data, eventID, eventStart, eventEnd);
             console.log("Time Conflict Response: ", s2);
             if(s2[0] == true) {
@@ -904,7 +908,8 @@ exports.handler = (event, context, callback) => {
                 "errorMessage": {
                   "code": 3,
                   "value": s2[1],
-                  "startTime": s2[2]
+                  "startTime": s2[2],
+                  "currentStartTime": s2[3]
                 }
               }
               context.succeed(error_message);
