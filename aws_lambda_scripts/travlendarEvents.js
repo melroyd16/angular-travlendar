@@ -235,7 +235,7 @@ exports.handler = (event, context, callback) => {
   }
 
 
-  function isUnderPreferredTransportation(currentEvent, travelMode, user_distance, allEvents) {
+  function isUnderPreferredTransportation(currentEvent, travelMode, user_distance, allEvents, day_start) {
     console.log("Checking Walking/Bicycling Criteria");
     var eventID = currentEvent.body.eventID;
     var eventStart = currentEvent.body.eventDetails.eventStart;
@@ -255,20 +255,23 @@ exports.handler = (event, context, callback) => {
     }
     console.log(distance);
     console.log("Preferred distance", distance);
-    console.log("Alfred", eventStart)
-    var date = new Date(eventStart);
-    var yy = date.getFullYear();
-    var mm = date.getMonth();
-    var dd = date.getDate();
-    var h = date.getHours();
-    var m = date.getMinutes();
-    var s = date.getSeconds();
-    console.log(mm+'/'+dd+'/'+yy, h+':'+m+':'+s)
+    // console.log("Alfred", eventStart)
+    // var date = new Date(eventStart);
+    // var yy = date.getFullYear();
+    // var mm = date.getMonth();
+    // var dd = date.getDate();
+    // var h = date.getHours();
+    // var m = date.getMinutes();
+    // var s = date.getSeconds();
+    // console.log(mm+'/'+dd+'/'+yy, h+':'+m+':'+s)
 
-    var milliStart = new Date(Date.UTC(yy,mm,dd,0,0,0)).getTime();
-    console.log(milliStart);
-    var milliEnd = new Date(Date.UTC(yy,mm,dd+1,0,0,0)).getTime();
-    console.log(milliEnd);
+    // var milliStart = new Date(Date.UTC(yy,mm,dd,0,0,0)).getTime();
+    // console.log(milliStart);
+    // var milliEnd = new Date(Date.UTC(yy,mm,dd+1,0,0,0)).getTime();
+    // console.log(milliEnd);
+
+    var milliStart = day_start;
+    var milliEnd = day_start + 24*60*60*1000;
 
     console.log(allEvents);
 
@@ -803,6 +806,8 @@ exports.handler = (event, context, callback) => {
             var user_distance = dist.Items[0];
             var error_message = "XYZ";
             console.log("ALFRED" + user_distance);
+            var lunchString = user_distance.lunchTime.start_time
+            var cur_midnight_time = lunchStart - 11*60*60*1000 - 45*60*1000
 
             var max_dist_status = false;
 
@@ -871,7 +876,9 @@ exports.handler = (event, context, callback) => {
               console.log("Original Data in DynamoDB: ");
               console.log(data);
               if(travelMode == 'walking' || travelMode == 'bicycling') {
-                var s = isUnderPreferredTransportation(event, travelMode, user_distance, data.Items);
+
+
+                var s = isUnderPreferredTransportation(event, travelMode, user_distance, data.Items, cur_midnight_time);
                 if (s[0] == false) {
                   var user_miles = null;
                   var error_code = -1;
