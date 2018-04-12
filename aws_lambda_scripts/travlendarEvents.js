@@ -204,7 +204,7 @@ exports.handler = (event, context, callback) => {
     console.log("CONFLICT CHECK")
     console.log(data)
     if (data == null || data.Items.length == 0){
-      return [false, null, null];
+      return [false, null, null, null];
     }
     console.log("Inside is conflict present");
     var itemList = data.Items
@@ -225,10 +225,10 @@ exports.handler = (event, context, callback) => {
       }
     }
     if(isMeetingOverlaps) {
-      return [isMeetingOverlaps, itemList[i].eventTitle, itemList[i].eventStart];
+      return [isMeetingOverlaps, itemList[i].eventTitle, itemList[i].eventStart, eventStart];
     }
     else {
-      return [isMeetingOverlaps, null, null];
+      return [isMeetingOverlaps, null, null, null];
     }
 
 
@@ -273,12 +273,14 @@ exports.handler = (event, context, callback) => {
     console.log(allEvents);
 
     distance = distance * 1609; //converting to meters
-
+    console.log("Total: " + distance)
     distance -= currentEvent.body.eventDetails.travelMode.distance.value;
+    console.log("Current: "+distance)
     if (distance < 0) {
       return [false, currentEvent.body.eventDetails.eventTitle];
     }
     for(var i= 0; i < allEvents.length; i++){
+      console.log("Checking event: " + allEvents[i].eventTitle)
       if (allEvents[i].id == currentEvent.id) {
         continue;
       }
@@ -594,13 +596,13 @@ exports.handler = (event, context, callback) => {
 
     var eventLeaveTime = event.body.eventDetails.eventStart;
     if(event.body.eventDetails.travelMode.duration != null && event.body.eventDetails.travelMode.duration.value!= null ) {
-      eventLeaveTime = event.body.eventDetails.eventStart - event.body.eventDetails.travelMode.duration.value * 1000
-    }
-    if(status == 'new') {
-      saveEvent(eventLeaveTime)
-    }else{
-      saveModifiedEvent(eventLeaveTime)
-    }
+        eventLeaveTime = event.body.eventDetails.eventStart - event.body.eventDetails.travelMode.duration.value * 1000
+      }
+      if(status == 'new') {
+        saveEvent(eventLeaveTime)
+      }else{
+        saveModifiedEvent(eventLeaveTime)
+      }
 
     // if(status == 'new'){
     //   saveEvent();
@@ -762,7 +764,7 @@ exports.handler = (event, context, callback) => {
       TableName: tableName,
       IndexName: "username-index",
       KeyConditionExpression: "#username = :u",
-      ProjectionExpression: "id, eventTitle, eventStart, eventEnd, origin, destination",
+      ProjectionExpression: "id, eventTitle, eventStart, eventEnd, origin, destination, travelMode",
       FilterExpression: "eventStart >= :start and eventStart <= :end",
       ExpressionAttributeNames: {
         "#username": "username"
@@ -866,8 +868,10 @@ exports.handler = (event, context, callback) => {
               }
             }
             if(max_dist_status) {
+              console.log("Original Data in DynamoDB: ");
+              console.log(data);
               if(travelMode == 'walking' || travelMode == 'bicycling') {
-                var s = isUnderPreferredTransportation(event, travelMode, user_distance, data);
+                var s = isUnderPreferredTransportation(event, travelMode, user_distance, data.Items);
                 if (s[0] == false) {
                   var user_miles = null;
                   var error_code = -1;
@@ -893,6 +897,9 @@ exports.handler = (event, context, callback) => {
               }
             }
 
+            // context.fail("STOP HERE")
+            // return;
+
             var s2 = isConflictPresent(data, eventID, eventStart, eventEnd);
             console.log("Time Conflict Response: ", s2);
             if(s2[0] == true) {
@@ -901,7 +908,8 @@ exports.handler = (event, context, callback) => {
                 "errorMessage": {
                   "code": 3,
                   "value": s2[1],
-                  "startTime": s2[2]
+                  "startTime": s2[2],
+                  "currentStartTime": s2[3]
                 }
               }
               context.succeed(error_message);
@@ -1093,7 +1101,7 @@ exports.handler = (event, context, callback) => {
         case "editEvent":
           if(event.body.forceSaveEvent){
             saveOrModifyEvents("modified")
-            //   saveModifiedEvent();
+         //   saveModifiedEvent();
           } else {
             queryForFetchingNearMeetings("modified");
           }

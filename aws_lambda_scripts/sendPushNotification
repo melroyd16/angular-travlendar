@@ -1,28 +1,46 @@
+
+
 var AWS = require('aws-sdk');
 
 exports.handler = (event, context, callback) => {
-  var snsApplicationARN = "arn:aws:sns:us-west-2:016911789346:app/GCM/PushNotificationSample";
+    console.log("aaaaaaaaaaaaa")
 
+  var snsApplicationARN = "arn:aws:sns:us-west-2:016911789346:app/GCM/PushNotificationExample2";
+  if (event == null){
+    return;
+  }else if (event.eventDetails == null){
+       deleteRules(event.ruleToDelete.ruleName, event.ruleToDelete.policyId);
+  }else{
   sendNotification();
-
-  function sendNotification(){
-    if(event != null && event['username'] != null){
-        getListOfENdPointsForGivenUser(event['username'])
-    }
-
-    console.log(event);
-    deleteRules(event.ruleToDelete.ruleName, event.ruleToDelete.policyId);
   }
 
+
+  function sendNotification(){
+    var username= "";
+    if (event['eventDetails']['username'] != null){
+      username = event.eventDetails.username;
+    }
+
+
+
+    if(username == null || username.trim() == ""){
+      deleteRules(event.ruleToDelete.ruleName, event.ruleToDelete.policyId);
+
+    }else{
+      getListOfENdPointsForGivenUser(username);
+    }
+
+    }
+
   function getListOfENdPointsForGivenUser(username){
-    console.log(username)
+    console.log("Username" + username);
     var listOfEndPoints = [];
 
     var snsClient = new AWS.SNS();
 
     var params = {
       PlatformApplicationArn: snsApplicationARN
-    }
+    };
 
     snsClient.listEndpointsByPlatformApplication(params, function(err, data) {
       if (err) {
@@ -40,20 +58,57 @@ exports.handler = (event, context, callback) => {
             { console.log(endPoint['EndpointArn']);
               console.log(endPoint['Attributes']['Token']);
               console.log(endPoint['Attributes']['CustomUserData']);
-              listOfEndPoints.push(endPoint['EndpointArn'])
+              listOfEndPoints.push(endPoint['EndpointArn']);
             }
           }
         }
       }
-
-      for(var i = 0 ; i < listOfEndPoints.length ; i++){
-        console.log("ENDPOINTS");
-        console.log(listOfEndPoints);
-      }
-
-
+      sendPushNotificationToEndPoints(listOfEndPoints)
     });
   }
+
+
+
+  function sendPushNotificationToEndPoints(listOfEndPoints){
+    var destinationAddress = ""
+
+    if(event['eventDetails']['destination'] != null && event['eventDetails']['destination']['formatted_address'] != null){
+        destinationAddress = event['eventDetails']['destination']['formatted_address']
+    }
+
+    var eventEnd  = ""
+
+    if(event['eventDetails']['eventEnd'] != null){
+      eventEnd += event['eventDetails']['eventEnd']
+    }
+
+    var message = "You have the meeting at location " + destinationAddress + " at time " + eventEnd;
+    console.log("Message " + message);
+    var snsClient = new AWS.SNS()
+
+    if(listOfEndPoints !== null && listOfEndPoints.length > 0){
+      for(var i = 0 ; i < listOfEndPoints.length ; i++){
+
+          var params = {
+              Message: JSON.stringify(event['eventDetails']),
+              TargetArn: listOfEndPoints[i]
+              // MessageAttributes: {
+              // 'eventDetails': {
+              // DataType: 'String', /* required */
+              // StringValue: 'XXXXXXXXX'
+              // }
+
+    };
+
+          snsClient.publish(params, function(err, data){
+              if (err) console.log(err, err.stack); // an error occurred
+              else     console.log(data);
+          });
+      }
+    }
+    deleteRules(event.ruleToDelete.ruleName, event.ruleToDelete.policyId);
+  }
+
 
 
   function deleteRules(ruleName, policyId) {
