@@ -378,10 +378,11 @@ export class CalendarViewComponent implements OnInit {
         this.displayModalError = true;
         this.forceSaveEvent = true;
       } else {
-        console.log(form);
-        form.reset();
-        // form.pristine = true;
-        form.resetForm();
+        if (form) {
+          form.reset();
+          form.resetForm();
+        }
+
         if (this.eventType === 'edit') {
           switch (this.event.repeatEditChoice) {
             case 'Current Event':
@@ -874,7 +875,7 @@ export class CalendarViewComponent implements OnInit {
       this.event.eventLocation = eventCopy.destination.formatted_address;
       this.eventType = 'edit';
       this.event.travelMode = eventCopy.travelMode;
-      this.saveEvent();
+      this.saveEvent(null);
     }
 
   }
