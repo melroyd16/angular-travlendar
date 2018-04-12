@@ -116,6 +116,7 @@ export class CalendarViewComponent implements OnInit {
   currentEventId = '';
   eventType = 'save';
   events: any[] = [];
+  midnight: any;
   refresh: Subject<any> = new Subject();
 
 
@@ -239,6 +240,7 @@ export class CalendarViewComponent implements OnInit {
     this.selectedPriorLocation = 'home';
     this.eventType = 'save';
     this.travelModeArray = [];
+    this.midnight = null;
     this.datesArray = [];
     this.editArray = [];
     this.deleteArray = [];
@@ -322,6 +324,7 @@ export class CalendarViewComponent implements OnInit {
       this.lunchEnd = this.setDateObject(this.lunchEnd, this.event.eventStart, this.profileService.userProfile.lunchEndTime);
       this.eventPayload.lunchStart = new Date(this.lunchStart).getTime();
       this.eventPayload.lunchEnd = new Date(this.lunchEnd).getTime();
+
     }
     if (this.profileService.userProfile.dinnerStartTime && this.profileService.userProfile.dinnerStartTime !== 'Not_Set') {
       this.dinnerStart = this.setDateObject(this.dinnerStart, this.event.eventStart, this.profileService.userProfile.dinnerStartTime);
@@ -329,6 +332,8 @@ export class CalendarViewComponent implements OnInit {
       this.eventPayload.dinnerStart = new Date(this.dinnerStart).getTime();
       this.eventPayload.dinnerEnd = new Date(this.dinnerEnd).getTime();
     }
+    this.midnight = this.setMidnight(this.event.eventStart);
+    this.eventPayload.midnight = new Date(this.midnight).getTime();
     this.eventPayload.eventStart = new Date(this.event.eventStart).getTime();
     this.eventPayload.eventEnd = new Date(this.event.eventEnd).getTime();
 
@@ -456,6 +461,16 @@ export class CalendarViewComponent implements OnInit {
     }
     target.setHours(parseInt(split[0]));
     target.setMinutes(parseInt(split[1].slice(0, 2)));
+    return target;
+  }
+
+  setMidnight(source:Date) :Date{
+    let target = new Date();
+    target.setDate(source.getDate());
+    target.setMonth(source.getMonth());
+    target.setFullYear(source.getFullYear());
+    target.setHours(0);
+    target.setMinutes(0);
     return target;
   }
 

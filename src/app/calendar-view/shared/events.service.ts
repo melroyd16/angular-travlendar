@@ -40,7 +40,7 @@ export class EventsService {
         forceSaveEvent: forceSaveEvent
       };
     }
-    console.log(new Date(eventDetails.eventStart));
+    console.log(payload);
     return this.centralAPIService.callAPI('events', payload, 'post');
   }
 
