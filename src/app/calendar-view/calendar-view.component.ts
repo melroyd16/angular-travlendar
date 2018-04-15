@@ -191,7 +191,6 @@ export class CalendarViewComponent implements OnInit {
 
     this.displayDeleteModal = false;
     this.maxRepeatDate.setMonth(this.maxRepeatDate.getMonth() + 2);
-    // const userProfile = this.profileService.getUserProfile();
     if (!this.profileService.userProfile || !this.profileService.userProfile.homeLocation) {
       this.profileService.fetchUserProfile().subscribe((locationDetails) => {
         console.log(locationDetails);
@@ -243,7 +242,6 @@ export class CalendarViewComponent implements OnInit {
     this.midnight = null;
     this.datesArray = [];
     this.editArray = [];
-    this.deleteArray = [];
     this.deleteArray = [];
     this.otherLocationDetails = new Location();
     this.eventsService.fetchEvents().subscribe((eventList) => {
@@ -434,12 +432,17 @@ export class CalendarViewComponent implements OnInit {
               this.saveEditEvents(this.editArray, this.event, this.startDifference, this.endDifference);
               break;
             default:
-              this.editEvent(this.event);
+              if (this.event.isRepeat && this.deleteArray.length == 0) {
+                this.repeatCheck(this.event);
+              }
+              else{
+                this.editEvent(this.event);
+              }
               break;
           }
         } else {
           this.eventPayload.id = data;
-          if (this.event.isRepeat) {
+          if (this.event.isRepeat && this.deleteArray.length == 0) {
             this.repeatCheck(this.event);
           } else {
             $('#eventModal').modal('toggle');
@@ -637,10 +640,8 @@ export class CalendarViewComponent implements OnInit {
           break;
         case 'Weekly':
           let j = this.event.eventStart;
-          j.setDate(j.getDate() + 7);
           while (j < this.event.repeatMax) {
-            this.datesArray.push(new Date(j));
-            j.setDate(j.getDate() + 7);
+              this.datesArray.push(new Date(j.setDate(j.getDate() + 7)));
           }
           break;
       }
@@ -671,7 +672,7 @@ export class CalendarViewComponent implements OnInit {
         this.eventsService.saveEvent(this.payloadArray[i], this.forceSaveEvent, 'save', this.event.id).subscribe((data) => {
           count++;
           if (data.errorMessage) {
-            this.deleteArray.push(this.payloadArray[count]);
+            this.deleteArray.push(this.payloadArray[count - 1]);
             switch (data.errorMessage.code) {
               case 1:
                 this.scheduleModalError = 'Maximum daily walking distance of '
@@ -699,7 +700,6 @@ export class CalendarViewComponent implements OnInit {
                 this.scheduleModalError = 'This Event is Conflicting. Click Save to proceed anyways.';
                 break;
             }
-
             $('#eventModal').modal('show');
             this.displayModalError = true;
             this.displayModalSave = false;
@@ -708,7 +708,7 @@ export class CalendarViewComponent implements OnInit {
             this.event.eventStart = new Date(this.event.eventStart);
             this.event.eventEnd = new Date(this.event.eventEnd);
             this.event.travelMode = this.payloadArray[count-1].travelMode.mode;
-
+            this.event.repeatMax = new Date(this.payloadArray[count - 1].repeatMax);
           }
           else {
             this.eventPayload.id = data;
