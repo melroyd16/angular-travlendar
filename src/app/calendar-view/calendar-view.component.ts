@@ -464,11 +464,12 @@ export class CalendarViewComponent implements OnInit {
     target.setMonth(source.getMonth());
     target.setFullYear(source.getFullYear());
     const split = time.split(':');
-    if (split[1].slice(2, 4) === 'pm') {
+    if (split[1].slice(2, 4) === 'pm'&& parseInt(split[0]) != 12) {
       split[0] = (parseInt(split[0]) + 12).toString();
     }
     target.setHours(parseInt(split[0]));
     target.setMinutes(parseInt(split[1].slice(0, 2)));
+    console.log(target);
     return target;
   }
 
