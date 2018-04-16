@@ -84,7 +84,7 @@
         <div class="alert alert-danger" role="alert" *ngIf="displayModalError">
           {{scheduleModalError}}
         </div>
-        <form #eventForm="ngForm">
+        <form #eventForm="ngForm" (ngSubmit)="saveEvent(eventForm)">
           <div class="form-group">
             <label for="eventTitle">Event Title</label>
             <input type="text" name="eventTitle" [(ngModel)]="event.eventTitle" class="form-control" id="eventTitle" placeholder="Enter event title" required name="eventTitle" #eventTitle="ngModel">
@@ -147,17 +147,17 @@
               <input #repeat type="checkbox" name="isRepeat" data-toggle="modal" [(ngModel)]="event.isRepeat" (change)="openRepeatBlock(repeat)"> Repeat Event
             </label>
           </div>
-          <div  class="col-xs-12 col-md-6" *ngIf="event.isRepeat">
+          <div class="col-xs-12 col-md-6" *ngIf="event.isRepeat">
             <label for="repeatSelect">Options</label>
             <select class="form-control" id="repeatSelect" name="repeatSelect" required [(ngModel)]="event.repeatPreference">
                 <option>Daily</option>
                 <option>Weekly</option>
             </select>
             <label for="repeatUntil">Repeat Until</label>
-            <input required name="Until" class="form-control" [owlDateTimeTrigger]="dt4" [owlDateTime]="dt4" [min]="event.eventEnd" [max]="maxRepeatDate"  [(ngModel)]="event.repeatMax">
+            <input required name="Until" class="form-control" [owlDateTimeTrigger]="dt4" [owlDateTime]="dt4" [min]="event.eventEnd" [max]="maxRepeatDate" [(ngModel)]="event.repeatMax">
             <owl-date-time [pickerType]="'calendar'" #dt4></owl-date-time>
           </div>
-          <div  class="col-xs-12 col-md-6" *ngIf="repeatEdit">
+          <div class="col-xs-12 col-md-6" *ngIf="repeatEdit">
             <label for="repeatSelect">Choose the Event(s) to be edited</label>
             <select class="form-control" id="redit" name="repeatEdit" required [disabled]="!event.isRepeat" [(ngModel)]="event.repeatEditChoice">
               <option>Current Event</option>
@@ -165,14 +165,14 @@
               <option>All Repeated Events</option>
             </select>
           </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="initEvent()">Close  </button>
+            <button type="submit" class="btn btn-primary">Save</button>
+          </div>
         </form>
         <div class="alert alert-success" role="alert" *ngIf="displayModalSave">
           Your Events are being saved
         </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="initEvent()">Close  </button>
-        <button type="button" class="btn btn-primary"   (click)="saveEvent()">Save</button>
       </div>
     </div>
   </div>
@@ -217,14 +217,14 @@
         </button>
       </div>
       <div class="modal-body">
-        <div  *ngIf="repeatDelete">
+        <div *ngIf="repeatDelete">
           <label for="repeatSelect">Choose the Event(s) to be deleted</label>
           <div class="col-xs-12 col-md-6">
-          <select  class="form-control" id="rdelete" name="repeatDelete" required [(ngModel)]="repeatDeleteChoice"  (change)="opendeletePrompt()">
+            <select class="form-control" id="rdelete" name="repeatDelete" required [(ngModel)]="repeatDeleteChoice" (change)="opendeletePrompt()">
             <option>Current Event</option>
             <option>All Repeated Events</option>
           </select>
-        </div>
+          </div>
         </div>
         <div *ngIf="deletePrompt">
           <p>Are you sure you want to delete this event?</p>
@@ -232,8 +232,8 @@
             <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="closeDeleteModal()">Close</button>
             <button type="button" class="btn btn-primary" (click)="deleteEvents()">Yes</button>
           </div>
-      </div>
+        </div>
 
-</div>
+      </div>
+    </div>
   </div>
-</div>

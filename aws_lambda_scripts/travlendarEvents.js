@@ -8,7 +8,6 @@ var lambda = new aws.Lambda({
 var username = "";
 
 exports.handler = (event, context, callback) => {
-  console.log(event)
 
   function saveEvent(eventLeaveTime) {
     var id = new Date().getTime() + "_" + username
@@ -81,11 +80,7 @@ exports.handler = (event, context, callback) => {
   }
 
   function lunchConflicts(lunchData, lunchStart, lunchEnd) {
-    console.log("LUNCH CONFLICT CHECK");
-    console.log(lunchData);
     if (lunchData == null || lunchData.Items.length == 0){
-      console.log("No DATA");
-      console.log(lunchData.Items)
       return [false, null];
     }
     var itemList = lunchData.Items;
@@ -113,14 +108,11 @@ exports.handler = (event, context, callback) => {
     // if not return false
     // check if eventStart-LunchStart >= 30 ==> return true
     // if not modify lunchStart to eventEnd
-    console.log("Lunch Time: "+lunchStart + " to " + lunchEnd);
-    console.log(lunchTimeMeetings)
     if (lunchTimeMeetings == null || lunchTimeMeetings.length == 0) {
       return true;
     }
     var LUNCH_TIME = 30*60*1000 ;    //30 minute lunch time
     var itemList = lunchTimeMeetings;
-    console.log(itemList[0])
     for (var i = 0; i < itemList.length; i++) {
       if (i == itemList.length - 1) {
         if (lunchEnd > itemList[i].eventEnd && lunchEnd - itemList[i].eventEnd > LUNCH_TIME) {
@@ -140,9 +132,6 @@ exports.handler = (event, context, callback) => {
 
   function getDurationFromDistanceAPIInMins(startlocation, endLocation,mode){
     return 3000
-    //     console.log("Inside the call Lambda function")
-    //     console.log("DISTAAAAAAA", startlocation, endLocation, mode)
-    //     console.log(startlocation,endLocation,mode)
     //     var AWS = require("aws-sdk");
 
     //         AWS.config.update({
@@ -164,13 +153,10 @@ exports.handler = (event, context, callback) => {
     // }, function(error, data) {
 
     //   if (error) {
-    //     console.log("Error" + error)
     //     return 0;
     //   }
-    //   console.log(data)
 
     //  // var response = data
-    //   console.log("SSSS")
     //   var response = data.Payload;
     //   if (data ==null || data.Payload == null){
     //       return 0;
@@ -182,7 +168,6 @@ exports.handler = (event, context, callback) => {
     //              result = res.result[0].duration_value;
     //          }
 
-    //   console.log("Response" + result)
     // return result;
     // });
   }
@@ -200,16 +185,11 @@ exports.handler = (event, context, callback) => {
 
   // THis method looks through the list to calculate the overlapping conditions
   function isConflictPresent(data, eventID, eventStart, eventEnd) {
-
-    console.log("CONFLICT CHECK")
-    console.log(data)
     if (data == null || data.Items.length == 0){
-      return [false, null, null];
+      return [false, null, null, null];
     }
-    console.log("Inside is conflict present");
     var itemList = data.Items
     var isMeetingOverlaps = false
-    console.log(itemList);
 
     for (var i = 0; i < itemList.length; i++) {
       if(itemList[i].id == eventID)
@@ -225,18 +205,17 @@ exports.handler = (event, context, callback) => {
       }
     }
     if(isMeetingOverlaps) {
-      return [isMeetingOverlaps, itemList[i].eventTitle, itemList[i].eventStart];
+      return [isMeetingOverlaps, itemList[i].eventTitle, itemList[i].eventStart, eventStart];
     }
     else {
-      return [isMeetingOverlaps, null, null];
+      return [isMeetingOverlaps, null, null, null];
     }
 
 
   }
 
 
-  function isUnderPreferredTransportation(currentEvent, travelMode, user_distance, allEvents) {
-    console.log("Checking Walking/Bicycling Criteria");
+  function isUnderPreferredTransportation(currentEvent, travelMode, user_distance, allEvents, day_start) {
     var eventID = currentEvent.body.eventID;
     var eventStart = currentEvent.body.eventDetails.eventStart;
     var eventEnd = currentEvent.body.eventDetails.eventEnd;
@@ -245,7 +224,6 @@ exports.handler = (event, context, callback) => {
     var currentTravelMode = currentEvent.body.eventDetails.travelMode.mode;
 
     var distance = 0;
-    console.log(username, currentTravelMode);
 
     if(currentTravelMode == 'walking') {
       distance = user_distance.walkingDistance;
@@ -253,27 +231,21 @@ exports.handler = (event, context, callback) => {
     else if (currentTravelMode == 'bicycling') {
       distance = user_distance.bicyclingDistance;
     }
-    console.log(distance);
-    console.log("Preferred distance", distance);
-    console.log("Alfred", eventStart)
-    var date = new Date(eventStart);
-    var yy = date.getFullYear();
-    var mm = date.getMonth();
-    var dd = date.getDate();
-    var h = date.getHours();
-    var m = date.getMinutes();
-    var s = date.getSeconds();
-    console.log(mm+'/'+dd+'/'+yy, h+':'+m+':'+s)
+    // var date = new Date(eventStart);
+    // var yy = date.getFullYear();
+    // var mm = date.getMonth();
+    // var dd = date.getDate();
+    // var h = date.getHours();
+    // var m = date.getMinutes();
+    // var s = date.getSeconds();
 
-    var milliStart = new Date(Date.UTC(yy,mm,dd,0,0,0)).getTime();
-    console.log(milliStart);
-    var milliEnd = new Date(Date.UTC(yy,mm,dd+1,0,0,0)).getTime();
-    console.log(milliEnd);
+    // var milliStart = new Date(Date.UTC(yy,mm,dd,0,0,0)).getTime();
+    // var milliEnd = new Date(Date.UTC(yy,mm,dd+1,0,0,0)).getTime();
 
-    console.log(allEvents);
+    var milliStart = day_start;
+    var milliEnd = day_start + 24*60*60*1000;
 
     distance = distance * 1609; //converting to meters
-
     distance -= currentEvent.body.eventDetails.travelMode.distance.value;
     if (distance < 0) {
       return [false, currentEvent.body.eventDetails.eventTitle];
@@ -283,11 +255,9 @@ exports.handler = (event, context, callback) => {
         continue;
       }
       if (allEvents[i].eventStart > milliStart && allEvents[i].eventStart < milliEnd) {
-        console.log("Daily Event: ", allEvents[i]);
         if (allEvents[i].travelMode.mode == currentTravelMode) {
           distance -= allEvents[i].travelMode.distance.value;
           if (distance < 0) {
-            console.log("Distance Overboard");
             return [false, allEvents[i].eventTitle];
           }
         }
@@ -304,15 +274,11 @@ exports.handler = (event, context, callback) => {
   //             mode: currentTravelMode
   //         }, null, 2)
   //         }, function (error, data) {
-  //             console.log("AAAAA: ", data);
   //             if (error) {
   //                 context.fail('error', error);
   //             }
   //             if (data.Payload) {
   //                 distance = data.Payload;
-  //                 console.log(distance);
-  //                 console.log("Preferred distance", distance);
-  //                 console.log("Alfred", eventStart)
   //                 var date = new Date(eventStart);
   //                 var yy = date.getFullYear();
   //                 var mm = date.getMonth();
@@ -320,14 +286,9 @@ exports.handler = (event, context, callback) => {
   //                 var h = date.getHours();
   //                 var m = date.getMinutes();
   //                 var s = date.getSeconds();
-  //                 console.log(mm+'/'+dd+'/'+yy, h+':'+m+':'+s)
 
   //                 var milliStart = new Date(Date.UTC(yy,mm,dd,0,0,0)).getTime();
-  //                 console.log(milliStart);
   //                 var milliEnd = new Date(Date.UTC(yy,mm,dd+1,0,0,0)).getTime();
-  //                 console.log(milliEnd);
-
-  //                 console.log(allEvents);
 
   //                 distance = 2;
   //                 distance = distance * 1609; //converting to meters
@@ -344,7 +305,6 @@ exports.handler = (event, context, callback) => {
   //                         if (allEvents[i].travelMode.mode == currentTravelMode) {
   //                             distance -= allEvents[i].travelMode.distance.value;
   //                             if (distance < 0) {
-  //                                 console.log("Distance Overboard");
   //                                 return false;
   //                             }
   //                         }
@@ -360,11 +320,6 @@ exports.handler = (event, context, callback) => {
 
 
   function checkConflictOnLocationBasis(data,eventID, eventStart, eventEnd, origin, destination, travelMode, status){
-    console.log("Input AAAA checkConflictOnLocationBasis");
-    console.log(data);
-    console.log(origin);
-    console.log(eventStart);
-
     var itemList = data.Items;
 
     var startmeetingDetails = null;
@@ -398,13 +353,6 @@ exports.handler = (event, context, callback) => {
         }
       }
     }
-
-
-    console.log("SSSSS");
-    console.log(startmeetingDetails);
-
-    console.log("EEEE");
-    console.log(endMeetinfDetails);
 
     // If there is no previous and next meeting then directly save the meeting
     if(startmeetingDetails == null && endMeetinfDetails == null){
@@ -440,8 +388,6 @@ exports.handler = (event, context, callback) => {
       // var previous_response = getDurationFromDistanceAPIInMins(startmeetingDetails.destination.place_id, origin, travelMode);
       // //var previous_response = getDurationFromDistanceAPIInMins("ChIJ-c0dQ52tK4cR0o7GfBfBnC0","ChIJ44CqppgIK4cRH7QsOa1K3aI", "driving")
 
-      // console.log("Previous location duration ", previous_response)
-
       // startmeetingDetails.eventStart = startmeetingDetails.eventStart + previous_response * 1000 //millesec
 
       // //startmeetingDetails.eventStart = startmeetingDetails.eventStart + 100 * 1000
@@ -465,8 +411,6 @@ exports.handler = (event, context, callback) => {
 
       // var next_response = getDurationFromDistanceAPIInMins(destination, endMeetinfDetails.origin.place_id,travelMode);
       // //var next_response = getDurationFromDistanceAPIInMins("ChIJ-c0dQ52tK4cR0o7GfBfBnC0","ChIJ44CqppgIK4cRH7QsOa1K3aI", "driving")
-
-      // console.log("Next location duration ", next_response)
       // var result = isConflictPresentForTwoLocations(endMeetinfDetails.eventStart,endMeetinfDetails.eventEnd,eventStart , eventEnd+ next_response  * 1000) // millesec
       //     if(result == true){
       //         return true;
@@ -497,8 +441,6 @@ exports.handler = (event, context, callback) => {
       "nextMeetingId":nextMeetingId,
       "previousMeetingId":previousMeetingId
     };
-    console.log('AABB')
-    console.log(params)
 
     // var AWS = require("aws-sdk");
     // AWS.config.update({
@@ -515,7 +457,6 @@ exports.handler = (event, context, callback) => {
     //   Payload: JSON.stringify(params, null, null) // pass params
     // }, function(error, data) {
     // if(status == "new") {
-    //     console.log("Saved SSSS")
     //     saveEvent();
     //   } else {
     //     saveModifiedEvent();
@@ -524,17 +465,12 @@ exports.handler = (event, context, callback) => {
     //   return;
 
     // if (error) {
-    //   console.log("Error SSSS" + error);
 
     //   // If the error occurs in fetching the service Still saving the data
 
     // }else{
-
-    //   console.log("Location data SSSS");
-    //   console.log(data)
     //   // save the meeting
     //   if (data['Payload'] == 'true'){
-    //       console.log("Conflict Found while comparing the location distance ")
     //     var error_message = {
     //       "errorMessage": {
     //         "code": 4,
@@ -570,12 +506,9 @@ exports.handler = (event, context, callback) => {
     // }, function(error, data) {
 
     //   if (error) {
-    //     console.log("Error in getting eventLeaveTime " + error);
 
 
     //   }else{
-    //     console.log("EventLEaveTime API data");
-    //     console.log(data);
 
     //     var jsonResult = JSON.parse(data['Payload']);
 
@@ -594,26 +527,16 @@ exports.handler = (event, context, callback) => {
 
     var eventLeaveTime = event.body.eventDetails.eventStart;
     if(event.body.eventDetails.travelMode.duration != null && event.body.eventDetails.travelMode.duration.value!= null ) {
-      eventLeaveTime = event.body.eventDetails.eventStart - event.body.eventDetails.travelMode.duration.value * 1000
-    }
-    if(status == 'new') {
-      saveEvent(eventLeaveTime)
-    }else{
-      saveModifiedEvent(eventLeaveTime)
-    }
-
-    // if(status == 'new'){
-    //   saveEvent();
-    // }else{
-    //   saveModifiedEvent();
-    // }
+        eventLeaveTime = event.body.eventDetails.eventStart - event.body.eventDetails.travelMode.duration.value * 1000
+      }
+      if(status == 'new') {
+        saveEvent(eventLeaveTime)
+      }else{
+        saveModifiedEvent(eventLeaveTime)
+      }
   }
 
   function promiseCallFunction(params, status, previousMeetingObject, nextMeetingObject){
-
-    console.log("Inside Promise call function ")
-    console.log(params)
-
     var callOtherLambdaFunction = new Promise(
       function (resolve, reject) {
 
@@ -628,13 +551,10 @@ exports.handler = (event, context, callback) => {
         }, function(error, data) {
 
           if (error) {
-            console.log("Error SSSS" + error);
             // If the error occurs in fetching the service Still saving the data
             saveOrModifyEvents(status)
             reject(error)
           }else{
-            console.log("Location data ");
-            console.log(data)
             // save the meeting
 
             var jsonResult = JSON.parse(data['Payload'])
@@ -653,8 +573,6 @@ exports.handler = (event, context, callback) => {
 
 
             if (conflictInDuration == true){
-              console.log("Conflict Found while comparing the location distance ")
-
 
               if (previousMeetingObject != null && previousMeetingObject.id != null && previousMeetingObject.id == conflictMeetingId && previousMeetingObject.eventTitle != null){
                 conflictTitle = previousMeetingObject.eventTitle
@@ -663,12 +581,6 @@ exports.handler = (event, context, callback) => {
               if(nextMeetingObject != null && nextMeetingObject.id != null && nextMeetingObject.id == conflictMeetingId && nextMeetingObject.eventTitle != null){
                 conflictTitle = nextMeetingObject.eventTitle
               }
-
-
-
-              console.log("TTTTTT")
-              console.log(conflictTitle)
-              console.log(conflictMeetingId)
               var error_message = {
                 "errorMessage": {
                   "code": 4,
@@ -693,14 +605,9 @@ exports.handler = (event, context, callback) => {
       callOtherLambdaFunction
         .then(function (data) {
           // yay, you got a new phone
-          //console.log(data);
-          //console.log("DDDD")
-          // output: { brand: 'Samsung', color: 'black' }
         })
         .catch(function (error) {
           // oops, mom don't buy it
-          //console.log(error.message);
-          // output: 'mom is not happy'
         });
 
 
@@ -709,20 +616,15 @@ exports.handler = (event, context, callback) => {
   }
 
   function convertStringTimeToMillis(time, startDate) {
-    console.log("Inside convert function")
     var hr = time[0]+time[1]
     var min = time[3]+time[4]
-    console.log(time)
-    console.log(hr + " " + min)
 
     var date = new Date(1522022400000)
-    console.log(date);
     var yy = date.getFullYear();
     var mm = date.getMonth() + 1;
     var dd = date.getDate();
     var hr = date.getHours();
     var min = date.getMinutes();
-    console.log(yy + "/" + mm + "/" + dd + " " + hr +":"+min);
 
     var timeInMillis = new Date(Date.UTC(yy,mm,dd,17,0,0)).getTime();
 
@@ -731,7 +633,6 @@ exports.handler = (event, context, callback) => {
 
 
   function queryForFetchingNearMeetings(status) {
-    console.log("Inside the queryForFetchingNearMeetings method ");
     var tableName = "user_events";
     var eventID = event.body.eventDetails.id;
     var eventTitle = event.body.eventDetails.eventTitle;
@@ -744,6 +645,8 @@ exports.handler = (event, context, callback) => {
     var lunchEnd = event.body.eventDetails.lunchEnd;
     var dinnerStart = event.body.eventDetails.dinnerStart;
     var dinnerEnd = event.body.eventDetails.dinnerEnd;
+    var midnightTime = event.body.eventDetails.midnight;
+
 
     var eventObj = {
       origin: event.body.eventDetails.origin,
@@ -753,16 +656,13 @@ exports.handler = (event, context, callback) => {
       eventTitle: eventTitle
     };
 
-    console.log("OBJECT+++++++++++++++");
-    console.log(eventObj);
-
     var cal_eventStart = Number(eventStart) - 86400000; //24*60*60*1000
     var cal_eventEnd = Number(eventEnd) + 86400000; //24*60*60*1000
     var params = {
       TableName: tableName,
       IndexName: "username-index",
       KeyConditionExpression: "#username = :u",
-      ProjectionExpression: "id, eventTitle, eventStart, eventEnd, origin, destination",
+      ProjectionExpression: "id, eventTitle, eventStart, eventEnd, origin, destination, travelMode",
       FilterExpression: "eventStart >= :start and eventStart <= :end",
       ExpressionAttributeNames: {
         "#username": "username"
@@ -790,17 +690,11 @@ exports.handler = (event, context, callback) => {
         }
 
         dynamo.query(payload, function(err, dist) {
-
-
-          // console.log(dist.Items[0]);
           if (err) {
             console.log("ERRRRRRRRR");
-            console.error("Unable to query. Error:", JSON.stringify(err, null, 2));
           } else {
-            console.log("Query succeeded.");
             var user_distance = dist.Items[0];
             var error_message = "XYZ";
-            console.log("ALFRED" + user_distance);
 
             var max_dist_status = false;
 
@@ -809,8 +703,6 @@ exports.handler = (event, context, callback) => {
                 var lunchTest = data;
                 lunchTest.Items.push(eventObj);
                 var meetingList = lunchConflicts(lunchTest, lunchStart, lunchEnd);
-                console.log(meetingList);
-                console.log("LIST:" + meetingList);
                 var lunch = isLunchPossible(meetingList, lunchStart, lunchEnd);
                 if (lunch == false) {
                   error_message = {
@@ -824,7 +716,6 @@ exports.handler = (event, context, callback) => {
                 }
                 else {
                   lunchTest.Items.pop(eventObj);
-                  console.log("NEW:"+lunchTest);
                 }
               }
             }
@@ -834,8 +725,6 @@ exports.handler = (event, context, callback) => {
                 var dinnerTest = data;
                 dinnerTest.Items.push(eventObj);
                 var meetingList = lunchConflicts(dinnerTest, dinnerStart, dinnerEnd);
-                console.log(meetingList);
-                console.log("LIST:" + meetingList);
                 var dinner = isLunchPossible(meetingList, dinnerStart, dinnerEnd);
                 if (dinner == false) {
                   error_message = {
@@ -849,7 +738,6 @@ exports.handler = (event, context, callback) => {
                 }
                 else {
                   dinnerTest.Items.pop(eventObj);
-                  console.log("NEW:"+lunchTest);
                 }
               }
 
@@ -867,7 +755,7 @@ exports.handler = (event, context, callback) => {
             }
             if(max_dist_status) {
               if(travelMode == 'walking' || travelMode == 'bicycling') {
-                var s = isUnderPreferredTransportation(event, travelMode, user_distance, data);
+                var s = isUnderPreferredTransportation(event, travelMode, user_distance, data.Items, midnightTime);
                 if (s[0] == false) {
                   var user_miles = null;
                   var error_code = -1;
@@ -885,23 +773,23 @@ exports.handler = (event, context, callback) => {
                       "value": user_miles
                     }
                   };
-                  console.log("Your " + travelMode + " distance exceeds your daily preference: " + user_miles + " miles");
                   context.succeed(error_message);
                   return;
-                  console.log("SHOULD NOT PRINT THIS")
                 }
               }
             }
 
+            // context.fail("STOP HERE")
+            // return;
+
             var s2 = isConflictPresent(data, eventID, eventStart, eventEnd);
-            console.log("Time Conflict Response: ", s2);
             if(s2[0] == true) {
-              console.log("This time overlaps with meeting: " + s2[1]);
               error_message = {
                 "errorMessage": {
                   "code": 3,
                   "value": s2[1],
-                  "startTime": s2[2]
+                  "startTime": s2[2],
+                  "currentStartTime": s2[3]
                 }
               }
               context.succeed(error_message);
@@ -947,6 +835,7 @@ exports.handler = (event, context, callback) => {
   }
 
   function deleteRules(uid) {
+    console.log(uid);
     var ruleName = 'notification_for_' + uid;
     var policyId = 'NID'+ uid;
     var cloudwatchevents = new aws.CloudWatchEvents();
@@ -978,7 +867,19 @@ exports.handler = (event, context, callback) => {
 
   function saveModifiedEvent(eventLeaveTime) {
 
-    if(event.body.eventDetails.isRepeat){
+    // delete the cron job if user edits an event and specifically modifies time
+    // do not dlete cron if user does not modify time
+    var payload = {
+      TableName: "user_events",
+      Key: {
+        "id": event.body.eventID
+      }
+    }
+    dynamo.getItem(payload, function(err, data){
+      if(!err){
+        console.log('before deleting rules');
+        deleteRules(data.Item.eventTitle.replace(/\s/g,'') + data.Item.eventStart);
+      }
       var new_event_payload = {
         TableName: "user_events",
         Item: {
@@ -990,30 +891,16 @@ exports.handler = (event, context, callback) => {
           "origin": event.body.eventDetails.origin,
           "destination": event.body.eventDetails.destination,
           "travelMode": event.body.eventDetails.travelMode,
-          "repeatMax" : event.body.eventDetails.repeatMax,
-          "isRepeat" : event.body.eventDetails.isRepeat,
-          "repeatPreference" : event.body.eventDetails.repeatPreference,
           "eventLeaveTime":eventLeaveTime
         }
       }
+
+    if(event.body.eventDetails.isRepeat){
+      new_event_payload.Item.repeatMax = event.body.eventDetails.repeatMax;
+      new_event_payload.Item.isRepeat = event.body.eventDetails.isRepeat;
+      new_event_payload.Item.repeatPreference = event.body.eventDetails.repeatPreference;
     }
 
-    else{
-      var new_event_payload = {
-        TableName: "user_events",
-        Item: {
-          "id": event.body.eventID,
-          "username": username,
-          "eventStart": event.body.eventDetails.eventStart,
-          "eventEnd": event.body.eventDetails.eventEnd,
-          "eventTitle": event.body.eventDetails.eventTitle,
-          "origin": event.body.eventDetails.origin,
-          "destination": event.body.eventDetails.destination,
-          "travelMode": event.body.eventDetails.travelMode,
-          "eventLeaveTime":eventLeaveTime
-        }
-      };
-    }
 
     dynamo.putItem(new_event_payload, function (err, data) {
       if (err) {
@@ -1022,6 +909,7 @@ exports.handler = (event, context, callback) => {
         context.succeed(event.body.eventID);
       }
     });
+    })
   }
 
 
@@ -1061,9 +949,6 @@ exports.handler = (event, context, callback) => {
   //     });
   // }
 
-
-
-
   lambda.invoke({
     FunctionName: 'getUsername',
     Payload: JSON.stringify({
@@ -1092,14 +977,10 @@ exports.handler = (event, context, callback) => {
           break;
         case "editEvent":
           if(event.body.forceSaveEvent){
-            saveOrModifyEvents("modified")
-            //   saveModifiedEvent();
+            saveOrModifyEvents("modified");
           } else {
             queryForFetchingNearMeetings("modified");
           }
-          break;
-        case "lunch":
-          console.log("LUNCH>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
           break;
         default:
           context.fail("Invalid Operation");
