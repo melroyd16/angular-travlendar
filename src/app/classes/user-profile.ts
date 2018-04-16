@@ -1,4 +1,4 @@
-import { Location } from './location';
+import {Location} from './location';
 
 export class UserProfile {
 
@@ -13,7 +13,7 @@ export class UserProfile {
   dinnerEndTime?: string;
 
   constructor(home: Location, work: Location, walk: number, cycle: number,
-    mode: any[], lunchStart: string, lunchEnd: string, dinnerStart: string, dinnerEnd: string) {
+              mode: any[], lunchStart: string, lunchEnd: string, dinnerStart: string, dinnerEnd: string) {
     this.homeLocation = home;
     this.workLocation = work;
     this.walkingDistance = walk;

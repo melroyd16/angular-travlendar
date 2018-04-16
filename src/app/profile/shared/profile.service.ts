@@ -1,15 +1,17 @@
-import { Injectable } from '@angular/core';
-import { CentralApiService } from '../../services/central-api.service';
-import { Location } from '../../classes/location';
-import { UserProfile } from '../../classes/user-profile';
-import { Observable } from 'rxjs/Observable';
+import {Injectable} from '@angular/core';
+import {CentralApiService} from '../../services/central-api.service';
+import {Location} from '../../classes/location';
+import {UserProfile} from '../../classes/user-profile';
+import {Observable} from 'rxjs/Observable';
 import { of } from 'rxjs/observable/of';
 
 @Injectable()
 export class ProfileService {
 
   userProfile: UserProfile = {};
-  constructor(public centralAPIService: CentralApiService) { }
+
+  constructor(public centralAPIService: CentralApiService) {
+  }
 
   fetchUserProfile(): Observable<any> {
     const simpleObservable = new Observable((observer) => {
@@ -52,8 +54,8 @@ export class ProfileService {
   }
 
   saveUserProfile(homeLocation: Location, workLocation: Location, walkingDistance: number,
-    bicyclingDistance: number, preferredModes: any[], lunchStartTime, lunchEndTime,
-    dinnerStartTime, dinnerEndTime): Observable<any> {
+                  bicyclingDistance: number, preferredModes: any[], lunchStartTime, lunchEndTime,
+                  dinnerStartTime, dinnerEndTime): Observable<any> {
     const payload = {
       operation: 'saveProfile',
       homeLocation: homeLocation,
@@ -76,7 +78,7 @@ export class ProfileService {
 
   setUserDetails(lunchStartTime: string, lunchEndTime: string, dinnerStartTime: string, dinnerEndTime: string,
                  walkingDistance: number, bicyclingDistance: number,
-    preferredModes: any[]): void {
+                 preferredModes: any[]): void {
     this.userProfile.walkingDistance = walkingDistance;
     this.userProfile.bicyclingDistance = bicyclingDistance;
     this.userProfile.preferredMode = preferredModes;
