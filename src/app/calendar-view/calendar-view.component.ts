@@ -106,6 +106,7 @@ export class CalendarViewComponent implements OnInit {
   errorList = [];
   editArray = [];
   deleteArray = [];
+  form : any;
   deleteEvent: any;
   ifSelected = false;
   difference: any;
@@ -241,6 +242,7 @@ export class CalendarViewComponent implements OnInit {
     this.eventType = 'save';
     this.travelModeArray = [];
     this.midnight = null;
+    this.form = null;
     this.datesArray = [];
     this.editArray = [];
     this.deleteArray = [];
@@ -316,6 +318,7 @@ export class CalendarViewComponent implements OnInit {
   }
 
   saveEvent(form): void {
+    this.form = form;
     this.eventPayload = Object.assign({}, this.event);
     if (this.profileService.userProfile.lunchStartTime && this.profileService.userProfile.lunchStartTime !== 'Not_Set') {
       this.lunchStart = this.setDateObject(this.lunchStart, this.event.eventStart, this.profileService.userProfile.lunchStartTime);
@@ -385,11 +388,11 @@ export class CalendarViewComponent implements OnInit {
         this.displayModalError = true;
         this.forceSaveEvent = true;
       } else {
-        if (form) {
-          form.reset();
-          form.resetForm();
-        }
 
+        if(!this.event.isRepeat && form){
+            form.reset();
+            form.resetForm();
+          }
         if (this.eventType === 'edit') {
           switch (this.event.repeatEditChoice) {
             case 'Current Event':
@@ -469,7 +472,6 @@ export class CalendarViewComponent implements OnInit {
     }
     target.setHours(parseInt(split[0]));
     target.setMinutes(parseInt(split[1].slice(0, 2)));
-    console.log(target);
     return target;
   }
 
@@ -627,6 +629,10 @@ export class CalendarViewComponent implements OnInit {
                 $('#eventModal').modal('hide');
                 this.initEvent();
                 this.displaySuccessMessage('All the Events have been edited successfully');
+                if (this.form) {
+                  this.form.reset();
+                  this.form.resetForm();
+                }
               }
             });
             i++;
@@ -723,8 +729,13 @@ export class CalendarViewComponent implements OnInit {
           if (count == this.datesArray.length){
             if(this.deleteArray.length < 1){
               $('#eventModal').modal('hide');
-              this.initEvent();
               this.displaySuccessMessage('All the Events have been added successfully');
+              console.log(this.form);
+              if (this.form) {
+                this.form.reset();
+                this.form.resetForm();
+              }
+              this.initEvent();
             }
             else{
               console.log(this.deleteArray);
