@@ -92,17 +92,30 @@ exports.handler = (event, context, callback) => {
 
       var min = Math.min(lunchStart, item_start_time);
       var max = Math.max(lunchEnd, item_end_time);
+
       if ((max - min) < ((lunchEnd - lunchStart) + (item_end_time - item_start_time))) {
         lunchOverlapMeetings.push(itemList[i]);
       }
     }
-
     return lunchOverlapMeetings;
 
   }
 
-  function isLunchPossible(lunchTimeMeetings, lunchStart, lunchEnd) {
+  function getOrderedMeetings(meetingList) {
+    var temp = null;
+    for (var i=0; i<meetingList.length; i++) {
+      for (var j=0; j<meetingList.length-i-1; j++) {
+        if (meetingList[j].eventStart > meetingList[j+1].eventStart) {
+          temp = meetingList[j];
+          meetingList[j] = meetingList[j+1];
+          meetingList[j+1] = temp;
+        }
+      }
+    }
+    return meetingList;
+  }
 
+  function isLunchPossible(lunchTimeMeetings, lunchStart, lunchEnd) {
     // Loop through lunchTimeMeetings
     // if event is last event and lunchEnd > eventEnd --> check if lunchEnd-eventEnd >= 30 ==> return true
     // if not return false
@@ -112,7 +125,7 @@ exports.handler = (event, context, callback) => {
       return true;
     }
     var LUNCH_TIME = 30*60*1000 ;    //30 minute lunch time
-    var itemList = lunchTimeMeetings;
+    var itemList = getOrderedMeetings(lunchTimeMeetings);
     for (var i = 0; i < itemList.length; i++) {
       if (i == itemList.length - 1) {
         if (lunchEnd > itemList[i].eventEnd && lunchEnd - itemList[i].eventEnd > LUNCH_TIME) {
@@ -590,6 +603,7 @@ exports.handler = (event, context, callback) => {
               context.succeed(error_message);
               return;
             }else{
+              console.log("Passed")
               // No Conflict
               saveOrModifyEvents(status)
             }
@@ -697,8 +711,8 @@ exports.handler = (event, context, callback) => {
             var error_message = "XYZ";
 
             var max_dist_status = false;
-
             if(user_distance.lunchTime && lunchStart != undefined) {
+              console.log("Checking lunch conflict")
               if (eventObj.eventEnd - eventObj.eventStart <= 24*60*60*1000) { // if an event is 24 hr long no need to check for lunch/ dinner time availability
                 var lunchTest = data;
                 lunchTest.Items.push(eventObj);
@@ -716,11 +730,13 @@ exports.handler = (event, context, callback) => {
                 }
                 else {
                   lunchTest.Items.pop(eventObj);
+                  console.log("Passed")
                 }
               }
             }
 
             if(user_distance.dinnerTime && dinnerStart != undefined) {
+              console.log("Checking dinner conflict")
               if (eventObj.eventEnd - eventObj.eventStart <= 24*60*60*1000) { // if an event is 24 hr long no need to check for lunch/ dinner time availability
                 var dinnerTest = data;
                 dinnerTest.Items.push(eventObj);
@@ -738,6 +754,7 @@ exports.handler = (event, context, callback) => {
                 }
                 else {
                   dinnerTest.Items.pop(eventObj);
+                  console.log("Passed")
                 }
               }
 
@@ -755,6 +772,7 @@ exports.handler = (event, context, callback) => {
             }
             if(max_dist_status) {
               if(travelMode == 'walking' || travelMode == 'bicycling') {
+                console.log("Checking " + travelMode + " conflict")
                 var s = isUnderPreferredTransportation(event, travelMode, user_distance, data.Items, midnightTime);
                 if (s[0] == false) {
                   var user_miles = null;
@@ -776,12 +794,13 @@ exports.handler = (event, context, callback) => {
                   context.succeed(error_message);
                   return;
                 }
+                else {
+                  console.log("Passed")
+                }
               }
             }
 
-            // context.fail("STOP HERE")
-            // return;
-
+            console.log("Checking direct conflict")
             var s2 = isConflictPresent(data, eventID, eventStart, eventEnd);
             if(s2[0] == true) {
               error_message = {
@@ -796,6 +815,8 @@ exports.handler = (event, context, callback) => {
               return;
 
             }else{
+              console.log("Passed")
+              console.log("Checking Travel time conflict")
               checkConflictOnLocationBasis(data, eventID, eventStart, eventEnd, origin, destination, travelMode, status)
             }
 
