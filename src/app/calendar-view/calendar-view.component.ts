@@ -23,8 +23,11 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import {
   CalendarEvent,
   CalendarEventAction,
-  CalendarEventTimesChangedEvent
+  CalendarEventTimesChangedEvent,
+  CalendarEventTitleFormatter
 } from 'angular-calendar';
+
+import { CustomEventTitleFormatter } from './custom-event-title-formatter.provider';
 
 import { UserLoginService } from '../services/user-login.service';
 import { LoggedInCallback } from '../services/cognito.service';
@@ -57,7 +60,13 @@ const colors: any = {
 @Component({
   selector: 'app-calendar-view',
   templateUrl: './calendar-view.component.html',
-  styleUrls: ['./calendar-view.component.scss']
+  styleUrls: ['./calendar-view.component.scss'],
+  providers: [
+    {
+      provide: CalendarEventTitleFormatter,
+      useClass: CustomEventTitleFormatter
+    }
+  ]
 })
 export class CalendarViewComponent implements OnInit {
   @ViewChild('modalContent') modalContent: TemplateRef<any>;
