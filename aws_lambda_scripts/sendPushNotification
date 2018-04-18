@@ -76,13 +76,20 @@ exports.handler = (event, context, callback) => {
         destinationAddress = event['eventDetails']['destination']['formatted_address']
     }
 
-    var eventEnd  = ""
+    var eventStart  = 0
 
-    if(event['eventDetails']['eventEnd'] != null){
-      eventEnd += event['eventDetails']['eventEnd']
+    if(event['eventDetails']['eventStart'] != null){
+      eventStart += event['eventDetails']['eventStart']
     }
 
-    var message = "You have the meeting at location " + destinationAddress + " at time " + eventEnd;
+    // Adding time in seconds
+    console.log("Print currentTime " + new Date().getTime())
+    var timeInSeconds = new Date().getTime() - eventStart;
+    if (timeInSeconds < 0){
+      timeInSeconds = 0 - timeInSeconds
+    }
+
+    var message = "You have the meeting at location " + destinationAddress + " in time " + parseInt(timeInSeconds/(60  * 1000)) + " mins";
     console.log("Message " + message);
     var snsClient = new AWS.SNS()
 
