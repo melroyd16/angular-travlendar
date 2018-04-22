@@ -88,6 +88,7 @@ export class CalendarViewComponent implements OnInit {
   repeatDeleteChoice: any;
   forceSaveEvent = false;
   repeatEdit = false;
+  allowSave = true;
   deletePrompt = true;
   repeatDelete = false;
   displaySuccess = false;
@@ -235,6 +236,7 @@ export class CalendarViewComponent implements OnInit {
     this.forceSaveEvent = false;
     this.repeatDeleteChoice = '';
     this.repeatEdit = false;
+    this.allowSave = true;
     this.deletePrompt = true;
     this.repeatDelete = false;
     this.scheduleModalError = '';
@@ -907,6 +909,37 @@ export class CalendarViewComponent implements OnInit {
     $('#repeatEditModal').modal('hide');
   }
 
+  eventClick({
+    event
+  }: any): void {
+    for (let i = 0; i < this.events.length; i++) {
+      this.allowSave = false;
+      $('#eventModal').modal('toggle');
+      if (event.id === this.events[i].id) {
+        this.event.id = event.id;
+        this.event.eventTitle = event.title;
+        this.event.eventStart = event.start;
+        this.event.eventEnd = event.end;
+        this.event.origin = event.origin;
+        this.event.otherLocation = event.origin.formatted_address;
+        this.event.destination = event.destination;
+        this.event.eventLocation = event.destination.formatted_address;
+        this.event.isRepeat = event.isRepeat;
+        this.event.repeatMax = event.repeatMax;
+        this.event.repeatPreference = event.repeatPreference;
+        this.changeLocation();
+        this.event.travelMode = event.travelMode.mode;
+        this.selectedPriorLocation = 'other';
+        if (this.event.origin.place_id && this.event.origin.place_id === this.homeLocation.place_id) {
+          this.selectedPriorLocation = 'home';
+        }
+        if (this.event.origin.place_id && this.event.origin.place_id === this.workLocation.place_id) {
+          this.selectedPriorLocation = 'work';
+        }
+        break;
+      }
+    }
+  }
 
   eventTimesChanged({
     event,
@@ -934,4 +967,5 @@ export class CalendarViewComponent implements OnInit {
     }
 
   }
+
 }

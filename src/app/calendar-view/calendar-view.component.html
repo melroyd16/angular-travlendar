@@ -59,7 +59,7 @@
   {{errorMessage}}
 </div>
 <div [ngSwitch]="view" *ngIf="eventsLoaded">
-  <mwl-calendar-month-view *ngSwitchCase="'month'" [viewDate]="viewDate" [events]="events" [refresh]="refresh" [activeDayIsOpen]="activeDayIsOpen" (dayClicked)="dayClicked($event.day)" (eventTimesChanged)="eventTimesChanged($event)">
+  <mwl-calendar-month-view *ngSwitchCase="'month'" [viewDate]="viewDate" [events]="events" [refresh]="refresh" [activeDayIsOpen]="activeDayIsOpen" (dayClicked)="dayClicked($event.day)" (eventTimesChanged)="eventTimesChanged($event)" (eventClicked)="eventClick($event)">
   </mwl-calendar-month-view>
   <mwl-calendar-week-view *ngSwitchCase="'week'" [viewDate]="viewDate" [events]="events" [refresh]="refresh" (eventTimesChanged)="eventTimesChanged($event)">
   </mwl-calendar-week-view>
@@ -87,7 +87,7 @@
         <form #eventForm="ngForm" (ngSubmit)="saveEvent(eventForm)">
           <div class="form-group">
             <label for="eventTitle">Event Title</label>
-            <input type="text" name="eventTitle" [(ngModel)]="event.eventTitle" class="form-control" id="eventTitle" placeholder="Enter event title" required name="eventTitle" #eventTitle="ngModel">
+            <input type="text" name="eventTitle" [disabled]="!allowSave" [(ngModel)]="event.eventTitle" class="form-control" id="eventTitle" placeholder="Enter event title" required name="eventTitle" #eventTitle="ngModel">
             <div [hidden]="eventTitle.valid || eventTitle.pristine" class="alert alert-danger">
               Event Title is Required
             </div>
@@ -96,26 +96,26 @@
           <div class="form-group row">
             <div class="col-xs-12 col-md-6">
               <label for="eventStart">Event Start</label>
-              <input required name="eventStart" [(ngModel)]="event.eventStart" class="form-control" [owlDateTimeTrigger]="dt1" [owlDateTime]="dt1" [min]="eventStartMinDate" (ngModelChange)="changeStartDate()">
+              <input required name="eventStart"  [disabled]="!allowSave"  [(ngModel)]="event.eventStart" class="form-control" [owlDateTimeTrigger]="dt1" [owlDateTime]="dt1" [min]="eventStartMinDate" (ngModelChange)="changeStartDate()">
               <owl-date-time #dt1></owl-date-time>
             </div>
             <div class="col-xs-12 col-md-6">
               <label for="eventEnd">Event End</label>
-              <input required name="eventEnd" [(ngModel)]="event.eventEnd" class="form-control" [owlDateTimeTrigger]="dtPicker2" [owlDateTime]="dtPicker2" [min]="event.eventStart" #dateTime="ngModel" (ngModelChange)="updateFlag()">
+              <input required name="eventEnd"  [disabled]="!allowSave" [(ngModel)]="event.eventEnd" class="form-control" [owlDateTimeTrigger]="dtPicker2" [owlDateTime]="dtPicker2" [min]="event.eventStart" #dateTime="ngModel" (ngModelChange)="updateFlag()">
               <owl-date-time #dtPicker2></owl-date-time>
             </div>
           </div>
 
           <div class="form-group">
             <label for="eventLocation">Event Location</label>
-            <input id="eventLocation" class="form-control" (onSelect)="selectAddress($event, 'event')" appGpComplete required [(ngModel)]="event.eventLocation" name="eventLocation" #eventLocation="ngModel" />
+            <input id="eventLocation" class="form-control" [disabled]="!allowSave" (onSelect)="selectAddress($event, 'event')" appGpComplete required [(ngModel)]="event.eventLocation" name="eventLocation" #eventLocation="ngModel" />
             <div [hidden]="eventLocation.valid || eventLocation.pristine" class="alert alert-danger">
               Event Location is required
             </div>
           </div>
           <div class="form-group">
             <label for="previousLocation">Previous Location</label>
-            <select class="form-control" id="previousLocation" [(ngModel)]="selectedPriorLocation" name="previousLocation" (ngModelChange)="changePreviousLocation()">
+            <select class="form-control" id="previousLocation" [disabled]="!allowSave" [(ngModel)]="selectedPriorLocation" name="previousLocation" (ngModelChange)="changePreviousLocation()">
               <option *ngFor="let locationType of locationTypes" [value]="locationType">{{locationType}}</option>
             </select>
           </div>
@@ -124,7 +124,7 @@
             <p *ngSwitchCase="'work'" class="text-info">{{workLocation?workLocation.formatted_address:''}}</p>
             <div *ngSwitchCase="'other'" class="form-group">
               <label for="otherLocation">Event Location</label>
-              <input id="otherLocation" class="form-control" (onSelect)="selectAddress($event, 'other')" appGpComplete required [(ngModel)]="event.otherLocation" name="otherLocation" #otherLocation="ngModel" />
+              <input id="otherLocation" [disabled]="!allowSave" class="form-control" (onSelect)="selectAddress($event, 'other')" appGpComplete required [(ngModel)]="event.otherLocation" name="otherLocation" #otherLocation="ngModel" />
               <div [hidden]="otherLocation.valid || otherLocation.pristine" class="alert alert-danger">
                 Other Event Location is required
               </div>
@@ -134,7 +134,7 @@
             <label>Travel Mode:</label>
             <table class="travel-mode-table">
               <tr *ngFor="let travelMode of travelModeArray">
-                <td *ngIf="travelMode.value.distance"><input type="radio" [(ngModel)]="event.travelMode" [value]="travelMode.mode" name="travelMode"></td>
+                <td *ngIf="travelMode.value.distance"><input type="radio" [disabled]="!allowSave" [(ngModel)]="event.travelMode" [value]="travelMode.mode" name="travelMode"></td>
                 <td *ngIf="travelMode.value.distance"><i class="fa fa-{{travelMode.icon}} travel-mode-icon"></i></td>
                 <td *ngIf="travelMode.value.distance">{{travelMode.mode}}</td>
                 <td *ngIf="travelMode.value.distance">{{travelMode.value.distance.text}}</td>
@@ -144,17 +144,17 @@
           </div>
           <div class="form-group">
             <label>
-              <input #repeat type="checkbox" name="isRepeat" data-toggle="modal" [(ngModel)]="event.isRepeat" (change)="openRepeatBlock(repeat)"> Repeat Event
+              <input #repeat type="checkbox" name="isRepeat" data-toggle="modal" [disabled]="!allowSave" [(ngModel)]="event.isRepeat" (change)="openRepeatBlock(repeat)"> Repeat Event
             </label>
           </div>
           <div class="col-xs-12 col-md-6" *ngIf="event.isRepeat">
             <label for="repeatSelect">Options</label>
-            <select class="form-control" id="repeatSelect" name="repeatSelect" required [(ngModel)]="event.repeatPreference">
+            <select class="form-control" id="repeatSelect" name="repeatSelect" required  [disabled]="!allowSave" [(ngModel)]="event.repeatPreference">
                 <option>Daily</option>
                 <option>Weekly</option>
             </select>
             <label for="repeatUntil">Repeat Until</label>
-            <input required name="Until" class="form-control" [owlDateTimeTrigger]="dt4" [owlDateTime]="dt4" [min]="event.eventEnd" [max]="maxRepeatDate" [(ngModel)]="event.repeatMax">
+            <input required name="Until" class="form-control" [disabled]="!allowSave" [owlDateTimeTrigger]="dt4" [owlDateTime]="dt4" [min]="event.eventEnd" [max]="maxRepeatDate" [(ngModel)]="event.repeatMax">
             <owl-date-time [pickerType]="'calendar'" #dt4></owl-date-time>
           </div>
           <div class="col-xs-12 col-md-6" *ngIf="repeatEdit">
@@ -167,7 +167,7 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="initEvent()">Close  </button>
-            <button type="submit" class="btn btn-primary">Save</button>
+            <button type="submit" class="btn btn-primary" [disabled]="!allowSave">Save</button>
           </div>
         </form>
         <div class="alert alert-success" role="alert" *ngIf="displayModalSave">
