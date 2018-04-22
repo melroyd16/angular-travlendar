@@ -89,6 +89,7 @@ export class CalendarViewComponent implements OnInit {
   forceSaveEvent = false;
   repeatEdit = false;
   allowSave = true;
+  allowClickSave = true;
   deletePrompt = true;
   repeatDelete = false;
   displaySuccess = false;
@@ -237,6 +238,7 @@ export class CalendarViewComponent implements OnInit {
     this.repeatDeleteChoice = '';
     this.repeatEdit = false;
     this.allowSave = true;
+    this.allowClickSave = true;
     this.deletePrompt = true;
     this.repeatDelete = false;
     this.scheduleModalError = '';
@@ -320,6 +322,10 @@ export class CalendarViewComponent implements OnInit {
   }
 
   saveEvent(form): void {
+    if(form){
+        form.reset();
+        form.resetForm();
+      }
     this.form = form;
     this.eventPayload = Object.assign({}, this.event);
     if (this.profileService.userProfile.lunchStartTime && this.profileService.userProfile.lunchStartTime !== 'Not_Set') {
@@ -794,6 +800,7 @@ export class CalendarViewComponent implements OnInit {
   changeLocation(): void {
     this.displayTravelModes = false;
     this.event.travelMode = null;
+    this.allowClickSave = true;
     this.travelModeArray = [];
     if (!(this.event.origin && this.event.origin.place_id)) {
       this.event.origin = this.homeLocation;
@@ -801,6 +808,11 @@ export class CalendarViewComponent implements OnInit {
     if (this.event.origin && this.event.origin.place_id && this.event.destination && this.event.destination.place_id) {
       this.calendarService.fetchTransitDetails(this.event.origin, this.event.destination).subscribe((data) => {
         this.travelModeArray = data;
+          for (let i = 0; i < this.travelModeArray.length; i++){
+            if(!this.travelModeArray[i].value.distance || !this.travelModeArray[i].value.distance ){
+              this.allowClickSave = false;
+            }
+        }
         this.displayTravelModes = true;
         this.ref.tick();
       });
@@ -914,6 +926,7 @@ export class CalendarViewComponent implements OnInit {
   }: any): void {
     for (let i = 0; i < this.events.length; i++) {
       this.allowSave = false;
+      this.allowClickSave
       $('#eventModal').modal('toggle');
       if (event.id === this.events[i].id) {
         this.event.id = event.id;
