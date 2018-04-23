@@ -1,3 +1,4 @@
+var moment = require('moment');
 var aws = require('aws-sdk');
 const doc = require("dynamodb-doc");
 const dynamo = new doc.DynamoDB();
@@ -50,6 +51,12 @@ exports.handler = (event, context, callback) => {
         }
       }
     }
+    
+    var end = moment().endOf('day').unix()*1000;
+    
+    if(event.body.eventDetails.eventStart < end){
+      createCronJob(payload.Item);
+    }
 
 
     dynamo.putItem(payload, function (err, data) {
@@ -60,6 +67,65 @@ exports.handler = (event, context, callback) => {
       }
     });
   }
+  
+  function createCronJob(scheduleItem) {
+        var scheduledDate = moment.unix(scheduleItem.eventLeaveTime/1000);
+        var cloudwatchevents = new aws.CloudWatchEvents();
+
+        var scheduleExpression = "cron("+
+            scheduledDate.minute() + " " + 
+            scheduledDate.hours() + " " +
+            scheduledDate.date() + " " +
+            (scheduledDate.month() + 1) + " " +
+            "? " +
+            scheduledDate.year() + ")";
+            
+
+        var endCronParams = {
+            Name: 'notification_for_' + scheduleItem.eventTitle.replace(/\s/g,'') + scheduleItem.eventStart,
+            Description: 'scheduling notification for an individual event',
+            ScheduleExpression: scheduleExpression,
+            State: "ENABLED"
+        };
+
+        cloudwatchevents.putRule(endCronParams, function (err, data) {
+            if (err) console.log(err, err.stack); // an error occurred
+            else {
+                var lambda = new aws.Lambda();
+                var params = {
+                    Action: "lambda:InvokeFunction",
+                    FunctionName: "sendPushNotification",
+                    Principal: "events.amazonaws.com",
+                    SourceArn: data.RuleArn,
+                    StatementId: "NID" + scheduleItem.eventTitle.replace(/\s/g,'') + scheduleItem.eventStart
+                };
+                lambda.addPermission(params, function (err, data) {
+                    if (err) console.log(err, err.stack); // an error occurred
+                    else {
+                        var input = {
+                            "operation": "scheduleCron",
+                            "eventDetails": scheduleItem,
+                            "ruleToDelete":{
+                                "ruleName": 'notification_for_' + scheduleItem.eventTitle.replace(/\s/g,'') + scheduleItem.eventStart,
+                                "policyId": "NID" + scheduleItem.eventTitle.replace(/\s/g,'') + scheduleItem.eventStart
+                            }
+                        }
+                        var params = {
+                            Rule: 'notification_for_' + scheduleItem.eventTitle.replace(/\s/g,'') + scheduleItem.eventStart,
+                            Targets: [{
+                                Arn: 'arn:aws:lambda:us-west-2:016911789346:function:sendPushNotification',
+                                Id: 'sendPushNotification',
+                                Input: JSON.stringify(input)
+                            }]
+                        };
+                        cloudwatchevents.putTargets(params, function (err, data) {
+                            if (err) console.log(err, err.stack);
+                        });
+                    }
+                });
+            }
+        });
+    }
 
   function fetchEvents() {
     var payload = {
@@ -92,18 +158,31 @@ exports.handler = (event, context, callback) => {
 
       var min = Math.min(lunchStart, item_start_time);
       var max = Math.max(lunchEnd, item_end_time);
+   
       if ((max - min) < ((lunchEnd - lunchStart) + (item_end_time - item_start_time))) {
         lunchOverlapMeetings.push(itemList[i]);
       }
     }
-
     return lunchOverlapMeetings;
 
   }
+  
+  function getOrderedMeetings(meetingList) {
+    var temp = null;
+    for (var i=0; i<meetingList.length; i++) {
+      for (var j=0; j<meetingList.length-i-1; j++) {
+        if (meetingList[j].eventStart > meetingList[j+1].eventStart) {
+          temp = meetingList[j];
+          meetingList[j] = meetingList[j+1];
+          meetingList[j+1] = temp;
+        }
+      }
+    }
+    return meetingList;
+  }
 
   function isLunchPossible(lunchTimeMeetings, lunchStart, lunchEnd) {
-
-    // Loop through lunchTimeMeetings
+    // Loop through lunchTimeMeetings 
     // if event is last event and lunchEnd > eventEnd --> check if lunchEnd-eventEnd >= 30 ==> return true
     // if not return false
     // check if eventStart-LunchStart >= 30 ==> return true
@@ -112,7 +191,7 @@ exports.handler = (event, context, callback) => {
       return true;
     }
     var LUNCH_TIME = 30*60*1000 ;    //30 minute lunch time
-    var itemList = lunchTimeMeetings;
+    var itemList = getOrderedMeetings(lunchTimeMeetings);
     for (var i = 0; i < itemList.length; i++) {
       if (i == itemList.length - 1) {
         if (lunchEnd > itemList[i].eventEnd && lunchEnd - itemList[i].eventEnd > LUNCH_TIME) {
@@ -221,7 +300,10 @@ exports.handler = (event, context, callback) => {
     var eventEnd = currentEvent.body.eventDetails.eventEnd;
     var origin = currentEvent.body.eventDetails.origin;
     var destination = currentEvent.body.eventDetails.destination;
-    var currentTravelMode = currentEvent.body.eventDetails.travelMode.mode;
+     var currentTravelMode;
+    if(currentEvent.body.eventDetails.travelMode != null){
+      currentTravelMode = currentEvent.body.eventDetails.travelMode.mode;
+    }
 
     var distance = 0;
 
@@ -238,7 +320,7 @@ exports.handler = (event, context, callback) => {
     // var h = date.getHours();
     // var m = date.getMinutes();
     // var s = date.getSeconds();
-
+    
     // var milliStart = new Date(Date.UTC(yy,mm,dd,0,0,0)).getTime();
     // var milliEnd = new Date(Date.UTC(yy,mm,dd+1,0,0,0)).getTime();
 
@@ -254,7 +336,7 @@ exports.handler = (event, context, callback) => {
       if (allEvents[i].id == currentEvent.id) {
         continue;
       }
-      if (allEvents[i].eventStart > milliStart && allEvents[i].eventStart < milliEnd) {
+      if (allEvents[i].eventStart > milliStart && allEvents[i].eventStart < milliEnd && travelMode != null) {
         if (allEvents[i].travelMode.mode == currentTravelMode) {
           distance -= allEvents[i].travelMode.distance.value;
           if (distance < 0) {
@@ -485,7 +567,7 @@ exports.handler = (event, context, callback) => {
 
   function saveOrModifyEvents(status){
     // Adding eventLeaveTime Code
-
+    
     // var aws = require('aws-sdk');
     // var lambda = new aws.Lambda({
     //   region: 'us-west-2'
@@ -640,14 +722,16 @@ exports.handler = (event, context, callback) => {
     var eventEnd = event.body.eventDetails.eventEnd;
     var origin = event.body.eventDetails.origin.place_id;
     var destination = event.body.eventDetails.destination.place_id;
-    var travelMode = event.body.eventDetails.travelMode.mode;
     var lunchStart = event.body.eventDetails.lunchStart;
     var lunchEnd = event.body.eventDetails.lunchEnd;
     var dinnerStart = event.body.eventDetails.dinnerStart;
     var dinnerEnd = event.body.eventDetails.dinnerEnd;
     var midnightTime = event.body.eventDetails.midnight;
-
-
+    var travelMode;
+     if(event.body.eventDetails.travelMode != null){
+      travelMode = event.body.eventDetails.travelMode.mode;
+    }
+    
     var eventObj = {
       origin: event.body.eventDetails.origin,
       destination: event.body.eventDetails.destination,
@@ -695,9 +779,7 @@ exports.handler = (event, context, callback) => {
           } else {
             var user_distance = dist.Items[0];
             var error_message = "XYZ";
-
             var max_dist_status = false;
-
             if(user_distance.lunchTime && lunchStart != undefined) {
               if (eventObj.eventEnd - eventObj.eventStart <= 24*60*60*1000) { // if an event is 24 hr long no need to check for lunch/ dinner time availability
                 var lunchTest = data;
@@ -778,10 +860,6 @@ exports.handler = (event, context, callback) => {
                 }
               }
             }
-
-            // context.fail("STOP HERE")
-            // return;
-
             var s2 = isConflictPresent(data, eventID, eventStart, eventEnd);
             if(s2[0] == true) {
               error_message = {
@@ -835,7 +913,6 @@ exports.handler = (event, context, callback) => {
   }
 
   function deleteRules(uid) {
-    console.log(uid);
     var ruleName = 'notification_for_' + uid;
     var policyId = 'NID'+ uid;
     var cloudwatchevents = new aws.CloudWatchEvents();
@@ -866,7 +943,7 @@ exports.handler = (event, context, callback) => {
 
 
   function saveModifiedEvent(eventLeaveTime) {
-
+    
     // delete the cron job if user edits an event and specifically modifies time
     // do not dlete cron if user does not modify time
     var payload = {
@@ -877,7 +954,6 @@ exports.handler = (event, context, callback) => {
     }
     dynamo.getItem(payload, function(err, data){
       if(!err){
-        console.log('before deleting rules');
         deleteRules(data.Item.eventTitle.replace(/\s/g,'') + data.Item.eventStart);
       }
       var new_event_payload = {
@@ -894,11 +970,17 @@ exports.handler = (event, context, callback) => {
           "eventLeaveTime":eventLeaveTime
         }
       }
-
+      
     if(event.body.eventDetails.isRepeat){
       new_event_payload.Item.repeatMax = event.body.eventDetails.repeatMax;
       new_event_payload.Item.isRepeat = event.body.eventDetails.isRepeat;
       new_event_payload.Item.repeatPreference = event.body.eventDetails.repeatPreference;
+    }
+    
+    var end = moment().endOf('day').unix()*1000;
+    
+    if(event.body.eventDetails.eventStart < end){
+      createCronJob(payload.Item);
     }
 
 
@@ -988,3 +1070,5 @@ exports.handler = (event, context, callback) => {
     }
   });
 }
+
+
