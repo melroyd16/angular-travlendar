@@ -1,19 +1,20 @@
-import { Injectable } from '@angular/core';
-import { CentralApiService } from '../../services/central-api.service';
-import { Observable } from 'rxjs/Observable';
-import { of } from 'rxjs/observable/of';
+import {Injectable} from '@angular/core';
+import {CentralApiService} from '../../services/central-api.service';
+import {Observable} from 'rxjs/Observable';
+import {of} from 'rxjs/observable/of';
 
-import { Location } from '../../classes/location';
-import { ProfileService } from '../../profile/shared/profile.service';
+import {Location} from '../../classes/location';
+import {ProfileService} from '../../profile/shared/profile.service';
 
 @Injectable()
 export class CalendarService {
 
-  constructor(public centralAPIService: CentralApiService,
-    public profileService: ProfileService) { }
-
   origin: Location;
   destination: Location;
+
+  constructor(public centralAPIService: CentralApiService,
+              public profileService: ProfileService) {
+  }
 
   fetchTravelModes(travelMode: string): any {
     const deferredObject = $.Deferred();
@@ -28,7 +29,7 @@ export class CalendarService {
       avoidHighways: false,
       avoidTolls: false
     };
-    service.getDistanceMatrix(parameter, function(response, status) {
+    service.getDistanceMatrix(parameter, function (response, status) {
       if (status !== google.maps.DistanceMatrixStatus.OK) {
         deferredObject.reject(status);
       } else {
@@ -46,7 +47,7 @@ export class CalendarService {
     const simpleObservable = new Observable((observer) => {
       $.when(this.fetchTravelModes('driving'), this.fetchTravelModes('walking'),
         this.fetchTravelModes('bicycling'), this.fetchTravelModes('transit'))
-        .then(function(val1, val2, val3, val4) {
+        .then(function (val1, val2, val3, val4) {
           const travelModeArray = [];
           travelModeArray.push({
             mode: 'driving',
@@ -84,7 +85,8 @@ export class CalendarService {
           }
           observer.complete();
         })
-        .fail(function() { });
+        .fail(function () {
+        });
     });
     return simpleObservable;
   }

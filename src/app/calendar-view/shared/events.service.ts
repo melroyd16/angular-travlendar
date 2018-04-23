@@ -1,12 +1,13 @@
-import { Injectable } from '@angular/core';
-import { CentralApiService } from '../../services/central-api.service';
-import { Observable } from 'rxjs/Observable';
-import { of } from 'rxjs/observable/of';
+import {Injectable} from '@angular/core';
+import {CentralApiService} from '../../services/central-api.service';
+import {Observable} from 'rxjs/Observable';
+import {of} from 'rxjs/observable/of';
 
 @Injectable()
 export class EventsService {
 
-  constructor(public centralAPIService: CentralApiService) { }
+  constructor(public centralAPIService: CentralApiService) {
+  }
 
   fetchEvents(): Observable<any> {
     const payload = {

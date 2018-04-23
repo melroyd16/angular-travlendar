@@ -7,14 +7,14 @@ pre {
   padding: 15px;
 }
 
-.cal-month-view .cal-open-day-events{
+.cal-month-view .cal-open-day-events {
   padding: 15px;
   color: white;
   background-color: aliceblue;
   box-shadow: inset 0 0 15px 0 rgba(0, 0, 0, 0.5);
 }
 
-.addMore{
+.addMore {
   border: none;
   width: 32px;
   height: 32px;
@@ -22,53 +22,54 @@ pre {
   transition: all ease-in-out 0.2s;
   cursor: pointer;
 }
-.addMore:hover{
+
+.addMore:hover {
   border: 1px solid #888;
   background-color: #ddd;
 }
 
-.add{
-    background: #32CD32;
-    color: #FFF;
-    font-weight: bold;
-    font-size: 21px;
-    border: 0;
-    cursor: pointer;
-    display: inline-block;
-    padding: 4px 9px;
-    vertical-align: top;
-    line-height: 100%;
+.add {
+  background: #32CD32;
+  color: #FFF;
+  font-weight: bold;
+  font-size: 21px;
+  border: 0;
+  cursor: pointer;
+  display: inline-block;
+  padding: 4px 9px;
+  vertical-align: top;
+  line-height: 100%;
 }
 
-.remove{
-    background: #C76868;
-    color: #FFF;
-    font-weight: bold;
-    font-size: 21px;
-    border: 0;
-    cursor: pointer;
-    display: inline-block;
-    padding: 4px 9px;
-    vertical-align: top;
-    line-height: 100%;
+.remove {
+  background: #C76868;
+  color: #FFF;
+  font-weight: bold;
+  font-size: 21px;
+  border: 0;
+  cursor: pointer;
+  display: inline-block;
+  padding: 4px 9px;
+  vertical-align: top;
+  line-height: 100%;
 }
 
 .add-event-row {
-    margin-top: 20px;
-    float: right;
-    .add-icon {
-        margin-right: 5px;
-    }
+  margin-top: 20px;
+  float: right;
+  .add-icon {
+    margin-right: 5px;
+  }
 }
 
 .travel-mode-table {
-    td {
-        padding-right: 7px;
-        .travel-mode-icon {
-            margin-right: 10px;
-            margin-left: 5px;
-            width: 16px;
-            text-align: center;
-        }
+  td {
+    padding-right: 7px;
+    .travel-mode-icon {
+      margin-right: 10px;
+      margin-left: 5px;
+      width: 16px;
+      text-align: center;
     }
+  }
 }

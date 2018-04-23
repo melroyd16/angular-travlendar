@@ -1,4 +1,4 @@
-import { GpCompleteDirective } from './gp-complete.directive';
+import {GpCompleteDirective} from './gp-complete.directive';
 
 describe('GpCompleteDirective', () => {
   it('should create an instance', () => {

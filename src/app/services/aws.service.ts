@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { Callback, CognitoUtil } from './cognito.service';
+import {Injectable} from '@angular/core';
+import {Callback, CognitoUtil} from './cognito.service';
 import * as AWS from 'aws-sdk/global';
 
 /**
@@ -15,6 +15,18 @@ export class AwsUtil {
 
   constructor(public cognitoUtil: CognitoUtil) {
     AWS.config.region = CognitoUtil._REGION;
+  }
+
+  static getCognitoParametersForIdConsolidation(idTokenJwt: string): {} {
+    const url = 'cognito-idp.' + CognitoUtil._REGION.toLowerCase() + '.amazonaws.com/' + CognitoUtil._USER_POOL_ID;
+    const logins: Array<string> = [];
+    logins[url] = idTokenJwt;
+    const params = {
+      IdentityPoolId: CognitoUtil._IDENTITY_POOL_ID, /* required */
+      Logins: logins
+    };
+
+    return params;
   }
 
   /**
@@ -40,7 +52,6 @@ export class AwsUtil {
       mythis.setupAWS(isLoggedIn, callback, idToken);
     }
   }
-
 
   /**
    * Sets up the AWS global params
@@ -77,25 +88,13 @@ export class AwsUtil {
 
     AWS.config.credentials = creds;
 
-    creds.get(function(err) {
+    creds.get(function (err) {
       if (!err) {
         if (AwsUtil.firstLogin) {
           AwsUtil.firstLogin = false;
         }
       }
     });
-  }
-
-  static getCognitoParametersForIdConsolidation(idTokenJwt: string): {} {
-    const url = 'cognito-idp.' + CognitoUtil._REGION.toLowerCase() + '.amazonaws.com/' + CognitoUtil._USER_POOL_ID;
-    const logins: Array<string> = [];
-    logins[url] = idTokenJwt;
-    const params = {
-      IdentityPoolId: CognitoUtil._IDENTITY_POOL_ID, /* required */
-      Logins: logins
-    };
-
-    return params;
   }
 
 }

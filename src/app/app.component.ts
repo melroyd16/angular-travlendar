@@ -1,12 +1,12 @@
-import { AwsUtil } from './services/aws.service';
-import { UserLoginService } from './services/user-login.service';
-import { CognitoUtil, LoggedInCallback } from './services/cognito.service';
-import { Router, NavigationEnd, ActivatedRoute } from '@angular/router';
+import {AwsUtil} from './services/aws.service';
+import {UserLoginService} from './services/user-login.service';
+import {CognitoUtil, LoggedInCallback} from './services/cognito.service';
+import {Router, NavigationEnd, ActivatedRoute} from '@angular/router';
 
-import { ProfileService } from './profile/shared/profile.service';
+import {ProfileService} from './profile/shared/profile.service';
 
-import { Component, ViewEncapsulation, OnInit } from '@angular/core';
-import { } from '@types/googlemaps';
+import {Component, ViewEncapsulation, OnInit} from '@angular/core';
+import {} from '@types/googlemaps';
 
 import * as moment from 'moment';
 
@@ -20,8 +20,9 @@ import * as moment from 'moment';
 })
 export class AppComponent implements OnInit, LoggedInCallback {
   currentRoute: string;
+
   constructor(public awsUtil: AwsUtil, public userService: UserLoginService, public cognito: CognitoUtil,
-    private router: Router, route: ActivatedRoute, private profileService: ProfileService) {
+              private router: Router, route: ActivatedRoute, private profileService: ProfileService) {
   }
 
   ngOnInit() {

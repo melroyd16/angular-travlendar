@@ -1,4 +1,4 @@
-import { Directive, ElementRef, EventEmitter, OnInit, Output } from '@angular/core';
+import {Directive, ElementRef, EventEmitter, OnInit, Output} from '@angular/core';
 
 @Directive({
   selector: '[appGpComplete]'

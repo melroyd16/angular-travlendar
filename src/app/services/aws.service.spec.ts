@@ -1,6 +1,6 @@
-import { TestBed, inject } from '@angular/core/testing';
+import {TestBed, inject} from '@angular/core/testing';
 
-import { AwsService } from './aws.service';
+import {AwsService} from './aws.service';
 
 describe('AwsService', () => {
   beforeEach(() => {

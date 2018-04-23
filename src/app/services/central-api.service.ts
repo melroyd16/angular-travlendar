@@ -1,18 +1,19 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { environment } from '../../environments/environment';
-import { Observable } from 'rxjs/Observable';
-import { of } from 'rxjs/observable/of';
+import {Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {environment} from '../../environments/environment';
+import {Observable} from 'rxjs/Observable';
+import {of} from 'rxjs/observable/of';
 
-import { Ng4LoadingSpinnerService } from 'ng4-loading-spinner';
+import {Ng4LoadingSpinnerService} from 'ng4-loading-spinner';
 
 @Injectable()
 export class CentralApiService {
 
-  constructor(private http: HttpClient,
-    private spinnerService: Ng4LoadingSpinnerService) { }
-
   hideSpinner = this.spinnerService.hide();
+
+  constructor(private http: HttpClient,
+              private spinnerService: Ng4LoadingSpinnerService) {
+  }
 
   callAPI(module: string, payload: any, method: string): Observable<any> {
 

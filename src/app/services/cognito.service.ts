@@ -1,5 +1,5 @@
-import { Injectable } from '@angular/core';
-import { environment } from '../../environments/environment';
+import {Injectable} from '@angular/core';
+import {environment} from '../../environments/environment';
 import {
   AuthenticationDetails,
   CognitoIdentityServiceProvider,
@@ -26,6 +26,7 @@ export interface LoggedInCallback {
 
 export interface Callback {
   callback(): void;
+
   callbackWithParam(result: any): void;
 }
 
@@ -103,7 +104,7 @@ export class CognitoUtil {
       throw new Error(('CognitoUtil: callback in getAccessToken is null...returning'));
     }
     if (this.getCurrentUser() != null) {
-      this.getCurrentUser().getSession(function(err, session) {
+      this.getCurrentUser().getSession(function (err, session) {
         if (err) {
           callback.callbackWithParam(null);
         } else {
@@ -122,7 +123,7 @@ export class CognitoUtil {
       throw new Error(('CognitoUtil: callback in getIdToken is null...returning'));
     }
     if (this.getCurrentUser() != null) {
-      this.getCurrentUser().getSession(function(err, session) {
+      this.getCurrentUser().getSession(function (err, session) {
         if (err) {
           callback.callbackWithParam(null);
         } else {
@@ -143,7 +144,7 @@ export class CognitoUtil {
       throw new Error(('CognitoUtil: callback in getRefreshToken is null...returning'));
     }
     if (this.getCurrentUser() != null) {
-      this.getCurrentUser().getSession(function(err, session) {
+      this.getCurrentUser().getSession(function (err, session) {
         if (err) {
           callback.callbackWithParam(null);
         } else {
@@ -158,7 +159,7 @@ export class CognitoUtil {
   }
 
   refresh(): void {
-    this.getCurrentUser().getSession(function(err, session) {
+    this.getCurrentUser().getSession(function (err, session) {
       if (err) {
         console.log('CognitoUtil: Can\'t set the credentials:' + err);
       } else {

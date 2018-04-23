@@ -1,5 +1,5 @@
-import { Location } from './location';
-import { TravelMode } from './travel-mode';
+import {Location} from './location';
+import {TravelMode} from './travel-mode';
 
 export class Event {
   eventTitle?: String;

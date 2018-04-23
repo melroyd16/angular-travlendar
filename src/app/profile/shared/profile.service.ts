@@ -3,7 +3,7 @@ import {CentralApiService} from '../../services/central-api.service';
 import {Location} from '../../classes/location';
 import {UserProfile} from '../../classes/user-profile';
 import {Observable} from 'rxjs/Observable';
-import { of } from 'rxjs/observable/of';
+import {of} from 'rxjs/observable/of';
 
 @Injectable()
 export class ProfileService {

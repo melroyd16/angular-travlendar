@@ -1,7 +1,7 @@
-import { environment } from '../../environments/environment';
-import { Injectable } from '@angular/core';
-import { CognitoCallback, CognitoUtil, LoggedInCallback } from './cognito.service';
-import { AuthenticationDetails, CognitoUser } from 'amazon-cognito-identity-js';
+import {environment} from '../../environments/environment';
+import {Injectable} from '@angular/core';
+import {CognitoCallback, CognitoUtil, LoggedInCallback} from './cognito.service';
+import {AuthenticationDetails, CognitoUser} from 'amazon-cognito-identity-js';
 import * as AWS from 'aws-sdk/global';
 import * as STS from 'aws-sdk/clients/sts';
 
@@ -26,10 +26,10 @@ export class UserLoginService {
     const cognitoUser = new CognitoUser(userData);
     const self = this;
     cognitoUser.authenticateUser(authenticationDetails, {
-      newPasswordRequired: function(userAttributes, requiredAttributes) {
+      newPasswordRequired: function (userAttributes, requiredAttributes) {
         callback.cognitoCallback(`User needs to set password.`, null);
       },
-      onSuccess: function(result) {
+      onSuccess: function (result) {
 
         const creds = self.cognitoUtil.buildCognitoCreds(result.getIdToken().getJwtToken());
 
@@ -47,12 +47,12 @@ export class UserLoginService {
           clientParams.endpoint = environment.sts_endpoint;
         }
         const sts = new STS(clientParams);
-        sts.getCallerIdentity(function(err, data) {
+        sts.getCallerIdentity(function (err, data) {
           callback.cognitoCallback(null, result);
         });
 
       },
-      onFailure: function(err) {
+      onFailure: function (err) {
         callback.cognitoCallback(err.message, null);
       },
     });
@@ -67,10 +67,10 @@ export class UserLoginService {
     const cognitoUser = new CognitoUser(userData);
 
     cognitoUser.forgotPassword({
-      onSuccess: function() {
+      onSuccess: function () {
 
       },
-      onFailure: function(err) {
+      onFailure: function (err) {
         callback.cognitoCallback(err.message, null);
       },
       inputVerificationCode() {
@@ -88,10 +88,10 @@ export class UserLoginService {
     const cognitoUser = new CognitoUser(userData);
 
     cognitoUser.confirmPassword(verificationCode, password, {
-      onSuccess: function() {
+      onSuccess: function () {
         callback.cognitoCallback(null, null);
       },
-      onFailure: function(err) {
+      onFailure: function (err) {
         callback.cognitoCallback(err.message, null);
       }
     });
@@ -110,7 +110,7 @@ export class UserLoginService {
     const cognitoUser = this.cognitoUtil.getCurrentUser();
 
     if (cognitoUser != null) {
-      cognitoUser.getSession(function(err, session) {
+      cognitoUser.getSession(function (err, session) {
         if (err) {
           callback.isLoggedIn(err, false);
         } else {

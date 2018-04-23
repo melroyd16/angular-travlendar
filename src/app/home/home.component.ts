@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { UserLoginService } from '../services/user-login.service';
-import { UserRegistrationService } from '../services/user-registration.service';
-import { CognitoCallback, LoggedInCallback } from '../services/cognito.service';
+import {Component, OnInit} from '@angular/core';
+import {Router} from '@angular/router';
+import {UserLoginService} from '../services/user-login.service';
+import {UserRegistrationService} from '../services/user-registration.service';
+import {CognitoCallback, LoggedInCallback} from '../services/cognito.service';
 
 declare let AWS: any;
 declare let AWSCognito: any;
@@ -12,6 +12,7 @@ export class RegistrationUser {
   email: string;
   password: string;
 }
+
 export class NewPasswordUser {
   username: string;
   existingPassword: string;
@@ -25,7 +26,7 @@ export class NewPasswordUser {
 export class LogoutComponent implements LoggedInCallback {
 
   constructor(public router: Router,
-    public userService: UserLoginService) {
+              public userService: UserLoginService) {
     this.userService.isAuthenticated(this);
   }
 
@@ -60,8 +61,8 @@ export class HomeComponent {
   private sub: any;
 
   constructor(public router: Router,
-    public userService: UserLoginService,
-    public userRegistration: UserRegistrationService) {
+              public userService: UserLoginService,
+              public userRegistration: UserRegistrationService) {
     this.onInit();
   }
 
@@ -175,6 +176,7 @@ export class HomeComponent {
   resendCode() {
     this.userRegistration.resendCode(this.rcEmail, this);
   }
+
   resetModal() {
     this.modalDisplay = 'loginModal';
     this.errorMessage = null;

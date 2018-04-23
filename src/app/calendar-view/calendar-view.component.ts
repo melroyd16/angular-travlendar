@@ -18,8 +18,8 @@ import {
   addHours,
   isPast
 } from 'date-fns';
-import { Subject } from 'rxjs/Subject';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import {Subject} from 'rxjs/Subject';
+import {NgbModal} from '@ng-bootstrap/ng-bootstrap';
 import {
   CalendarEvent,
   CalendarEventAction,
@@ -27,18 +27,18 @@ import {
   CalendarEventTitleFormatter
 } from 'angular-calendar';
 
-import { CustomEventTitleFormatter } from './custom-event-title-formatter.provider';
+import {CustomEventTitleFormatter} from './custom-event-title-formatter.provider';
 
-import { UserLoginService } from '../services/user-login.service';
-import { LoggedInCallback } from '../services/cognito.service';
-import { Router } from '@angular/router';
+import {UserLoginService} from '../services/user-login.service';
+import {LoggedInCallback} from '../services/cognito.service';
+import {Router} from '@angular/router';
 
-import { ProfileService } from '../profile/shared/profile.service';
-import { EventsService } from './shared/events.service';
-import { CalendarService } from './shared/calendar.service';
-import { Location } from '../classes/location';
-import { Event } from '../classes/event';
-import { FormGroup, FormControl } from '@angular/forms';
+import {ProfileService} from '../profile/shared/profile.service';
+import {EventsService} from './shared/events.service';
+import {CalendarService} from './shared/calendar.service';
+import {Location} from '../classes/location';
+import {Event} from '../classes/event';
+import {FormGroup, FormControl} from '@angular/forms';
 
 import * as moment from 'moment';
 
@@ -115,7 +115,7 @@ export class CalendarViewComponent implements OnInit {
   errorList = [];
   editArray = [];
   deleteArray = [];
-  form : any;
+  form: any;
   deleteEvent: any;
   ifSelected = false;
   difference: any;
@@ -134,7 +134,7 @@ export class CalendarViewComponent implements OnInit {
   eventActions: CalendarEventAction[] = [
     {
       label: '<i class="fas fa-edit"></i>',
-      onClick: ({ event }: { event: any }): void => {
+      onClick: ({event}: { event: any }): void => {
         for (let i = 0; i < this.events.length; i++) {
           $('#eventModal').modal('toggle');
           if (event.id === this.events[i].id) {
@@ -169,7 +169,7 @@ export class CalendarViewComponent implements OnInit {
     },
     {
       label: '<i class="fa fa-fw fa-times"></i>',
-      onClick: ({ event }: { event: any }): void => {
+      onClick: ({event}: { event: any }): void => {
         for (let i = 0; i < this.events.length; i++) {
           if (event.id === this.events[i].id && this.events[i].isRepeat == true) {
             this.repeatDelete = true;
@@ -184,11 +184,11 @@ export class CalendarViewComponent implements OnInit {
   ];
 
   constructor(private modal: NgbModal, public router: Router,
-    public userService: UserLoginService,
-    public profileService: ProfileService,
-    public eventsService: EventsService,
-    public calendarService: CalendarService,
-    private ref: ApplicationRef) {
+              public userService: UserLoginService,
+              public profileService: ProfileService,
+              public eventsService: EventsService,
+              public calendarService: CalendarService,
+              private ref: ApplicationRef) {
     this.userService.isAuthenticated(this);
   }
 
@@ -259,7 +259,7 @@ export class CalendarViewComponent implements OnInit {
     this.eventsService.fetchEvents().subscribe((eventList) => {
       this.eventsLoaded = true;
       this.events = [];
-      if(eventList.Items){
+      if (eventList.Items) {
         for (let i = 0; i < eventList.Items.length; i++) {
           this.addEvent(eventList.Items[i]);
         }
@@ -398,10 +398,10 @@ export class CalendarViewComponent implements OnInit {
         this.forceSaveEvent = true;
       } else {
 
-        if(!this.event.isRepeat && form){
-            form.reset();
-            form.resetForm();
-          }
+        if (!this.event.isRepeat && form) {
+          form.reset();
+          form.resetForm();
+        }
         if (this.eventType === 'edit') {
           switch (this.event.repeatEditChoice) {
             case 'Current Event':
@@ -452,7 +452,7 @@ export class CalendarViewComponent implements OnInit {
               if (this.event.isRepeat && this.deleteArray.length == 0) {
                 this.repeatCheck(this.event);
               }
-              else{
+              else {
                 this.editEvent(this.event);
               }
               break;
@@ -476,7 +476,7 @@ export class CalendarViewComponent implements OnInit {
     target.setMonth(source.getMonth());
     target.setFullYear(source.getFullYear());
     const split = time.split(':');
-    if (split[1].slice(2, 4) === 'pm'&& parseInt(split[0]) != 12) {
+    if (split[1].slice(2, 4) === 'pm' && parseInt(split[0]) != 12) {
       split[0] = (parseInt(split[0]) + 12).toString();
     }
     target.setHours(parseInt(split[0]));
@@ -484,7 +484,7 @@ export class CalendarViewComponent implements OnInit {
     return target;
   }
 
-  setMidnight(source:Date) :Date{
+  setMidnight(source: Date): Date {
     let target = new Date();
     target.setDate(source.getDate());
     target.setMonth(source.getMonth());
@@ -594,58 +594,58 @@ export class CalendarViewComponent implements OnInit {
           this.events[i].dinnerStart = this.setDateObject(this.dinnerStart, new Date(this.events[i].eventStart), this.profileService.userProfile.dinnerStartTime).getTime();
           this.events[i].dinnerEnd = this.setDateObject(this.dinnerEnd, new Date(this.events[i].eventStart), this.profileService.userProfile.dinnerEndTime).getTime();
         }
-            this.displayModalSave = true;
-            this.eventsService.saveEvent(this.events[i], this.forceSaveEvent, 'edit', this.events[i].id).subscribe((data) => {
-              count++;
-              if (data.errorMessage) {
-                switch (data.errorMessage.code) {
-                  case 1:
-                  this.scheduleModalError = 'Maximum daily Walking distance of '
-                    + data.errorMessage.value + ' miles will be exceeded for the event starting at ' + new Date(data.errorMessage.currentStartTime)  +' . Click Save to proceed anyways.';
-                  break;
-                  case 2:
-                    this.scheduleModalError = 'Maximum daily bicycling distance of '
-                      + data.errorMessage.value + ' miles will be exceeded for the event starting at ' + new Date(data.errorMessage.currentStartTime)  +' . Click Save to proceed anyways.';
-                    break;
-                  case 3:
-                  this.scheduleModalError = 'The event  starting at ' + new Date(data.errorMessage.currentStartTime)  +
--                  ' conflicts with meeting  '+ data.errorMessage.value +' starting at '+new Date(data.errorMessage.startTime)+ '. Click Save to proceed anyways.';
-                    break;
-                  case 4:
-                    this.scheduleModalError = 'The travel time for the event starting at '+ new Date(data.errorMessage.currentStartTime)  +' conflicts with event: '
-                      + data.errorMessage.value + '. Click Save to proceed anyways.';
-                    break;
-                  case 5:
-                    this.scheduleModalError = 'This Event starting at '+ new Date(data.errorMessage.currentStartTime)  +' conflicts with the preferred Lunch Time Slot . Click Save to proceed anyways.';
-                    break;
-                  case 6:
-                    this.scheduleModalError = 'This Event starting at '+ new Date(data.errorMessage.currentStartTime)  +' conflicts with the preferred Dinner Time Slot . Click Save to proceed anyways.';
-                    break;
-                  default:
-                    this.scheduleModalError = 'This Event starting at '+ new Date(data.errorMessage.currentStartTime)  +' is Conflicting. Click Save to proceed anyways.';
-                    break;
-                }
-                $('#eventModal').modal('show');
-                this.displayModalError = true;
-                this.displayModalSave = false;
-                this.forceSaveEvent = true;
-              }
-              else {
-                this.eventPayload.id = data;
-                this.refresh.next();
-              }
-              if (count == events.length) {
-                $('#eventModal').modal('hide');
-                this.initEvent();
-                this.displaySuccessMessage('All the Events have been edited successfully');
-                if (this.form) {
-                  this.form.reset();
-                  this.form.resetForm();
-                }
-              }
-            });
-            i++;
+        this.displayModalSave = true;
+        this.eventsService.saveEvent(this.events[i], this.forceSaveEvent, 'edit', this.events[i].id).subscribe((data) => {
+          count++;
+          if (data.errorMessage) {
+            switch (data.errorMessage.code) {
+              case 1:
+                this.scheduleModalError = 'Maximum daily Walking distance of '
+                  + data.errorMessage.value + ' miles will be exceeded for the event starting at ' + new Date(data.errorMessage.currentStartTime) + ' . Click Save to proceed anyways.';
+                break;
+              case 2:
+                this.scheduleModalError = 'Maximum daily bicycling distance of '
+                  + data.errorMessage.value + ' miles will be exceeded for the event starting at ' + new Date(data.errorMessage.currentStartTime) + ' . Click Save to proceed anyways.';
+                break;
+              case 3:
+                this.scheduleModalError = 'The event  starting at ' + new Date(data.errorMessage.currentStartTime) +
+                  -' conflicts with meeting  ' + data.errorMessage.value + ' starting at ' + new Date(data.errorMessage.startTime) + '. Click Save to proceed anyways.';
+                break;
+              case 4:
+                this.scheduleModalError = 'The travel time for the event starting at ' + new Date(data.errorMessage.currentStartTime) + ' conflicts with event: '
+                  + data.errorMessage.value + '. Click Save to proceed anyways.';
+                break;
+              case 5:
+                this.scheduleModalError = 'This Event starting at ' + new Date(data.errorMessage.currentStartTime) + ' conflicts with the preferred Lunch Time Slot . Click Save to proceed anyways.';
+                break;
+              case 6:
+                this.scheduleModalError = 'This Event starting at ' + new Date(data.errorMessage.currentStartTime) + ' conflicts with the preferred Dinner Time Slot . Click Save to proceed anyways.';
+                break;
+              default:
+                this.scheduleModalError = 'This Event starting at ' + new Date(data.errorMessage.currentStartTime) + ' is Conflicting. Click Save to proceed anyways.';
+                break;
+            }
+            $('#eventModal').modal('show');
+            this.displayModalError = true;
+            this.displayModalSave = false;
+            this.forceSaveEvent = true;
           }
+          else {
+            this.eventPayload.id = data;
+            this.refresh.next();
+          }
+          if (count == events.length) {
+            $('#eventModal').modal('hide');
+            this.initEvent();
+            this.displaySuccessMessage('All the Events have been edited successfully');
+            if (this.form) {
+              this.form.reset();
+              this.form.resetForm();
+            }
+          }
+        });
+        i++;
+      }
     }
 
   }
@@ -662,7 +662,7 @@ export class CalendarViewComponent implements OnInit {
         case 'Weekly':
           let j = this.event.eventStart;
           while (j < this.event.repeatMax) {
-              this.datesArray.push(new Date(j.setDate(j.getDate() + 7)));
+            this.datesArray.push(new Date(j.setDate(j.getDate() + 7)));
           }
           break;
       }
@@ -696,47 +696,47 @@ export class CalendarViewComponent implements OnInit {
             this.deleteArray.push(this.payloadArray[count - 1]);
             switch (data.errorMessage.code) {
               case 1:
-              this.scheduleModalError = 'Maximum daily Walking distance of '
-                + data.errorMessage.value + ' miles will be exceeded for the event starting at ' + new Date(data.errorMessage.currentStartTime)  +' . Click Save to proceed anyways.';
-              break;
+                this.scheduleModalError = 'Maximum daily Walking distance of '
+                  + data.errorMessage.value + ' miles will be exceeded for the event starting at ' + new Date(data.errorMessage.currentStartTime) + ' . Click Save to proceed anyways.';
+                break;
               case 2:
                 this.scheduleModalError = 'Maximum daily bicycling distance of '
-                  + data.errorMessage.value + ' miles will be exceeded for the event starting at ' + new Date(data.errorMessage.currentStartTime)  +' . Click Save to proceed anyways.';
+                  + data.errorMessage.value + ' miles will be exceeded for the event starting at ' + new Date(data.errorMessage.currentStartTime) + ' . Click Save to proceed anyways.';
                 break;
               case 3:
-              this.scheduleModalError = 'The event  starting at ' + new Date(data.errorMessage.currentStartTime) +
-              ' conflicts with meeting  '+ data.errorMessage.value +' starting at '+new Date(data.errorMessage.startTime)+ '. Click Save to proceed anyways.';
+                this.scheduleModalError = 'The event  starting at ' + new Date(data.errorMessage.currentStartTime) +
+                  ' conflicts with meeting  ' + data.errorMessage.value + ' starting at ' + new Date(data.errorMessage.startTime) + '. Click Save to proceed anyways.';
                 break;
               case 4:
-                this.scheduleModalError = 'The travel time for the event starting at '+ new Date(data.errorMessage.currentStartTime)  +' conflicts with event: '
+                this.scheduleModalError = 'The travel time for the event starting at ' + new Date(data.errorMessage.currentStartTime) + ' conflicts with event: '
                   + data.errorMessage.value + '. Click Save to proceed anyways.';
                 break;
               case 5:
-                this.scheduleModalError = 'This Event starting at '+ new Date(data.errorMessage.currentStartTime)  +' conflicts with the preferred Lunch Time Slot . Click Save to proceed anyways.';
+                this.scheduleModalError = 'This Event starting at ' + new Date(data.errorMessage.currentStartTime) + ' conflicts with the preferred Lunch Time Slot . Click Save to proceed anyways.';
                 break;
               case 6:
-                this.scheduleModalError = 'This Event starting at '+ new Date(data.errorMessage.currentStartTime)  +' conflicts with the preferred Dinner Time Slot . Click Save to proceed anyways.';
+                this.scheduleModalError = 'This Event starting at ' + new Date(data.errorMessage.currentStartTime) + ' conflicts with the preferred Dinner Time Slot . Click Save to proceed anyways.';
                 break;
               default:
-                this.scheduleModalError = 'This Event starting at '+ new Date(data.errorMessage.currentStartTime) +' is Conflicting. Click Save to proceed anyways.';
+                this.scheduleModalError = 'This Event starting at ' + new Date(data.errorMessage.currentStartTime) + ' is Conflicting. Click Save to proceed anyways.';
                 break;
             }
             $('#eventModal').modal('show');
             this.displayModalError = true;
             this.displayModalSave = false;
             this.forceSaveEvent = true;
-            this.event= Object.assign({},this.payloadArray[count - 1] );
+            this.event = Object.assign({}, this.payloadArray[count - 1]);
             this.event.eventStart = new Date(data.errorMessage.currentStartTime);
             this.event.eventEnd = new Date(data.errorMessage.currentStartTime + this.difference);
-            this.event.travelMode = this.payloadArray[count-1].travelMode.mode;
+            this.event.travelMode = this.payloadArray[count - 1].travelMode.mode;
             this.event.repeatMax = new Date(this.payloadArray[count - 1].repeatMax);
           }
           else {
             this.eventPayload.id = data;
             this.refresh.next();
           }
-          if (count == this.datesArray.length){
-            if(this.deleteArray.length < 1){
+          if (count == this.datesArray.length) {
+            if (this.deleteArray.length < 1) {
               $('#eventModal').modal('hide');
               this.displaySuccessMessage('All the Events have been added successfully');
               console.log(this.form);
@@ -746,7 +746,7 @@ export class CalendarViewComponent implements OnInit {
               }
               this.initEvent();
             }
-            else{
+            else {
               console.log(this.deleteArray);
             }
           }
@@ -757,13 +757,14 @@ export class CalendarViewComponent implements OnInit {
   }
 
   handleEvent(action: string, event: any): void {
-    this.modalData = { event, action };
-    this.modal.open(this.modalContent, { size: 'lg' });
+    this.modalData = {event, action};
+    this.modal.open(this.modalContent, {size: 'lg'});
   }
 
   openEventModal(): void {
     this.displayEventModal = true;
   }
+
   displaySuccessMessage(message): void {
     this.successMessage = message;
     this.displaySuccess = true;
@@ -795,7 +796,6 @@ export class CalendarViewComponent implements OnInit {
       this.event.repeatMax = undefined;
     }
   }
-
 
 
   changeLocation(): void {
@@ -885,7 +885,7 @@ export class CalendarViewComponent implements OnInit {
     });
   }
 
-  dayClicked({ date, events }: { date: Date; events: any[] }): void {
+  dayClicked({date, events}: { date: Date; events: any[] }): void {
     if (isSameMonth(date, this.viewDate)) {
       if (
         (isSameDay(this.viewDate, date) && this.activeDayIsOpen === true) ||
@@ -902,7 +902,9 @@ export class CalendarViewComponent implements OnInit {
   getEventActions(eventEndTime): CalendarEventAction[] {
     if (isPast(eventEndTime)) {
       return [];
-    } else { return this.eventActions; }
+    } else {
+      return this.eventActions;
+    }
   }
 
   enableMaxDateSelection(): void {
@@ -918,10 +920,10 @@ export class CalendarViewComponent implements OnInit {
 
 
   eventTimesChanged({
-    event,
-    newStart,
-    newEnd
-  }: CalendarEventTimesChangedEvent): void {
+                      event,
+                      newStart,
+                      newEnd
+                    }: CalendarEventTimesChangedEvent): void {
 
     if (isPast(newStart)) {
       // console.log("DRAGGED INTO PAST");

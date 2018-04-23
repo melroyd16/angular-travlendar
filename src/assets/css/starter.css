@@ -1,12 +1,11 @@
 body,
-html
-{
+html {
   margin: 0;
-  padding:0;
+  padding: 0;
   width: 100%;
   height: 100%;
-  background-repeat:no-repeat;
-  background-size:cover;
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 
 body,
@@ -177,6 +176,7 @@ p.copyright {
   margin-right: .75rem;
   margin-left: .75rem;
 }
+
 div.col-sm-7 a:link {
   text-decoration: none;
 }
@@ -192,7 +192,6 @@ div.col-sm-7 a:hover {
 div.col-sm-7 a:active {
   text-decoration: underline;
 }
-
 
 .jumbotron {
   position: absolute;
@@ -220,13 +219,16 @@ div.col-sm-7 a:active {
   filter: alpha(opacity=90); /* For IE8 and earlier */
   text-align: center
 }
-.row{
+
+.row {
   padding-top: 20px;
   margin-right: 0;
   margin-left: 0;
 
 }
 
-a { cursor: pointer;}
+a {
+  cursor: pointer;
+}
 
 

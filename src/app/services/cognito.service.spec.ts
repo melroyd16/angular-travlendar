@@ -1,6 +1,6 @@
-import { TestBed, inject } from '@angular/core/testing';
+import {TestBed, inject} from '@angular/core/testing';
 
-import { CognitoService } from './cognito.service';
+import {CognitoService} from './cognito.service';
 
 describe('CognitoService', () => {
   beforeEach(() => {

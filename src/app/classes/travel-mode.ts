@@ -1,4 +1,4 @@
-import { TextValue } from './text-value';
+import {TextValue} from './text-value';
 
 export class TravelMode {
   distance: TextValue;
