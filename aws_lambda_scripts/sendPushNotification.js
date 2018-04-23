@@ -4,8 +4,8 @@ var AWS = require('aws-sdk');
 
 exports.handler = (event, context, callback) => {
     console.log("aaaaaaaaaaaaa")
-
-  var snsApplicationARN = "arn:aws:sns:us-west-2:016911789346:app/GCM/PushNotificationExample2";
+  
+  var snsApplicationARN = "arn:aws:sns:us-west-2:016911789346:app/GCM/Travlendar";
   if (event == null){
     return;
   }else if (event.eventDetails == null){
@@ -88,23 +88,32 @@ exports.handler = (event, context, callback) => {
     if (timeInSeconds < 0){
       timeInSeconds = 0 - timeInSeconds
     }
-
-    var message = "You have the meeting at location " + destinationAddress + " in time " + parseInt(timeInSeconds/(60  * 1000)) + " mins";
+    
+    var message = "You have the meeting at location \"" + destinationAddress + "\" in " + parseInt(timeInSeconds/(60  * 1000)) + " mins";
     console.log("Message " + message);
-    var snsClient = new AWS.SNS()
+    var snsClient = new AWS.SNS();
+    
+    var pushMessage = {
+      "GCM": JSON.stringify({
+        notification: {
+          text: message,
+        }
+      })
+    }
 
     if(listOfEndPoints !== null && listOfEndPoints.length > 0){
       for(var i = 0 ; i < listOfEndPoints.length ; i++){
 
           var params = {
-              Message: JSON.stringify(event['eventDetails']),
+              Message: JSON.stringify(pushMessage),
+              MessageStructure: 'json',
               TargetArn: listOfEndPoints[i]
               // MessageAttributes: {
               // 'eventDetails': {
               // DataType: 'String', /* required */
               // StringValue: 'XXXXXXXXX'
               // }
-
+          
     };
 
           snsClient.publish(params, function(err, data){
@@ -119,6 +128,7 @@ exports.handler = (event, context, callback) => {
 
 
   function deleteRules(ruleName, policyId) {
+    return;
     var cloudwatchevents = new AWS.CloudWatchEvents();
     var lambda = new AWS.Lambda();
     var params = {
@@ -145,3 +155,5 @@ exports.handler = (event, context, callback) => {
     });
   }
 };
+
+
