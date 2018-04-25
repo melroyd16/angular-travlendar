@@ -331,7 +331,7 @@ export class CalendarViewComponent implements OnInit {
   }
 
   saveEvent(form): void {
-    if(form){
+    if(form && !this.event.isRepeat){
         form.reset();
         form.resetForm();
       }
