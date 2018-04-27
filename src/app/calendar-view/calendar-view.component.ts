@@ -331,10 +331,6 @@ export class CalendarViewComponent implements OnInit {
   }
 
   saveEvent(form): void {
-    if(form && !this.event.isRepeat){
-        form.reset();
-        form.resetForm();
-      }
     this.form = form;
     this.eventPayload = Object.assign({}, this.event);
     if (this.profileService.userProfile.lunchStartTime && this.profileService.userProfile.lunchStartTime !== 'Not_Set') {
