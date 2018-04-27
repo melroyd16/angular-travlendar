@@ -97,6 +97,8 @@ export class CalendarViewComponent implements OnInit {
   repeatDeleteChoice: any;
   forceSaveEvent = false;
   repeatEdit = false;
+  allowSave = true;
+  allowClickSave = true;
   deletePrompt = true;
   repeatDelete = false;
   displaySuccess = false;
@@ -244,6 +246,8 @@ export class CalendarViewComponent implements OnInit {
     this.forceSaveEvent = false;
     this.repeatDeleteChoice = '';
     this.repeatEdit = false;
+    this.allowSave = true;
+    this.allowClickSave = true;
     this.deletePrompt = true;
     this.repeatDelete = false;
     this.scheduleModalError = '';
@@ -801,6 +805,7 @@ export class CalendarViewComponent implements OnInit {
   changeLocation(): void {
     this.displayTravelModes = false;
     this.event.travelMode = null;
+    this.allowClickSave = true;
     this.travelModeArray = [];
     if (!(this.event.origin && this.event.origin.place_id)) {
       this.event.origin = this.homeLocation;
@@ -808,6 +813,11 @@ export class CalendarViewComponent implements OnInit {
     if (this.event.origin && this.event.origin.place_id && this.event.destination && this.event.destination.place_id) {
       this.calendarService.fetchTransitDetails(this.event.origin, this.event.destination).subscribe((data) => {
         this.travelModeArray = data;
+          for (let i = 0; i < this.travelModeArray.length; i++){
+            if(!this.travelModeArray[i].value.distance || !this.travelModeArray[i].value.distance ){
+              this.allowClickSave = false;
+            }
+        }
         this.displayTravelModes = true;
         this.ref.tick();
       });
@@ -916,6 +926,38 @@ export class CalendarViewComponent implements OnInit {
     $('#repeatEditModal').modal('hide');
   }
 
+  eventClick({
+    event
+  }: any): void {
+    for (let i = 0; i < this.events.length; i++) {
+      this.allowSave = false;
+      this.allowClickSave
+      $('#eventModal').modal('toggle');
+      if (event.id === this.events[i].id) {
+        this.event.id = event.id;
+        this.event.eventTitle = event.title;
+        this.event.eventStart = event.start;
+        this.event.eventEnd = event.end;
+        this.event.origin = event.origin;
+        this.event.otherLocation = event.origin.formatted_address;
+        this.event.destination = event.destination;
+        this.event.eventLocation = event.destination.formatted_address;
+        this.event.isRepeat = event.isRepeat;
+        this.event.repeatMax = event.repeatMax;
+        this.event.repeatPreference = event.repeatPreference;
+        this.changeLocation();
+        this.event.travelMode = event.travelMode.mode;
+        this.selectedPriorLocation = 'other';
+        if (this.event.origin.place_id && this.event.origin.place_id === this.homeLocation.place_id) {
+          this.selectedPriorLocation = 'home';
+        }
+        if (this.event.origin.place_id && this.event.origin.place_id === this.workLocation.place_id) {
+          this.selectedPriorLocation = 'work';
+        }
+        break;
+      }
+    }
+  }
 
   eventTimesChanged({
     event,
@@ -943,4 +985,5 @@ export class CalendarViewComponent implements OnInit {
     }
 
   }
+
 }
